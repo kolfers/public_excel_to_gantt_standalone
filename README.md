@@ -2,6 +2,8 @@
 
 A self-contained HTML/JS tool that reads your Excel planning file and generates an interactive, beautiful Gantt chart directly in your browser. No server, no Python, and no installations are required. Your data never leaves your computer because all parsing and rendering happens locally in your browser.
 
+**Live App:** [https://kolfers.github.io/public_excel_to_gantt_standalone/](https://kolfers.github.io/public_excel_to_gantt_standalone/) 
+
 ## Quick Start
 
 1. Open `gantt_standalone.html` in any modern web browser (Edge, Chrome, Firefox, Safari).
