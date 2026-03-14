@@ -1,0 +1,1 @@
+- Fix tooltips for hidden depency icon
