@@ -38,6 +38,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh
   font-size:.8rem;font-weight:700;white-space:nowrap;flex-shrink:0;cursor:pointer;
   display:none;align-items:center;justify-content:center;height:22px;box-sizing:border-box;gap:2px;transition:background .15s}
 .snap-pill:hover{background:#4b5563}
+.toolbar-pills{display:flex;flex-direction:column;gap:2px;margin-left:8px;width:160px;}
 
 /* View buttons */
 .btn{background:var(--bg);border:1px solid var(--border-md);color:var(--text);border-radius:5px;
@@ -134,13 +135,15 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .left-row.ghost-cat{background:var(--surface);opacity:.5;padding-left:16px;cursor:pointer}
 .cat-stats{font-size:.66rem;color:var(--text-lt);margin-left:5px;flex-shrink:0;cursor:help;white-space:nowrap}
 /* Compact mode overrides */
-#left-panel.compact-mode{width:105px!important;min-width:105px!important}
-#left-panel.compact-mode #left-header{height:auto;flex-direction:column;align-items:stretch;padding:6px 4px;gap:4px}
-#left-panel.compact-mode .tasks-label{text-align:center;margin:0;font-size:.65rem;border-bottom:1px dashed var(--border-md);padding-bottom:2px}
-#left-panel.compact-mode .filter-btns{flex-direction:column;gap:3px;align-items:stretch}
-#left-panel.compact-mode .fbtn{font-size:.68rem;padding:3px 2px;text-align:center}
-#left-panel.compact-mode #left-subheader{flex-direction:column;height:auto;padding:4px 0;gap:4px}
-#left-panel.compact-mode #left-subheader .compact-btn{font-size:.68rem;width:100%;text-align:center}
+#left-panel.compact-mode{width:135px!important;min-width:135px!important}
+#left-panel.compact-mode .tasks-label{display:none}
+#left-panel.compact-mode #left-header{padding:6px 4px;gap:3px;height:28px;}
+#left-panel.compact-mode .filter-btns{gap:3px;}
+#left-panel.compact-mode .add-global-btn{font-size:.65rem;padding:2px 5px;}
+#left-panel.compact-mode .fbtn{font-size:.65rem;padding:2px 5px;}
+#left-panel.compact-mode #left-subheader{padding:6px 4px;gap:2px;justify-content:space-between;height:28px;}
+#left-panel.compact-mode #left-subheader .compact-btn{font-size:.65rem;padding:2px 4px;width:auto;}
+#left-panel.compact-mode .overdue-tag{display:none;}
 
 /* Right panel */
 #right-panel{flex:1;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
@@ -164,6 +167,14 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 #tooltip .tt-diff-curr{color:#16a34a;font-weight:700;margin-left:6px}
 #tooltip .tt-diff-snap{color:#991b1b;font-weight:700;margin-left:6px}
 /* Responsive toolbar */
+.txt-short { display: none; }
+@media(max-width:1465px){
+  .txt-full { display: none !important; }
+  .txt-short { display: inline !important; }
+  .app-title { width: 135px; justify-content: flex-start; padding-left: 12px; }
+  .toolbar-pills { width: 95px; }
+  select#compare-sel { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+}
 @media(max-width:960px){
   .compare-label{display:none}
   select#compare-sel{max-width:140px;font-size:.7rem}
@@ -239,7 +250,7 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .drop-card {
     background: var(--bg); border-radius: 12px; padding: 40px; text-align: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px dashed var(--border-md);
-    width: 440px; max-width: 90%;
+    width: 600px; max-width: 90%;
 }
 .drop-card.dragover { border-color: var(--accent); background: #f0f9ff; }
 .drop-title { font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
@@ -319,7 +330,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 
 <!-- Landing / drop zone -->
 <div id="landing-zone">
-    <div class="drop-card" id="drop-card">
+    <div class="drop-card" id="drop-card" style="position: relative;">
         <div class="drop-title">&#128200; Gantt Chart Viewer</div>
         <div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>
         <div class="drop-version">v1.4</div>
@@ -340,9 +351,10 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         <div style="display: flex; justify-content: center;">
             <button class="browse-btn" data-action="browseFile">&#128193; Browse&hellip;</button>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-top: 25px;">
-            <button class="browse-btn" data-action="startEmptyChart" style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md);">&#128196; Start Empty Chart</button>
-            <button class="browse-btn" data-action="loadExampleData" style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md);">&#128202; Load example</button>
+        <div style="display: flex; justify-content: space-between; margin-top: 25px; gap: 8px;">
+            <button class="btn template-download-btn" data-action="downloadTemplate" data-tooltip="Download full app as-is for offline use" style="padding: 6px 12px; font-size: 0.85em; border: 1px solid #16a34a; background: #f0fdf4; color: #16a34a; font-weight: 600; cursor: pointer; border-radius: 4px; flex: 1;">&#128229; Download</button>
+            <button class="browse-btn" data-action="startEmptyChart" style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md); flex: 1;">&#128196; Empty Chart</button>
+            <button class="browse-btn" data-action="loadExampleData" style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md); flex: 1;">&#128202; Load Example</button>
         </div>
         <input type="file" id="file-input" accept=".xlsx,.xlsm" style="display: none;">
     </div>
@@ -355,7 +367,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <header id="toolbar">
     <div class="toolbar-left">
       <span class="app-title" id="app-title">Gantt Chart</span>
-      <div style="display:flex; flex-direction:column; gap:2px; margin-left:8px; width:160px;">
+      <div class="toolbar-pills">
           <span class="date-pill" id="date-pill" style="display:none; text-align:center; width:100%; box-sizing:border-box;" data-action="reloadFile" data-tooltip="Current plan generation date. Click to reload the loaded file and pick up external changes."></span>
           <select id="compare-sel" style="width:100%; box-sizing:border-box;">
             <option value="">&#8212; compare &#8212;</option>
@@ -366,25 +378,25 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       </div>
       <div style="display:flex; flex-direction:column; gap:3px; align-items:stretch;">
         <button class="cbtn" id="stats-btn" data-action="toggleFlyout"
-                style="display:none; width:100%; justify-content:center;" data-tooltip="Toggle comparison stats panel">&#9783;&thinsp;Stats</button>
+                style="display:none; width:100%; justify-content:center;" data-tooltip="Toggle comparison stats panel">&#9783;&thinsp;<span class="txt-full">Stats</span></button>
         <button class="cbtn" id="changes-only-btn" data-action="toggleChangesOnly"
-                style="display:none; width:100%; justify-content:center;" data-tooltip="Show only changed items">&#8800;&thinsp;Changes</button>
+                style="display:none; width:100%; justify-content:center;" data-tooltip="Show only changed items">&#8800;&thinsp;<span class="txt-full">Changes</span></button>
       </div>
     </div>
     <div class="toolbar-center">
       <div class="btn-group" id="view-btns">
-        <button class="btn" id="btn-week"  data-action="setView" data-value="week" data-tooltip="Week view">Week</button>
-        <button class="btn active" id="btn-month" data-action="setView" data-value="month" data-tooltip="Month view">Month</button>
-        <button class="btn" id="btn-year"  data-action="setView" data-value="year" data-tooltip="Year view">Year</button>
+        <button class="btn" id="btn-week"  data-action="setView" data-value="week" data-tooltip="Week view"><span class="txt-full">Week</span><span class="txt-short">W</span></button>
+        <button class="btn active" id="btn-month" data-action="setView" data-value="month" data-tooltip="Month view"><span class="txt-full">Month</span><span class="txt-short">M</span></button>
+        <button class="btn" id="btn-year"  data-action="setView" data-value="year" data-tooltip="Year view"><span class="txt-full">Year</span><span class="txt-short">Y</span></button>
       </div>
       <button class="btn icon-btn" data-action="navigate" data-value="-1" data-tooltip="Previous time period">&#8592;</button>
-      <button class="btn today-btn" data-action="goToday" data-tooltip="Jump to today">Today</button>
+      <button class="btn today-btn" data-action="goToday" data-tooltip="Jump to today"><span class="txt-full">Today</span><span class="txt-short">T</span></button>
       <button class="btn icon-btn" data-action="navigate" data-value="1" data-tooltip="Next time period">&#8594;</button>
     </div>
     <div class="toolbar-right">
-      <span id="unsaved-warning" class="unsaved-warning" style="display:none;">!! Unsaved Changes !!</span>
-      <button class="btn" id="save-btn" data-action="saveSnapshot" style="margin-right:12px; border-color:#16a34a; color:#16a34a;" data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file.">&#128190; Save Excel</button>
-      <button class="btn" id="export-btn" data-action="exportChart" style="margin-right:12px; border-color:#2563eb; color:#2563eb;" data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart.">&#128228; Export Chart</button>
+      <span id="unsaved-warning" class="unsaved-warning" style="display:none;"><span class="txt-full">!! Unsaved Changes !!</span><span class="txt-short">!!</span></span>
+      <button class="btn" id="save-btn" data-action="saveSnapshot" style="margin-right:12px; border-color:#16a34a; color:#16a34a;" data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file.">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short"> Save</span></button>
+      <button class="btn" id="export-btn" data-action="exportChart" style="margin-right:12px; border-color:#2563eb; color:#2563eb;" data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart.">&#128228;<span class="txt-full"> Export Chart</span><span class="txt-short"> Export</span></button>
       <button class="btn" id="info-btn" data-action="toggleInfoPanel" style="border-color:#d97706; color:#d97706;" data-tooltip="View application info and version">&#10067; Info</button>
     </div>
   </header>
@@ -1186,7 +1198,7 @@ function saveSnapshot() {
     }, 200);
 }
 
-function exportChart() {
+function exportChart(asTemplate = false) {
     const rootClone = document.documentElement.cloneNode(true);
     
     // Clean up dynamic UI elements
@@ -1196,37 +1208,47 @@ function exportChart() {
     if (hdr) hdr.innerHTML = '';
     const lrows = rootClone.querySelector('#left-rows');
     if (lrows) lrows.innerHTML = '';
-    const landing = rootClone.querySelector('#landing-zone');
-    if (landing) landing.style.display = 'none';
-    const app = rootClone.querySelector('#app');
-    if (app) app.style.display = 'flex';
+    
+    // For Read-Only Export, we hide the landing zone and show the app.
+    // For Template Download, we want to leave the landing zone visible and the app hidden.
+    if (!asTemplate) {
+        const landing = rootClone.querySelector('#landing-zone');
+        if (landing) landing.style.display = 'none';
+        const app = rootClone.querySelector('#app');
+        if (app) app.style.display = 'flex';
+    }
+    
     const tt = rootClone.querySelector('#tooltip');
     if (tt) tt.style.display = 'none';
     const flyout = rootClone.querySelector('#flyout-pane');
     if (flyout) { flyout.classList.remove('open'); flyout.style.transform = ''; }
     
     // Hide UI elements that shouldn't appear in export
-    const sbtn = rootClone.querySelector('#save-btn'); if(sbtn) sbtn.style.display='none';
-    const ebtn = rootClone.querySelector('#export-btn'); if(ebtn) ebtn.style.display='none';
-    const unsavedWarn = rootClone.querySelector('#unsaved-warning'); if(unsavedWarn) unsavedWarn.style.display='none';
-    const tb = rootClone.querySelector('#toolbar'); if(tb) tb.classList.remove('toolbar-unsaved');
-    const datePill = rootClone.querySelector('#date-pill'); 
-    if(datePill) {
-        datePill.removeAttribute('onclick');
-        datePill.removeAttribute('data-action');
-        datePill.style.cursor = 'default';
-        datePill.dataset.tooltip = 'Exported snapshot';
-        datePill.removeAttribute('title');
+    if (!asTemplate) {
+        const sbtn = rootClone.querySelector('#save-btn'); if(sbtn) sbtn.style.display='none';
+        const ebtn = rootClone.querySelector('#export-btn'); if(ebtn) ebtn.style.display='none';
+        const unsavedWarn = rootClone.querySelector('#unsaved-warning'); if(unsavedWarn) unsavedWarn.style.display='none';
+        const tb = rootClone.querySelector('#toolbar'); if(tb) tb.classList.remove('toolbar-unsaved');
+        const datePill = rootClone.querySelector('#date-pill'); 
+        if(datePill) {
+            datePill.removeAttribute('onclick');
+            datePill.removeAttribute('data-action');
+            datePill.style.cursor = 'default';
+            datePill.dataset.tooltip = 'Exported snapshot';
+            datePill.removeAttribute('title');
+        }
     }
 
     let htmlStr = "<!DOCTYPE html>\n<html lang=\"en\">\n" + rootClone.innerHTML + "\n</html>";
     
-    // Set IS_EXPORTED to true
-    htmlStr = htmlStr.replace("window.IS_EXPORTED = false;", "window.IS_EXPORTED = true;");
-    
-    // Replace DATA initialization.
-    const safeJsonStr = JSON.stringify(DATA).replace(/</g, '\\u003c');
-    htmlStr = htmlStr.replace(/\/\/ ==EXPORT_DATA_PLACEHOLDER==[\s\S]*?let DATA =[^;]+;/, "// ==EXPORT_DATA_PLACEHOLDER==\nlet DATA = " + safeJsonStr + ";");
+    if (!asTemplate) {
+        // Set IS_EXPORTED to true
+        htmlStr = htmlStr.replace("window.IS_EXPORTED = false;", "window.IS_EXPORTED = true;");
+        
+        // Replace DATA initialization.
+        const safeJsonStr = JSON.stringify(DATA).replace(/</g, '\\u003c');
+        htmlStr = htmlStr.replace(/\/\/ ==EXPORT_DATA_PLACEHOLDER==[\s\S]*?let DATA =[^;]+;/, "// ==EXPORT_DATA_PLACEHOLDER==\nlet DATA = " + safeJsonStr + ";");
+    }
     
     const blob = new Blob([htmlStr], {type: "text/html;charset=utf-8"});
     const url = URL.createObjectURL(blob);
@@ -1234,12 +1256,15 @@ function exportChart() {
     a.style.display = 'none';
     a.href = url;
     
-    let originalName = DATA.meta.source_file || 'Plan';
-    let baseName = originalName.lastIndexOf('.') > 0 ? originalName.substring(0, originalName.lastIndexOf('.')) : originalName;
-    const now = new Date();
-    const dateStr = formatDateStr(now);
-    
-    a.download = `gantt_${baseName}_${dateStr}.html`;
+    if (asTemplate) {
+        a.download = `gantt_standalone.html`;
+    } else {
+        let originalName = DATA.meta.source_file || 'Plan';
+        let baseName = originalName.lastIndexOf('.') > 0 ? originalName.substring(0, originalName.lastIndexOf('.')) : originalName;
+        const now = new Date();
+        const dateStr = formatDateStr(now);
+        a.download = `gantt_${baseName}_${dateStr}.html`;
+    }
     
     document.body.appendChild(a);
     a.click();
@@ -1352,8 +1377,19 @@ function toggleCompact() {
   if (lp) lp.classList.toggle('compact-mode', AppState.compactMode);
   const tb = document.getElementById('toolbar');
   if (tb) tb.classList.toggle('compact-mode', AppState.compactMode);
+  
   const btn = document.getElementById('compact-btn');
   if (btn) btn.textContent = AppState.compactMode ? '\u25B7 Full' : '\u25C1 Compact';
+  
+  const fbUnfinished = document.getElementById('fb-unfinished');
+  if (fbUnfinished) fbUnfinished.textContent = AppState.compactMode ? 'Act' : 'Active';
+  
+  const fbOverdue = document.getElementById('fb-overdue');
+  if (fbOverdue) fbOverdue.textContent = AppState.compactMode ? 'Due' : 'Overdue';
+  
+  const addBtn = document.querySelector('.add-global-btn');
+  if (addBtn) addBtn.textContent = AppState.compactMode ? '+' : 'Add +';
+  
   render();
 }
 
@@ -1370,7 +1406,11 @@ function _setCompareUI(label) {
     if (sel) sel.style.display = 'none';
     if (pill) {
       pill.style.display = 'inline-flex';
-      pill.innerHTML = `<span>vs ${escHtml(label)}</span><span class="flyout-close" style="position:static;font-size:1.1rem;padding:0;margin-left:4px" data-action="clearCompare">&times;</span>`;
+      const parts = label.split(' ');
+      let shortLabel = parts[0] || label;
+      const dParts = shortLabel.split('-');
+      if (dParts.length === 3) shortLabel = dParts[0] + '-' + dParts[1];
+      pill.innerHTML = `<span><span class="txt-full">${escHtml(label)}</span><span class="txt-short">${escHtml(shortLabel)}</span></span><span class="flyout-close" style="position:static;font-size:1.1rem;padding:0;margin-left:4px;color:#fff;" data-action="clearCompare">&times;</span>`;
     }
     if (btn) {
       btn.style.display = 'inline-flex';
@@ -1564,7 +1604,7 @@ function renderLeft(visible, today, statsMap) {
       const chev = document.createElement('span'); chev.className='chevron';
       chev.textContent = AppState.collapsed['p:'+r.phase] ? '\u25b6' : '\u25bc'; div.appendChild(chev);
       const lbl = document.createElement('div'); lbl.className='row-label'; lbl.style.flex='1';
-      lbl.textContent = (r.ghost?'\u27f3 ':'')+trimTitle(r.phase, AppState.compactMode, 7); div.appendChild(lbl);
+      lbl.textContent = (r.ghost?'\u27f3 ':'')+trimTitle(r.phase, AppState.compactMode, 11); div.appendChild(lbl);
       // Milestone indicators (only for real, non-ghost phase rows)
       if (!r.ghost && !AppState.compactMode) {
         const phaseTasks = AppState.currentTasks.filter(t => t.Phase === r.phase && isMilestoneTask(t));
@@ -1619,7 +1659,7 @@ function renderLeft(visible, today, statsMap) {
       chev.textContent = AppState.collapsed['c:'+r.phase+':'+r.cat] ? '\u25b6' : '\u25bc'; div.appendChild(chev);
       const lbl = document.createElement('div'); lbl.className='row-label'; lbl.style.overflow='hidden';
       const lblText = document.createElement('span'); lblText.className='row-label-text';
-      lblText.textContent=trimTitle(r.cat, AppState.compactMode, 5); lbl.appendChild(lblText);
+      lblText.textContent=trimTitle(r.cat, AppState.compactMode, 9); lbl.appendChild(lblText);
       if (!r.ghost) {
         const sk = r.phase+'||'+r.cat; const st = statsMap[sk]||{total:0,active:0,overdue:0,done:0};
         const stats = document.createElement('span'); stats.className='cat-stats';
@@ -1661,7 +1701,7 @@ function renderLeft(visible, today, statsMap) {
       const titleSpan = document.createElement('span'); titleSpan.className='row-label-text';
       const rawTaskTitle = r.task.Title || '';
       const dispTaskTitle = rawTaskTitle.replace(/\(milestone\)/gi,'').trim();
-      titleSpan.textContent = (r.ghost?'\u27f3 ':'')+trimTitle(dispTaskTitle, AppState.compactMode, 5);
+      titleSpan.textContent = (r.ghost?'\u27f3 ':'')+trimTitle(dispTaskTitle, AppState.compactMode, 7);
       titleSpan.dataset.tooltip = rawTaskTitle;
       titleSpan.style.background = '#fff';
       titleSpan.style.color = '#000';
@@ -2073,31 +2113,25 @@ function hideTooltip(){document.getElementById('tooltip').style.display='none';}
 let _toolbarHoverX = 0, _toolbarHoverY = 0;
 let _toolbarTimer = null;
 
+const UNSAVED_WARNING_HTML = '<div style="max-width:250px; white-space:normal;"><b>Unsaved changes are active</b><br/><br/>You have modified the Gantt chart in memory.<br/>&bull; Click <b>Save Excel</b> to commit changes.<br/>&bull; Click the <b>green date indicator on the top left</b> to discard and reload.</div>';
+
 function onToolbarMove(e) {
-  // Ignore if hovering over interactive elements
-  if (e.target.closest('button') || e.target.closest('.btn') || e.target.id === 'unsaved-warning' || e.target.closest('.date-pill') || e.target.id === 'snap-pill') {
+  // Ignore if hovering over interactive elements, EXCEPT for the unsaved warning itself
+  if (e.target.closest('button') || e.target.closest('.btn') || e.target.closest('.date-pill') || e.target.id === 'snap-pill') {
     clearTimeout(_toolbarTimer);
     _toolbarTimer = null;
     hideTooltip();
     return;
   }
   
-  _toolbarHoverX = e.pageX;
-  _toolbarHoverY = e.pageY;
+  _toolbarHoverX = e.clientX;
+  _toolbarHoverY = e.clientY;
   
   if (!AppState.unsavedChanges) return;
   
   if (!_toolbarTimer) {
      _toolbarTimer = setTimeout(() => {
-         const tt = document.getElementById('tooltip');
-         tt.innerHTML = '<div style="max-width:250px; white-space:normal; line-height:1.4;"><b>Unsaved changes are active</b><br/><br/>You have modified the Gantt chart in memory.<br/>&bull; Click <b>Save Excel</b> to commit changes.<br/>&bull; Click the <b>green date indicator on the top left</b> to discard and reload.</div>';
-         tt.style.display = 'block';
-         
-         let x = _toolbarHoverX + 15;
-         let y = _toolbarHoverY + 15;
-         if (x + 280 > window.innerWidth) x = window.innerWidth - 280;
-         tt.style.left = x + 'px';
-         tt.style.top = y + 'px';
+         showHTMLTooltip({clientX: _toolbarHoverX, clientY: _toolbarHoverY, stopPropagation:()=>{}}, UNSAVED_WARNING_HTML);
      }, 600);
   }
 }
@@ -2189,12 +2223,6 @@ function updateFlyout(){
   }
   // Show stats button
   if(statsBtn) statsBtn.style.display='inline-flex';
-  // Auto-open pane the first time a comparison is activated
-  if(!flyoutOpen){
-    flyoutOpen=true;
-    if(pane) pane.classList.add('open');
-    if(statsBtn) statsBtn.classList.add('active');
-  }
   const today=new Date(); today.setHours(0,0,0,0);
   const snapTasks=DATA.snapshots[AppState.compareLabel]||[];
   const snapById={};
@@ -2508,6 +2536,7 @@ function initEvents() {
                 case 'reloadFile': reloadFile(); break;
                 case 'saveSnapshot': saveSnapshot(); break;
                 case 'exportChart': exportChart(); break;
+                case 'downloadTemplate': exportChart(true); break;
                 case 'startEmptyChart': startEmptyChart(); break;
                 case 'loadExampleData': loadExampleData(); break;
                 case 'setFilter': setFilter(val); break;
@@ -2536,6 +2565,8 @@ function initEvents() {
         const tooltipEl = e.target.closest('[data-tooltip]');
         if (tooltipEl) {
             showSimpleTooltip(e, tooltipEl.dataset.tooltip);
+        } else if (e.target.closest('#unsaved-warning')) {
+            showHTMLTooltip(e, UNSAVED_WARNING_HTML);
         } else if (e.target.closest('#toolbar')) {
             onToolbarMove(e);
         }
@@ -2543,10 +2574,22 @@ function initEvents() {
 
     document.body.addEventListener('mouseout', (e) => {
         if (e.target.closest('[data-tooltip]')) hideTooltip();
+        if (e.target.closest('#unsaved-warning')) hideTooltip();
         if (e.target.closest('#toolbar')) onToolbarOut(e);
     });
     _eventsInit = true;
 }
+
+// ── Auto-Compact Resize Logic ─────────────────────────────────────────
+let _wasNarrow = window.innerWidth <= 1465;
+window.addEventListener('resize', () => {
+    const isNarrow = window.innerWidth <= 1465;
+    if (isNarrow !== _wasNarrow) {
+        _wasNarrow = isNarrow;
+        if (isNarrow && !AppState.compactMode) toggleCompact();
+        else if (!isNarrow && AppState.compactMode) toggleCompact();
+    }
+});
 
 // ── Init ──────────────────────────────────────────────────────────────
 function init(){
@@ -2561,10 +2604,22 @@ function init(){
   let src=String(meta.source_file||'Gantt Chart');
   src = src.replace(/\.xls[xm]?$/i, '');
   const trimmed=src.length>30?src.slice(0,30):src;
+  const narrowed=src.length>5?src.slice(0,5)+'..':src;
   const titleEl=document.getElementById('app-title');
-  if(titleEl) titleEl.textContent=trimmed;
+  if(titleEl) titleEl.innerHTML=`<span class="txt-full">${escHtml(trimmed)}</span><span class="txt-short">${escHtml(narrowed)}</span>`;
   const pillEl=document.getElementById('date-pill');
-  if(pillEl){ pillEl.innerHTML=meta.generated_at ? meta.generated_at + '&thinsp;&#x21A9;&#xFE0E;' : ''; pillEl.style.display=meta.generated_at?'inline-flex':'none'; }
+  if(pillEl){
+      if (meta.generated_at) {
+          const parts = meta.generated_at.split(' ');
+          let shortDate = parts[0] || meta.generated_at;
+          const dParts = shortDate.split('-');
+          if (dParts.length === 3) shortDate = dParts[0] + '-' + dParts[1];
+          pillEl.innerHTML=`<span class="txt-full">${meta.generated_at}</span><span class="txt-short">${shortDate}</span>&thinsp;&#x21A9;&#xFE0E;`;
+      } else {
+          pillEl.innerHTML = '';
+      }
+      pillEl.style.display=meta.generated_at?'inline-flex':'none'; 
+  }
 
   AppState.currentTasks.forEach(t=>catColor(t.Category));
   const dates=AppState.currentTasks.map(t=>parseDate(t['Start Date'])).filter(Boolean);
@@ -2573,6 +2628,11 @@ function init(){
   AppState.viewportStart=startOf(today<earliest?earliest:today,'month');
   AppState.viewportStart=addDays(AppState.viewportStart,-7);
   populateCompare();
+  
+  if (window.innerWidth <= 1465 && !AppState.compactMode) {
+      toggleCompact();
+  }
+
   initDragScroll();
   initEvents();
   render();
