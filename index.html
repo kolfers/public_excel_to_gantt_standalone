@@ -16,6 +16,80 @@
   --green-old:#008000;--gray-500:#6b7280;--gray-600:#4b5563;
   --toolbar-h:64px;--left-w:270px;--row-h:34px;--head-h:56px;
   --font:'Segoe UI',system-ui,sans-serif;
+  
+  /* Semantic tokens */
+  --header-bg: var(--slate-700);
+  --header-text: #ffffff;
+  --pill-date-bg: var(--green-800);
+  --pill-date-hover: var(--green-900);
+  --btn-active-bg: var(--slate-700);
+  --btn-hover-bg: var(--surface2);
+  --row-phase-bg: var(--slate-700);
+  --row-phase-text: #f8fafc;
+  --row-task-hover: var(--surface2);
+  --tooltip-bg: #ffffff;
+  --modal-overlay: rgba(0,0,0,0.4);
+  --modal-header-bg: var(--surface);
+  --timeline-line: var(--surface2);
+  --timeline-grid: var(--border);
+  /* Status Colors */
+  --status-done: #22c55e;
+  --status-on-track: #3b82f6;
+  --status-behind: #ef4444;
+  --status-waiting: #eab308;
+
+  /* Category Colors */
+  --cat-1: #0d9488; --cat-2: #d97706; --cat-3: #0284c7; --cat-4: #e11d48; --cat-5: #65a30d;
+  --cat-6: #ea580c; --cat-7: #0891b2; --cat-8: #db2777; --cat-9: #059669; --cat-10: #4338ca;
+}
+
+[data-theme='dark'] {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface2: #334155;
+  --border: #334155;
+  --border-md: #475569;
+  --text: #f1f5f9;
+  --text-mu: #94a3b8;
+  --text-lt: #64748b;
+  --accent: #38bdf8;
+  --today: #fbbf24;
+  --danger: #ef4444;
+  --slate-700: #1e293b;
+  --slate-600: #334155;
+  --green-800: #064e40;
+  --green-900: #065f46;
+  --green-old: #059669;
+  --gray-500: #94a3b8;
+  --gray-600: #cbd5e1;
+
+  /* Status Colors */
+  --status-done: #10b981;
+  --status-on-track: #60a5fa;
+  --status-behind: #f87171;
+  --status-waiting: #fbbf24;
+
+  /* Category Colors */
+  --cat-1: #2dd4bf; --cat-2: #fbbf24; --cat-3: #38bdf8; --cat-4: #fb7185; --cat-5: #a3e635;
+  --cat-6: #fb923c; --cat-7: #22d3ee; --cat-8: #f472b6; --cat-9: #34d399; --cat-10: #818cf8;
+
+  /* Semantic tokens for dark mode */
+  --header-bg: #1e293b;
+  --header-text: #f1f5f9;
+  --pill-date-bg: #064e40;
+  --pill-date-hover: #065f46;
+  --btn-active-bg: #38bdf8;
+  --btn-hover-bg: #334155;
+  --row-phase-bg: #334155;
+  --row-phase-text: #f1f5f9;
+  --row-task-hover: #1e293b;
+  --tooltip-bg: #1e293b;
+  --modal-overlay: rgba(0,0,0,0.7);
+  --modal-header-bg: #1e293b;
+  --timeline-line: #1e293b;
+  --timeline-grid: #334155;
+  --shadow: rgba(0,0,0,0.4);
+  --glow: rgba(239, 68, 68, 0.6);
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
 #app{display:flex;flex-direction:column;height:100vh}
@@ -28,12 +102,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh
 .toolbar-right{display:flex;align-items:center;gap:6px;flex:1;justify-content:flex-end}
 
 /* Title & pills */
-.app-title{background:var(--slate-700);color:#fff;font-size:1.5rem;font-weight:700;white-space:nowrap;
+.app-title{background:var(--header-bg);color:var(--header-text);font-size:1.5rem;font-weight:700;white-space:nowrap;
   flex-shrink:0;cursor:default;width:270px;height:100%;display:flex;align-items:center;justify-content:center;box-sizing:border-box;}
-.date-pill{background:var(--green-800);color:#fff;border-radius:10px;padding:0 10px;
+.date-pill{background:var(--pill-date-bg);color:#fff;border-radius:10px;padding:0 10px;
   font-size:.8rem;font-weight:700;white-space:nowrap;flex-shrink:0;cursor:pointer;transition:background .15s;
   height:22px;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;}
-.date-pill:hover{background:var(--green-900)}
+.date-pill:hover{background:var(--pill-date-hover)}
 .snap-pill{background:#6b7280;color:#fff;border-radius:10px;padding:0 10px;
   font-size:.8rem;font-weight:700;white-space:nowrap;flex-shrink:0;cursor:pointer;
   display:none;align-items:center;justify-content:center;height:22px;box-sizing:border-box;gap:2px;transition:background .15s}
@@ -43,8 +117,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh
 /* View buttons */
 .btn{background:var(--bg);border:1px solid var(--border-md);color:var(--text);border-radius:5px;
   padding:4px 12px;font-size:.79rem;cursor:pointer;transition:background .1s;font-family:var(--font)}
-.btn:hover{background:var(--surface2)}
-.btn.active{background:var(--slate-700);color:#fff;border-color:var(--slate-700);font-weight:600}
+.btn:hover{background:var(--btn-hover-bg)}
+.btn.active{background:var(--btn-active-bg);color:#fff;border-color:var(--btn-active-bg);font-weight:600}
 .btn-group{display:flex;border-radius:5px;overflow:hidden;border:1px solid var(--border-md)}
 .btn-group .btn{border:none;border-radius:0;border-right:1px solid var(--border-md)}
 .btn-group .btn:last-child{border-right:none}
@@ -56,7 +130,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh
 .compare-label{font-size:.9rem;font-weight:700;color:var(--text-mu);white-space:nowrap;flex-shrink:0;cursor:default}
 select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:var(--text);
   border-radius:5px;padding:3px 7px;font-size:.74rem;cursor:pointer;font-family:var(--font);
-  max-width:200px}
+  max-width:200px; font-weight:bold;text-align:center; text-align-last:center;}
 .cbtn{background:transparent;border:1px solid var(--border-md);color:var(--text-mu);
   border-radius:5px;padding:0 9px;font-size:.72rem;cursor:pointer;font-family:var(--font);
   white-space:nowrap;transition:background .15s,color .15s,border-color .15s;
@@ -65,13 +139,13 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .cbtn.active{background:var(--danger);color:#fff;border-color:var(--danger);font-weight:600}
 
 .unsaved-warning {
-  color: #ef4444;
+  color: var(--danger);
   font-weight: 800;
   font-size: 0.95rem;
   margin-right: 12px;
   padding: 2px 8px;
   white-space: nowrap;
-  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+  text-shadow: -1px -1px 0 var(--bg), 1px -1px 0 var(--bg), -1px 1px 0 var(--bg), 1px 1px 0 var(--bg);
 }
 
 .toolbar-unsaved { background-color: #fefce8 !important; transition: background-color 0.3s; }
@@ -103,9 +177,9 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
   border-radius:4px;padding:2px 8px;font-size:.72rem;cursor:pointer;font-family:var(--font);
   white-space:nowrap;transition:background .1s;flex-shrink:0}
 .xbtn:hover{background:var(--surface2);color:var(--text)}
-.add-global-btn{background:var(--slate-700);color:#fff;border:none;border-radius:4px;padding:2px 8px;
+.add-global-btn{background:var(--btn-active-bg);color:#fff;border:none;border-radius:4px;padding:2px 8px;
   font-size:.68rem;font-weight:400;cursor:pointer;font-family:var(--font);transition:background .1s;white-space:nowrap;flex-shrink:0}
-.add-global-btn:hover{background:var(--slate-600)}
+.add-global-btn:hover{filter: brightness(1.1);}
 #left-rows{overflow-y:auto;overflow-x:hidden;flex:1}
 #left-rows::-webkit-scrollbar{width:3px}
 #left-rows::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:2px}
@@ -115,11 +189,11 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
   flex-shrink:0;width:14px;display:inline-flex;justify-content:center}
 .row-label{font-size:.77rem;overflow:hidden;text-overflow:ellipsis;flex:1;color:var(--text);
   display:flex;align-items:center;gap:0;min-width:0}
-.row-label-text{overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0}
+.row-label-text{overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;border-width:2px!important}
 .overdue-tag{font-size:.65rem;font-weight:600;margin-left:4px;white-space:nowrap;flex-shrink:0}
 .status-pill{font-size:.58rem;font-weight:700;padding:1px 6px;border-radius:8px;
   margin-left:4px;color:#fff;white-space:nowrap;flex-shrink:0;line-height:1.6}
-.left-row.phase-row{background:var(--slate-700);color:#fff;cursor:pointer}
+.left-row.phase-row{background:var(--row-phase-bg);color:var(--row-phase-text);cursor:pointer}
 .left-row.phase-row .row-label{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.4px;color:#f8fafc}
 .left-row.phase-row .chevron{color:#94a3b8}
 .left-row.category-row{background:var(--surface);padding-left:16px;cursor:pointer}
@@ -149,16 +223,16 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 #right-panel{flex:1;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
 #timeline-header{height:var(--head-h);overflow:hidden;border-bottom:1px solid var(--border);
   background:var(--surface);flex-shrink:0;transition:box-shadow .25s ease}
-.changes-glow { box-shadow: inset 0 2px 8px rgba(239, 68, 68, 0.4); }
+.changes-glow { box-shadow: inset 0 2px 8px var(--glow); }
 #chart-area{flex:1;overflow:auto;cursor:grab;user-select:none;-webkit-user-select:none;}
 #chart-area::-webkit-scrollbar{height:5px;width:5px}
 #chart-area::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:3px}
 #gantt-svg{display:block}
 
 /* Tooltip */
-#tooltip{position:fixed;background:#fff;border:1px solid var(--border-md);border-radius:7px;
+#tooltip{position:fixed;background:var(--tooltip-bg);border:1px solid var(--border-md);border-radius:7px;
   padding:10px 14px;font-size:.74rem;line-height:1.75;color:var(--text);pointer-events:none;
-  display:none;z-index:999;max-width:340px;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+  display:none;z-index:10001;max-width:340px;box-shadow:0 4px 16px var(--shadow)}
 #tooltip .tt-title{font-weight:700;font-size:.82rem;color:var(--accent);margin-bottom:4px}
 #tooltip .tt-snap{font-size:.7rem;color:var(--text-mu);margin-bottom:6px;font-style:italic}
 #tooltip .tt-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
@@ -190,7 +264,7 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
   border-left:1px solid var(--border);z-index:9999;transform:translateX(100%);
   transition:transform .25s ease;overflow-y:auto;padding:16px 14px;box-shadow:-4px 0 16px rgba(0,0,0,.06)}
 #flyout-pane.open{transform:translateX(0)}
-#stats-btn.active{background:var(--green-800);color:#fff;border-color:var(--green-800);font-weight:600}
+#stats-btn.active{background:var(--btn-active-bg);color:#fff;border-color:var(--btn-active-bg);font-weight:600}
 
 /* Info panel */
 #info-panel{position:fixed;right:0;top:var(--toolbar-h);width:320px;
@@ -254,6 +328,7 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 }
 .drop-card.dragover { border-color: var(--accent); background: #f0f9ff; }
 .drop-title { font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.drop-instruct { font-size: 1.0rem; font-weight: 500; color: var(--text); margin-bottom: 20px; }
 .drop-desc {
     color: var(--text-mu); font-size: 0.88rem; line-height: 1.55; margin-bottom: 14px;
     text-align: left;
@@ -281,9 +356,9 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .landing-footer a:hover { text-decoration: underline; }
 
 /* Modal & Form */
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-.modal { background: var(--bg); border: 1px solid var(--border-md); border-radius: 8px; width: 480px; max-width: 95%; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; max-height: 90vh; font-size: 0.85rem;}
-.modal-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface); border-radius: 8px 8px 0 0; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+.modal { background: var(--bg); border: 1px solid var(--border-md); border-radius: 8px; width: 480px; max-width: 95%; box-shadow: 0 10px 25px var(--shadow); display: flex; flex-direction: column; max-height: 90vh; font-size: 0.85rem;}
+.modal-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--modal-header-bg); border-radius: 8px 8px 0 0; }
 .modal-header h3 { margin: 0; font-size: 1rem; color: var(--text); }
 #modal-btn-dependent { margin-right: 8px; border: 1px solid #fde047; background: #fef9c3; color: #854d0e; padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; cursor: pointer; font-family: var(--font); white-space: nowrap; transition: all 0.15s; }
 #modal-btn-dependent:hover { background: #fef08a; border-color: #facc15; color: #713f12; }
@@ -292,7 +367,7 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .modal-close { cursor: pointer; font-size: 1.2rem; line-height: 1; color: var(--text-mu); }
 .modal-close:hover { color: var(--text); }
 .modal-body { padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-.modal-footer { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: var(--surface); border-radius: 0 0 8px 8px; }
+.modal-footer { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: var(--modal-header-bg); border-radius: 0 0 8px 8px; }
 .form-row { display: flex; gap: 12px; }
 .form-row .form-group { flex: 1; min-width: 0; }
 .form-group { display: flex; flex-direction: column; }
@@ -333,28 +408,29 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <div class="drop-card" id="drop-card" style="position: relative;">
         <div class="drop-title">&#128200; Gantt Chart Viewer</div>
         <div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>
-        <div class="drop-version">v1.4</div>
-        <div class="drop-desc">
-            Visualise your project planning as an interactive Gantt chart.
-            Load any <strong>.xlsx</strong> or <strong>.xlsm</strong> workbook that contains a
-            <em>Current Planning</em> sheet with task data. Only <strong>Title, Start Date, and End Date</strong> are required.
-            Other columns (ID, Phase, Category, Status, Progress, Priority, Dependency, Description) are optional and will use intelligent defaults if missing.
-            Snapshots stored in a <em>Log</em> sheet
-            are automatically loaded for timeline comparison.
+        <div class="drop-version">v1.8</div>
+        <div class="drop-text">
+            Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
+            with a table of tasks in <em>"Current Planning"</em> or <em>"Sheet 1"</em>. <br><br>
+            Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
+            <em>Optional: ID, Phase, Category, Status, Progress, Priority, Dependency, Description.</em> <a href="#" data-action="downloadExampleExcel" style="color: var(--accent); font-weight: 600; text-decoration: none;">Download example Excel here</a> <br><br>
+            <strong>Create and edit</strong> tasks, dependencies, and milestones. <br>
+            <strong>Save and compare</strong> snapshots of tasks stored in a <em>Log</em> sheet. <br>
+            <strong>Export changes</strong> to Excel or prefilled Gantt chart.
         </div>
         <div class="drop-privacy">
             <span class="drop-privacy-icon">&#128274;</span>
             <span class="drop-privacy-text"><strong>Runs entirely in your browser.</strong>
-            Your file is never uploaded &mdash; all processing happens locally on your device.</span>
+            Your file is never uploaded &mdash; all processing happens locally on your device. <strong> Download </strong> offline app below.</span>
         </div>
-        <div class="drop-text">Drop your file in this window, or click Browse</div>
+        <div class="drop-instruct"><strong>Drop your file</strong> in this window, or click Browse</div>
         <div style="display: flex; justify-content: center;">
-            <button class="browse-btn" data-action="browseFile">&#128193; Browse&hellip;</button>
+            <button class="browse-btn" data-action="browseFile" data-tooltip="Select an Excel file from your computer">&#128193; Browse&hellip;</button>
         </div>
         <div style="display: flex; justify-content: space-between; margin-top: 25px; gap: 8px;">
             <button class="btn template-download-btn" data-action="downloadTemplate" data-tooltip="Download full app as-is for offline use" style="padding: 6px 12px; font-size: 0.85em; border: 1px solid #16a34a; background: #f0fdf4; color: #16a34a; font-weight: 600; cursor: pointer; border-radius: 4px; flex: 1;">&#128229; Download</button>
-            <button class="browse-btn" data-action="startEmptyChart" style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md); flex: 1;">&#128196; Empty Chart</button>
-            <button class="browse-btn" data-action="loadExampleData" style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md); flex: 1;">&#128202; Load Example</button>
+            <button class="browse-btn" data-action="startEmptyChart" data-tooltip="Start a new project from scratch" style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md); flex: 1;">&#128196; Empty Chart</button>
+            <button class="browse-btn" data-action="loadExampleData" data-tooltip="Explore features with a sample dataset" style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md); flex: 1;">&#128202; Load Example</button>
         </div>
         <input type="file" id="file-input" accept=".xlsx,.xlsm" style="display: none;">
     </div>
@@ -373,7 +449,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <div class="toolbar-pills">
           <span class="date-pill" id="date-pill" style="display:none; text-align:center; width:100%; box-sizing:border-box;" data-action="reloadFile" data-tooltip="Current plan generation date. Click to reload the loaded file and pick up external changes."></span>
           <select id="compare-sel" style="width:100%; box-sizing:border-box;">
-            <option value="">&#8212; compare &#8212;</option>
+            <option value="">&#8212; Compare &#8212;</option>
           </select>
           <span class="snap-pill" id="snap-pill" style="display:none; text-align:center; width:100%; box-sizing:border-box; justify-content:center;" data-action="clearCompare" data-tooltip="Clear comparison">
             <span id="snap-pill-text"></span>&thinsp;&#10005;
@@ -487,7 +563,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     
     <p style="margin-top:20px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded &mdash; all processing happens locally.</p>
     <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v1.4</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v1.8</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a href="https://github.com/kolfers/public_excel_to_gantt_standalone" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">GitHub Repository</a>.</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">Created by <a href="https://www.universiteitleiden.nl/en/staffmembers/kerwin-olfers#tab-1" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Kerwin Olfers</a> &middot; Released under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">MIT License</a>.</p>
     </div>
@@ -583,7 +659,7 @@ const CAT_COLORS    = ["#0d9488", "#d97706", "#0284c7", "#e11d48", "#65a30d", "#
 
 
 
-function loadExampleData() {
+function getExampleData() {
     const today = new Date();
     
     // Helper: Add days to today => YYYY-MM-DD
@@ -603,39 +679,38 @@ function loadExampleData() {
     };
 
     const tasks = [
-        { ID: "A1", Title: "Project Kickoff (milestone)", Phase: "Initiation", Category: "Management", "Start Date": addDays(-14), "End Date": addDays(-14), Status: "Done", Progress: 100 },
-        { ID: "A2", Title: "Requirements Gathering", Phase: "Initiation", Category: "Analysis", "Start Date": addDays(-13), "End Date": addDays(-3), Status: "Done", Progress: 100 },
-        { ID: "A3", Title: "Architecture Review", Phase: "Planning", Category: "Development", "Start Date": addDays(-2), "End Date": addDays(2), Status: "Done", Progress: 100 },
-        { ID: "A10", Title: "Vendor Selection", Phase: "Planning", Category: "Management", "Start Date": addDays(-10), "End Date": addDays(-2), Status: "Behind", Progress: 75 }, // Overdue item
-        { ID: "A4", Title: "API Design", Phase: "Planning", Category: "Development", "Start Date": addDays(3), "End Date": addDays(10), Status: "On Track", Progress: 40, Dependency: "A3" },
-        { ID: "A11", Title: "Hardware Procurement", Phase: "Planning", Category: "Management", "Start Date": addDays(-5), "End Date": addDays(-1), Status: "Waiting", Progress: 10, Dependency: "A10" }, // Overdue item
-        { ID: "A5", Title: "Design Approval (milestone)", Phase: "Planning", Category: "Management", "Start Date": addDays(10), "End Date": addDays(10), Status: "Waiting", Progress: 0 },
-        { ID: "A6", Title: "Backend Implementation", Phase: "Execution", Category: "Development", "Start Date": addDays(11), "End Date": addDays(20), Status: "Waiting", Progress: 0, Dependency: "A4" },
-        { ID: "A7", Title: "Frontend Integration", Phase: "Execution", Category: "Development", "Start Date": addDays(21), "End Date": addDays(30), Status: "Waiting", Progress: 0, Dependency: "A6" },
-        { ID: "A8", Title: "Testing", Phase: "Execution", Category: "Analysis", "Start Date": addDays(25), "End Date": addDays(40), Status: "Waiting", Progress: 0 },
-        { ID: "A9", Title: "Go Live (milestone)", Phase: "Closure", Category: "Management", "Start Date": addDays(45), "End Date": addDays(45), Status: "Waiting", Progress: 0 }
+        { ID: "A1", Title: "Project Kickoff (milestone)", Phase: "Initiation", Category: "Management", "Start Date": addDays(-14), "End Date": addDays(-14), Status: "Done", Progress: 100, Priority: "High", Description: "Initial meeting to align stakeholders and define project scope for the upcoming quarters." },
+        { ID: "A2", Title: "Requirements Gathering", Phase: "Initiation", Category: "Analysis", "Start Date": addDays(-13), "End Date": addDays(-3), Status: "Done", Progress: 100, Priority: "Medium", Description: "Collecting user stories and functional requirements from all department heads." },
+        { ID: "A3", Title: "Architecture Review", Phase: "Planning", Category: "Development", "Start Date": addDays(-2), "End Date": addDays(2), Status: "Done", Progress: 100, Priority: "High", Description: "Technical audit of the proposed system architecture and scalability plans." },
+        { ID: "A10", Title: "Vendor Selection", Phase: "Planning", Category: "Management", "Start Date": addDays(-10), "End Date": addDays(-2), Status: "Behind", Progress: 75, Priority: "Medium", Description: "Evaluating third-party service providers for the cloud infrastructure migration." },
+        { ID: "A4", Title: "API Design", Phase: "Planning", Category: "Development", "Start Date": addDays(3), "End Date": addDays(10), Status: "On Track", Progress: 40, Dependency: "A3", Priority: "High", Description: "Defining RESTful endpoints and data schemas for the internal microservices layer." },
+        { ID: "A11", Title: "Hardware Procurement", Phase: "Planning", Category: "Management", "Start Date": addDays(-5), "End Date": addDays(-1), Status: "Waiting", Progress: 10, Dependency: "A10", Priority: "Low", Description: "Ordering server hardware and network components for the on-premise datacenter." },
+        { ID: "A5", Title: "Design Approval (milestone)", Phase: "Planning", Category: "Management", "Start Date": addDays(10), "End Date": addDays(10), Status: "Waiting", Progress: 0, Priority: "Medium", Description: "Final sign-off on the UI design and user experience flows by the product owner." },
+        { ID: "A6", Title: "Backend Implementation", Phase: "Execution", Category: "Development", "Start Date": addDays(11), "End Date": addDays(20), Status: "Waiting", Progress: 0, Dependency: "A4", Priority: "High", Description: "Developing the core logic and database integration for the application backend." },
+        { ID: "A7", Title: "Frontend Integration", Phase: "Execution", Category: "Development", "Start Date": addDays(21), "End Date": addDays(30), Status: "Waiting", Progress: 0, Dependency: "A6", Priority: "Medium", Description: "Building the responsive user interface and connecting it to the backend APIs." },
+        { ID: "A8", Title: "Testing", Phase: "Execution", Category: "Analysis", "Start Date": addDays(25), "End Date": addDays(40), Status: "Waiting", Progress: 0, Priority: "High", Description: "Comprehensive quality assurance testing, including unit, integration, and user acceptance tests." },
+        { ID: "A9", Title: "Go Live (milestone)", Phase: "Closure", Category: "Management", "Start Date": addDays(45), "End Date": addDays(45), Status: "Waiting", Progress: 0, Priority: "High", Description: "Official production launch and handover to the operations team." }
     ];
 
-    // Snapshot from 5 days ago (things were slightly behind, and API Design hadn't fully started)
     const snapshotTasks = [
-        { ID: "A1", Title: "Project Kickoff (milestone)", "Start Date": addDays(-14), "End Date": addDays(-14), Status: "Done", Progress: 100 },
-        { ID: "A2", Title: "Requirements Gathering", "Start Date": addDays(-13), "End Date": addDays(-1), Status: "Behind", Progress: 75 }, // Was running a bit late
-        { ID: "A3", Title: "Architecture Review", "Start Date": addDays(-2), "End Date": addDays(2), Status: "On Track", Progress: 50 },
-        { ID: "A10", Title: "Vendor Selection", "Start Date": addDays(-10), "End Date": addDays(-2), Status: "Behind", Progress: 40 }, 
-        { ID: "A4", Title: "API Design", "Start Date": addDays(3), "End Date": addDays(10), Status: "Waiting", Progress: 0 },
-        { ID: "A11", Title: "Hardware Procurement", "Start Date": addDays(-5), "End Date": addDays(-1), Status: "Waiting", Progress: 0 },
-        { ID: "A5", Title: "Design Approval (milestone)", "Start Date": addDays(10), "End Date": addDays(10), Status: "Waiting", Progress: 0 },
-        { ID: "A6", Title: "Backend Implementation", "Start Date": addDays(11), "End Date": addDays(20), Status: "Waiting", Progress: 0 },
-        { ID: "A7", Title: "Frontend Integration", "Start Date": addDays(21), "End Date": addDays(30), Status: "Waiting", Progress: 0 },
-        { ID: "A8", Title: "Testing", "Start Date": addDays(25), "End Date": addDays(40), Status: "Waiting", Progress: 0 },
-        { ID: "A9", Title: "Go Live (milestone)", "Start Date": addDays(45), "End Date": addDays(45), Status: "Waiting", Progress: 0 }
+        { ID: "A1", Title: "Project Kickoff (milestone)", "Start Date": addDays(-14), "End Date": addDays(-14), Status: "Done", Progress: 100, Priority: "High", Description: "Initial meeting to align stakeholders and define project scope for the upcoming quarters." },
+        { ID: "A2", Title: "Requirements Gathering", "Start Date": addDays(-13), "End Date": addDays(-1), Status: "Behind", Progress: 75, Priority: "Medium", Description: "Initial requirement gathering session with key department stakeholders." },
+        { ID: "A3", Title: "Architecture Review", "Start Date": addDays(-2), "End Date": addDays(2), Status: "On Track", Progress: 50, Priority: "High", Description: "Technical audit of the proposed system architecture and scalability plans." },
+        { ID: "A10", Title: "Vendor Selection", "Start Date": addDays(-10), "End Date": addDays(-2), Status: "Behind", Progress: 40, Priority: "Medium", Description: "Vendor research and initial long-list creation for infrastructure services." }, 
+        { ID: "A4", Title: "API Design", "Start Date": addDays(3), "End Date": addDays(10), Status: "Waiting", Progress: 0, Priority: "High", Description: "Preliminary API design and initial documentation draft." },
+        { ID: "A11", Title: "Hardware Procurement", "Start Date": addDays(-5), "End Date": addDays(-1), Status: "Waiting", Progress: 0, Priority: "Low", Description: "Ordering server hardware and network components for the on-premise datacenter." },
+        { ID: "A5", Title: "Design Approval (milestone)", "Start Date": addDays(10), "End Date": addDays(10), Status: "Waiting", Progress: 0, Priority: "Medium", Description: "Final sign-off on the UI design and user experience flows by the product owner." },
+        { ID: "A6", Title: "Backend Implementation", "Start Date": addDays(11), "End Date": addDays(20), Status: "Waiting", Progress: 0, Priority: "High", Description: "Developing the core logic and database integration for the application backend." },
+        { ID: "A7", Title: "Frontend Integration", "Start Date": addDays(21), "End Date": addDays(30), Status: "Waiting", Progress: 0, Priority: "Medium", Description: "Building the responsive user interface and connecting it to the backend APIs." },
+        { ID: "A8", Title: "Testing", "Start Date": addDays(25), "End Date": addDays(40), Status: "Waiting", Progress: 0, Priority: "High", Description: "Comprehensive quality assurance testing, including unit, integration, and user acceptance tests." },
+        { ID: "A9", Title: "Go Live (milestone)", "Start Date": addDays(45), "End Date": addDays(45), Status: "Waiting", Progress: 0, Priority: "High", Description: "Official production launch and handover to the operations team." }
     ];
 
     const snapshotDate = new Date(today);
     snapshotDate.setDate(snapshotDate.getDate() - 5);
-    snapshotDate.setHours(12, 0); // Fake save time of noon
+    snapshotDate.setHours(12, 0);
 
-    DATA = {
+    return {
         tasks: tasks,
         snapshots: {
             [formatDateTimeStr(snapshotDate)]: snapshotTasks
@@ -645,11 +720,21 @@ function loadExampleData() {
             generated_at: formatDateTimeStr(today)
         }
     };
+}
+
+function loadExampleData() {
+    DATA = getExampleData();
     document.getElementById("landing-zone").style.display = "none";
     document.getElementById("app").style.display = "flex";
     clearCompare();
     init();
 }
+
+function downloadExampleExcel() {
+    const exampleData = getExampleData();
+    downloadDataAsExcel(exampleData, "Example_Gantt_Data.xlsx");
+}
+
 
 
 
@@ -1028,65 +1113,73 @@ function reloadFile() {
     loadFile(_currentFile);
 }
 
+function downloadDataAsExcel(data, fileName) {
+    const wb = XLSX.utils.book_new();
+    
+    // 1. Build Current Planning sheet
+    const cpData = [['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description']];
+    data.tasks.forEach(t => {
+        cpData.push([
+            t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
+            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||''
+        ]);
+    });
+    const wsCurrent = XLSX.utils.aoa_to_sheet(cpData);
+    XLSX.utils.book_append_sheet(wb, wsCurrent, "Current Planning");
+    
+    // 2. Build Log sheet
+    const logData = [['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Saved On Date']];
+    // Insert existing snapshots if any
+    Object.keys(data.snapshots).sort((a,b) => new Date(a) - new Date(b)).forEach(dateKey => {
+        data.snapshots[dateKey].forEach(t => {
+            logData.push([
+                t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
+                t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'', dateKey
+            ]);
+        });
+    });
+    
+    // Append the brand new snapshot representing "Right Now"
+    const nowStr = formatDateTimeStr(new Date());
+    data.tasks.forEach(t => {
+        logData.push([
+            t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
+            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'', nowStr
+        ]);
+    });
+    
+    const wsLog = XLSX.utils.aoa_to_sheet(logData);
+    XLSX.utils.book_append_sheet(wb, wsLog, "Log");
+    
+    // Write out the raw workbook as XLSX
+    const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+    const blob = new Blob([wbout], {type: "application/octet-stream"});
+    
+    // Trigger download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.style.display = 'none';
+    a.href = url;
+    a.download = fileName;
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    return nowStr;
+}
+
 function saveSnapshot() {
     if (!_currentArrayBuffer || !_currentFile) {
         // If we have no original file (e.g. Example Data), build a new one from DATA
-        const wb = XLSX.utils.book_new();
-        
-        // 1. Build Current Planning sheet
-        const cpData = [['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description']];
-        DATA.tasks.forEach(t => {
-            cpData.push([
-                t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-                t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||''
-            ]);
-        });
-        const wsCurrent = XLSX.utils.aoa_to_sheet(cpData);
-        XLSX.utils.book_append_sheet(wb, wsCurrent, "Current Planning");
-        
-        // 2. Build Log sheet
-        const logData = [['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Saved On Date']];
-        // Insert existing snapshots if any
-        Object.keys(DATA.snapshots).sort((a,b) => new Date(a) - new Date(b)).forEach(dateKey => {
-            DATA.snapshots[dateKey].forEach(t => {
-                logData.push([
-                    t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-                    t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'', dateKey
-                ]);
-            });
-        });
-        
-        // Append the brand new snapshot representing "Right Now"
-        const nowStr = formatDateTimeStr(new Date());
-        DATA.tasks.forEach(t => {
-            logData.push([
-                t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-                t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'', nowStr
-            ]);
-        });
-        
-        const wsLog = XLSX.utils.aoa_to_sheet(logData);
-        XLSX.utils.book_append_sheet(wb, wsLog, "Log");
-        
-        // Write out the raw workbook as XLSX
-        const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
-        const blob = new Blob([wbout], {type: "application/octet-stream"});
-        
-        // Trigger download
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.style.display = 'none';
-        a.href = url;
         const d = new Date();
         const dateSuffix = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         let originalName = DATA.meta.source_file || 'New_Plan';
         let baseName = originalName.lastIndexOf('.') > 0 ? originalName.substring(0, originalName.lastIndexOf('.')) : originalName;
-        a.download = baseName + "_" + dateSuffix + ".xlsx";
-        
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        const fileName = baseName + "_" + dateSuffix + ".xlsx";
+
+        const nowStr = downloadDataAsExcel(DATA, fileName);
         
         // Soft update state
         setTimeout(() => {
@@ -1362,7 +1455,7 @@ function buildStatsMap(tasks, today) {
 
 function populateCompare() {
   const sel = document.getElementById('compare-sel');
-  sel.innerHTML = '<option value="">\u2014 none \u2014</option>';
+  sel.innerHTML = '<option value=""><strong>\u2014 Compare \u2014</strong></option>';
   Object.keys(DATA.snapshots).forEach(l => {
     const n = countDiffs(DATA.snapshots[l]);
     const o = document.createElement('option');
@@ -1715,14 +1808,14 @@ function renderLeft(visible, today, statsMap) {
       titleSpan.style.marginRight = '4px';
       titleSpan.style.flexShrink = '0';
       lbl.appendChild(titleSpan);
-      if (!r.ghost && !AppState.compactMode) {
-        const statusKey = (r.task.Status||'').toLowerCase();
-        const pillColor = STATUS_COLORS[statusKey] || '#94a3b8';
-        const pill = document.createElement('span'); pill.className='status-pill';
-        pill.style.background = pillColor; pill.textContent = r.task.Status||''; lbl.appendChild(pill);
-        const ov = overdueInfo(r.task, today);
-        if (ov) { const tag=document.createElement('span'); tag.className='overdue-tag'; tag.style.color=ov.color; tag.textContent=`(${ov.label})`; lbl.appendChild(tag); }
-      } else if (!r.ghost && AppState.compactMode) {
+      if (!r.ghost) { // && !AppState.compactMode) {
+      //  const statusKey = (r.task.Status||'').toLowerCase();
+      //  const pillColor = STATUS_COLORS[statusKey] || '#94a3b8';
+      //  const pill = document.createElement('span'); pill.className='status-pill';
+      //  pill.style.background = pillColor; pill.textContent = r.task.Status||''; lbl.appendChild(pill);
+      //  const ov = overdueInfo(r.task, today);
+      //  if (ov) { const tag=document.createElement('span'); tag.className='overdue-tag'; tag.style.color=ov.color; tag.textContent=`(${ov.label})`; lbl.appendChild(tag); }
+      //} else if (!r.ghost && AppState.compactMode) {
         const statusKey = (r.task.Status||'').toLowerCase();
         const sc = STATUS_COLORS[statusKey] || '#94a3b8';
         const circ = document.createElement('span');
@@ -1986,7 +2079,7 @@ function renderChart(visible, today) {
             const iconX = x - 13;
             const iconY = y + h/2;
             const attG = svgEl('g', {style: 'cursor:pointer'});
-            attG.appendChild(svgEl('circle', {cx: iconX, cy: iconY, r: 7, fill: '#ef4444'}));
+            attG.appendChild(svgEl('circle', {cx: iconX, cy: iconY, r: 10, fill: '#ef4444'}));
             const ex = svgEl('text', {x: iconX, y: iconY + 4, 'text-anchor':'middle', fill:'#fff', 'font-size': 10, 'font-weight': 'bold'});
             ex.textContent = '!';
             attG.appendChild(ex);
@@ -1997,6 +2090,8 @@ function renderChart(visible, today) {
               render();
               setTimeout(() => scrollToTask(realParent), 60);
             };
+            attG.onmousemove = (e) => showHTMLTooltip(e, `Hidden dependency: <b>${escHtml(realParent.Title)}</b>`);
+            attG.onmouseleave = hideTooltip;
             svg.appendChild(attG);
           }
         }
@@ -2029,18 +2124,20 @@ function syncScroll(){
 
 
 // ── Tooltip ───────────────────────────────────────────────────────────
-function _getVal(task, key) {
+function _getVal(task, key, contextTasks=[]) {
   const v = task[key];
   if (v === null || v === undefined || v === '') return '\u2014';
   if (key === 'Start Date' || key === 'End Date') {
     const d = typeof parseDate === 'function' ? parseDate(v) : null;
     if (d && !isNaN(d)) {
-      const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       const moFull = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      // Use DD-Mon-YY formatting like: 12 March 2026 or 12-Mar-26. The prompt asked for DD-Mon-YY but gave example "12 March 2026".
-      // We will output: 12 March 2026
       return String(d.getDate()).padStart(2, '0') + ' ' + moFull[d.getMonth()] + ' ' + d.getFullYear();
     }
+  }
+  if (key === 'Dependency' && contextTasks.length > 0) {
+    const depId = String(v).trim();
+    const parent = contextTasks.find(pt => getTaskId(pt) === depId);
+    if (parent) return `${parent.Title} (${parent.Category})`;
   }
   const suffix = key === 'Progress' ? '%' : '';
   return String(v) + suffix;
@@ -2058,21 +2155,24 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
 
   // Fields to render in the tooltip
   const fields = [
-    {label:'Description',key:'Description',skip_diff:true},
     {label:'Status',     key:'Status', is_status:true},
     {label:'Start',      key:'Start Date'},
     {label:'End',        key:'End Date'},
     {label:'Progress',   key:'Progress'},
     {label:'Priority',   key:'Priority'},
     {label:'Dependency', key:'Dependency'},
+    {label:'Description',key:'Description'},
   ];
+
+  const currentList = AppState.currentTasks || [];
+  const snapList = (snapLabel && DATA.snapshots[snapLabel]) ? DATA.snapshots[snapLabel] : [];
 
   let rows = '';
   fields.forEach(({label,key,skip_diff,is_status}) => {
-    const myVal  = _getVal(t, key);
+    const myVal  = _getVal(t, key, isGhost ? snapList : currentList);
     let diffHtml = '';
     if (!skip_diff && partnerTask) {
-      const partVal = _getVal(partnerTask, key);
+      const partVal = _getVal(partnerTask, key, isGhost ? currentList : snapList);
       if (myVal !== partVal) {
         // isGhost: show current (partner) value in green. !isGhost: show snapshot (partner) value in red.
         const cls   = isGhost ? 'tt-diff-curr' : 'tt-diff-snap';
@@ -2541,6 +2641,7 @@ function initEvents() {
                 case 'saveSnapshot': saveSnapshot(); break;
                 case 'exportChart': exportChart(); break;
                 case 'downloadTemplate': exportChart(true); break;
+                case 'downloadExampleExcel': downloadExampleExcel(); break;
                 case 'startEmptyChart': startEmptyChart(); break;
                 case 'loadExampleData': loadExampleData(); break;
                 case 'setFilter': setFilter(val); break;
