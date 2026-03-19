@@ -33,6 +33,7 @@ html{margin:0;padding:0;height:100%;overflow:hidden}
   --modal-header-bg: var(--surface);
   --timeline-line: var(--surface2);
   --timeline-grid: var(--border);
+  --glow: rgba(239, 68, 68, 0.6);
   /* Status Colors */
   --status-done: #22c55e;
   --status-on-track: #3b82f6;
@@ -99,22 +100,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh
 /* Toolbar */
 #toolbar{height:var(--toolbar-h);background:var(--bg);border-bottom:1px solid var(--border);
   display:flex;align-items:center;padding:0 14px 0 0;gap:12px;flex-shrink:0;z-index:10}
-.toolbar-left{display:flex;align-items:center;gap:7px;flex:1;min-width:0;overflow:hidden;height:100%}
+.toolbar-left{display:flex;align-items:center;gap:0;flex:1;min-width:0;overflow:hidden;height:100%}
 .toolbar-center{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .toolbar-right{display:flex;align-items:center;gap:6px;flex:1;justify-content:flex-end}
 
 /* Title & pills */
 .app-title{background:var(--header-bg);color:var(--header-text);font-size:1.5rem;font-weight:700;white-space:nowrap;
   flex-shrink:0;cursor:default;width:270px;height:100%;display:flex;align-items:center;justify-content:center;box-sizing:border-box;}
-.date-pill{background:var(--pill-date-bg);color:#fff;border-radius:10px;padding:0 10px;
-  font-size:.8rem;font-weight:700;white-space:nowrap;flex-shrink:0;cursor:pointer;transition:background .15s;
-  height:22px;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;}
-.date-pill:hover{background:var(--pill-date-hover)}
-.snap-pill{background:#6b7280;color:#fff;border-radius:10px;padding:0 10px;
+.date-pill{background:var(--header-bg);color:var(--header-text);border-radius:0;padding:0 10px;
+  font-size:.8rem;font-weight:700;white-space:nowrap;flex-shrink:0;cursor:pointer;transition:filter .15s;
+  height:24px;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;}
+.date-pill:hover{filter:brightness(1.18)}
+.snap-pill{background:#6b7280;color:#fff;border-radius:0;padding:0 10px;
   font-size:.8rem;font-weight:700;white-space:nowrap;flex-shrink:0;cursor:pointer;
-  display:none;align-items:center;justify-content:center;height:22px;box-sizing:border-box;gap:2px;transition:background .15s}
+  display:none;align-items:center;justify-content:center;height:24px;box-sizing:border-box;gap:2px;transition:background .15s}
 .snap-pill:hover{background:#4b5563}
-.toolbar-pills{display:flex;flex-direction:column;gap:2px;margin-left:8px;width:160px;}
+.toolbar-pills{display:flex;flex-direction:column;gap:2px;margin-left:0;width:160px;border-left:1px solid rgba(255,255,255,0.3);padding-left:8px;}
 
 /* View buttons */
 .btn{background:var(--bg);border:1px solid var(--border-md);color:var(--text);border-radius:5px;
@@ -131,7 +132,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh
 /* Compare controls */
 .compare-label{font-size:.9rem;font-weight:700;color:var(--text-mu);white-space:nowrap;flex-shrink:0;cursor:default}
 select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:var(--text);
-  border-radius:5px;padding:3px 7px;font-size:.74rem;cursor:pointer;font-family:var(--font);
+  border-radius:0;padding:3px 7px;font-size:.74rem;cursor:pointer;font-family:var(--font);
   max-width:200px; font-weight:bold;text-align:center; text-align-last:center;}
 .cbtn{background:transparent;border:1px solid var(--border-md);color:var(--text-mu);
   border-radius:5px;padding:0 9px;font-size:.72rem;cursor:pointer;font-family:var(--font);
@@ -141,18 +142,18 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .cbtn.active{background:var(--danger);color:#fff;border-color:var(--danger);font-weight:600}
 
 .unsaved-warning {
-  color: var(--danger);
-  font-weight: 800;
-  font-size: 0.95rem;
+  color: #5d5d5d;
+  font-weight: 700;
+  font-size: 0.88rem;
   margin-right: 12px;
   padding: 2px 8px;
   white-space: nowrap;
-  text-shadow: -1px -1px 0 var(--bg), 1px -1px 0 var(--bg), -1px 1px 0 var(--bg), 1px 1px 0 var(--bg);
 }
 
 .toolbar-unsaved { background-color: #fefce8 !important; transition: background-color 0.3s, box-shadow 0.3s; }
+.toolbar-unsaved #save-btn { box-shadow: 0 0 0 2px #fbbf24, 0 0 8px rgba(251,191,36,0.45); transition: box-shadow 0.3s; }
 [data-theme='dark'] .toolbar-unsaved { background-color: transparent !important; box-shadow: inset 0 2px 8px rgba(253,211,77,0.85); }
-[data-theme='dark'] .toolbar-unsaved .unsaved-warning { color: #fbbf24; text-shadow: none; }
+[data-theme='dark'] .toolbar-unsaved .unsaved-warning { color: #fbbf24; }
 
 /* Layout */
 #gantt-container{display:flex;flex:1;overflow:hidden}
@@ -181,9 +182,77 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
   border-radius:4px;padding:2px 8px;font-size:.72rem;cursor:pointer;font-family:var(--font);
   white-space:nowrap;transition:background .1s;flex-shrink:0}
 .xbtn:hover{background:var(--surface2);color:var(--text)}
-.add-global-btn{background:var(--btn-active-bg);color:#fff;border:none;border-radius:4px;padding:2px 8px;
-  font-size:.68rem;font-weight:400;cursor:pointer;font-family:var(--font);transition:background .1s;white-space:nowrap;flex-shrink:0}
-.add-global-btn:hover{filter: brightness(1.1);}
+.filter-btn{background:transparent;border:1px solid var(--border-md);color:var(--text-mu);
+  border-radius:4px;padding:2px 8px;font-size:.68rem;cursor:pointer;font-family:var(--font);
+  white-space:nowrap;flex-shrink:0;transition:background .1s,color .1s,border-color .1s}
+.filter-btn:hover{background:var(--surface2);color:var(--text)}
+.filter-btn.active{background:#d97706;color:#fff;border-color:#d97706;font-weight:600}
+.toolbar-add-task{flex:1;display:flex;align-items:center;justify-content:center}
+.add-task-toolbar-btn{background:var(--header-bg);color:#fff;border-color:var(--header-bg)}
+.add-task-toolbar-btn:hover{filter:brightness(1.15);background:var(--header-bg);color:#fff}
+#filter-panel{position:fixed;z-index:9998;background:var(--bg);border:1px solid var(--border-md);
+  border-radius:6px;box-shadow:0 4px 18px rgba(0,0,0,.15);padding:8px 10px;min-width:340px}
+.filter-panel-header{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.filter-panel-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-mu)}
+.filter-clear-btn{background:transparent;border:1px solid var(--border-md);color:var(--text-mu);
+  border-radius:3px;padding:1px 6px;font-size:.65rem;cursor:pointer;font-family:var(--font);transition:background .1s}
+.filter-clear-btn:hover{background:var(--surface2);color:var(--text)}
+.filter-panel-row{display:flex;align-items:center;gap:4px;padding:3px 0;flex-wrap:nowrap;white-space:nowrap}
+.filter-prop-label{font-size:.65rem;font-weight:700;color:var(--text-mu);text-transform:uppercase;
+  letter-spacing:.3px;min-width:68px;flex-shrink:0}
+.filter-chip{background:transparent;border:1px solid var(--border-md);color:var(--text-mu);
+  border-radius:3px;padding:1px 7px;font-size:.65rem;cursor:pointer;font-family:var(--font);
+  white-space:nowrap;flex-shrink:0;transition:background .1s,color .1s,border-color .1s}
+.filter-chip:hover{background:var(--surface2);color:var(--text)}
+.filter-chip.active{background:#d97706;color:#fff;border-color:#d97706;font-weight:600}
+/* Status chip colors */
+.filter-chip[data-prop="status"][data-value="Done"]{color:#22c55e;border-color:#22c55e}
+.filter-chip[data-prop="status"][data-value="Done"].active{background:#22c55e;color:#fff;border-color:#22c55e}
+.filter-chip[data-prop="status"][data-value="On Track"]{color:#3b82f6;border-color:#3b82f6}
+.filter-chip[data-prop="status"][data-value="On Track"].active{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.filter-chip[data-prop="status"][data-value="Behind"]{color:#ef4444;border-color:#ef4444}
+.filter-chip[data-prop="status"][data-value="Behind"].active{background:#ef4444;color:#fff;border-color:#ef4444}
+.filter-chip[data-prop="status"][data-value="Waiting"]{color:#eab308;border-color:#eab308}
+.filter-chip[data-prop="status"][data-value="Waiting"].active{background:#eab308;color:#fff;border-color:#eab308}
+.filter-chip[data-prop="status"][data-value="On Hold"]{color:#6b7280;border-color:#6b7280}
+.filter-chip[data-prop="status"][data-value="On Hold"].active{background:#6b7280;color:#fff;border-color:#6b7280}
+/* Priority chip colors */
+.filter-chip[data-prop="priority"][data-value="High"]{color:#ef4444;border-color:#ef4444}
+.filter-chip[data-prop="priority"][data-value="High"].active{background:#ef4444;color:#fff;border-color:#ef4444}
+.filter-chip[data-prop="priority"][data-value="Medium"]{color:#f97316;border-color:#f97316}
+.filter-chip[data-prop="priority"][data-value="Medium"].active{background:#f97316;color:#fff;border-color:#f97316}
+.filter-chip[data-prop="priority"][data-value="Low"]{color:#22c55e;border-color:#22c55e}
+.filter-chip[data-prop="priority"][data-value="Low"].active{background:#22c55e;color:#fff;border-color:#22c55e}
+#filter-summary{position:fixed;top:calc(var(--toolbar-h) + var(--head-h));left:var(--left-w);
+  display:flex;align-items:center;gap:4px;padding:4px 8px;z-index:20;pointer-events:auto;
+  flex-wrap:nowrap;max-width:60vw;justify-content:flex-start}
+#left-panel.compact-mode ~ * ~ #filter-summary,
+#left-panel.compact-mode ~ #filter-summary{left:135px}
+.filter-summary-chip{background:rgba(217,119,6,.12);color:#d97706;border:1px solid rgba(217,119,6,.35);
+  border-radius:4px;padding:2px 8px;font-size:.68rem;font-weight:600;cursor:pointer;
+  white-space:nowrap;transition:background .1s}
+.filter-summary-chip:hover{background:rgba(217,119,6,.25)}
+[data-theme='dark'] .filter-summary-chip{background:rgba(251,191,36,.1);color:#fbbf24;border-color:rgba(251,191,36,.35)}
+[data-theme='dark'] .filter-summary-chip:hover{background:rgba(251,191,36,.22)}
+/* Summary chip colors matching filter-chip colors */
+.filter-summary-chip[data-prop="status"][data-value="Done"]{background:rgba(34,197,94,.12);color:#22c55e;border-color:rgba(34,197,94,.35)}
+.filter-summary-chip[data-prop="status"][data-value="Done"]:hover{background:rgba(34,197,94,.25)}
+.filter-summary-chip[data-prop="status"][data-value="On Track"]{background:rgba(59,130,246,.12);color:#3b82f6;border-color:rgba(59,130,246,.35)}
+.filter-summary-chip[data-prop="status"][data-value="On Track"]:hover{background:rgba(59,130,246,.25)}
+.filter-summary-chip[data-prop="status"][data-value="Behind"]{background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.35)}
+.filter-summary-chip[data-prop="status"][data-value="Behind"]:hover{background:rgba(239,68,68,.25)}
+.filter-summary-chip[data-prop="status"][data-value="Waiting"]{background:rgba(234,179,8,.12);color:#eab308;border-color:rgba(234,179,8,.35)}
+.filter-summary-chip[data-prop="status"][data-value="Waiting"]:hover{background:rgba(234,179,8,.25)}
+.filter-summary-chip[data-prop="status"][data-value="On Hold"]{background:rgba(107,114,128,.12);color:#6b7280;border-color:rgba(107,114,128,.35)}
+.filter-summary-chip[data-prop="status"][data-value="On Hold"]:hover{background:rgba(107,114,128,.25)}
+.filter-summary-chip[data-prop="status"][data-value=""]{background:rgba(107,114,128,.12);color:#6b7280;border-color:rgba(107,114,128,.35)}
+.filter-summary-chip[data-prop="priority"][data-value="High"]{background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.35)}
+.filter-summary-chip[data-prop="priority"][data-value="High"]:hover{background:rgba(239,68,68,.25)}
+.filter-summary-chip[data-prop="priority"][data-value="Medium"]{background:rgba(249,115,22,.12);color:#f97316;border-color:rgba(249,115,22,.35)}
+.filter-summary-chip[data-prop="priority"][data-value="Medium"]:hover{background:rgba(249,115,22,.25)}
+.filter-summary-chip[data-prop="priority"][data-value="Low"]{background:rgba(34,197,94,.12);color:#22c55e;border-color:rgba(34,197,94,.35)}
+.filter-summary-chip[data-prop="priority"][data-value="Low"]:hover{background:rgba(34,197,94,.25)}
 #left-rows{overflow-y:auto;overflow-x:hidden;flex:1}
 #left-rows::-webkit-scrollbar{width:3px}
 #left-rows::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:2px}
@@ -217,7 +286,7 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 #left-panel.compact-mode .tasks-label{display:none}
 #left-panel.compact-mode #left-header{padding:6px 4px;gap:3px;height:28px;}
 #left-panel.compact-mode .filter-btns{gap:3px;}
-#left-panel.compact-mode .add-global-btn{font-size:.65rem;padding:2px 5px;}
+#left-panel.compact-mode .filter-btn{font-size:.65rem;padding:2px 5px;}
 #left-panel.compact-mode .fbtn{font-size:.65rem;padding:2px 5px;}
 #left-panel.compact-mode #left-subheader{padding:6px 4px;gap:2px;justify-content:space-between;height:28px;}
 #left-panel.compact-mode #left-subheader .compact-btn{font-size:.65rem;padding:2px 4px;width:auto;}
@@ -344,6 +413,8 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 }
 .drop-privacy-icon { font-size: 1rem; line-height: 1.5; flex-shrink: 0; }
 .drop-privacy-text { color: #166534; font-size: 0.82rem; line-height: 1.45; }
+[data-theme='dark'] .drop-privacy { background: #14532d; border-color: #166534; }
+[data-theme='dark'] .drop-privacy-text { color: #d1fae5; }
 .drop-text { color: var(--text-mu); font-size: 0.9rem; margin-bottom: 20px; }
 .drop-version { font-size: 0.72rem; color: var(--text-lt); margin-bottom: 12px; }
 .browse-btn {
@@ -351,6 +422,9 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
     border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem;
 }
 .browse-btn:hover { background: #0369a1; }
+[data-theme='dark'] .browse-btn:hover { background: #0284c7; }
+[data-theme='dark'] .template-download-btn { background: #052e16 !important; border-color: #166534 !important; color: #86efac !important; }
+[data-theme='dark'] .template-download-btn:hover { background: #064e3b !important; border-color: #16a34a !important; }
 #file-input { display: none; }
 .landing-footer {
     position: absolute; bottom: 18px; left: 0; right: 0;
@@ -366,8 +440,12 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .modal-header h3 { margin: 0; font-size: 1rem; color: var(--text); }
 #modal-btn-dependent { margin-right: 8px; border: 1px solid #fde047; background: #fef9c3; color: #854d0e; padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; cursor: pointer; font-family: var(--font); white-space: nowrap; transition: all 0.15s; }
 #modal-btn-dependent:hover { background: #fef08a; border-color: #facc15; color: #713f12; }
+[data-theme='dark'] #modal-btn-dependent { background: #1c1400; border-color: #a16207; color: #fde68a; }
+[data-theme='dark'] #modal-btn-dependent:hover { background: #2d1f00; border-color: #ca8a04; color: #fef08a; }
 #modal-btn-duplicate { margin-right: 12px; border: 1px solid #bae6fd; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; cursor: pointer; font-family: var(--font); white-space: nowrap; transition: all 0.15s; }
 #modal-btn-duplicate:hover { background: #bae6fd; border-color: #38bdf8; color: #075985; }
+[data-theme='dark'] #modal-btn-duplicate { background: #001c2d; border-color: #0369a1; color: #7dd3fc; }
+[data-theme='dark'] #modal-btn-duplicate:hover { background: #002a40; border-color: #38bdf8; color: #bae6fd; }
 .modal-close { cursor: pointer; font-size: 1.2rem; line-height: 1; color: var(--text-mu); }
 .modal-close:hover { color: var(--text); }
 .modal-body { padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
@@ -388,8 +466,12 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .select-pill:hover:not(.active) { opacity: 0.8; }
 .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
 .btn-primary:hover { background: #0369a1; }
+[data-theme='dark'] .btn-primary { background: #0c4a6e; border-color: #38bdf8; color: #e0f2fe; }
+[data-theme='dark'] .btn-primary:hover { background: #164e63; }
 .btn-delete { color: #dc2626; border-color: #fca5a5; background: #fef2f2; }
 .btn-delete:hover { background: #fee2e2; border-color: #f87171; }
+[data-theme='dark'] .btn-delete { color: #fca5a5; border-color: #7f1d1d; background: #1c0606; }
+[data-theme='dark'] .btn-delete:hover { background: #2d0a0a; border-color: #f87171; }
 
 .add-task-btn { display: inline-flex; justify-content: center; align-items: center; width: 18px; height: 18px; line-height: 1; border-radius: 4px; margin-left: 6px; margin-right: 6px; font-size: 1.15rem; padding-bottom: 2px; cursor: pointer; color: rgba(255,255,255,0.8); background: transparent; transition: background 0.1s, color 0.1s; opacity: 0; }
 .left-row:hover .add-task-btn { opacity: 1; }
@@ -434,7 +516,14 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
   background: var(--modal-header-bg);
   border-radius: 8px 8px 0 0;
   flex-shrink: 0; gap: 6px;
+  position: relative;
 }
+.modal-view-close {
+  position: absolute; top: 50%; right: 12px; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  font-size: 1.3rem; line-height: 1; color: var(--text-mu); padding: 2px 6px;
+}
+.modal-view-close:hover { color: var(--text); }
 .modal-view-bar .btn-group { font-size: 0.8rem; }
 .modal-view-bar .btn-group .btn { padding: 4px 14px; font-size: 0.8rem; }
 /* Task info row inside all view bars — no border above, border below separates from modal-header */
@@ -443,9 +532,6 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .modal-view-bar:not(:has(.comments-task-info:not(:empty))) { border-bottom: 1px solid var(--border); }
 
 /* ── Comments modal ────────────────────────────────────────────────── */
-.modal-standard { height: min(90vh, 740px); }
-.comments-modal { width: 500px; }
-.comments-modal .modal-body { flex: 1; overflow-y: auto; }
 .comments-modal-body { gap: 10px; }
 .comments-task-info { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 0.75rem; margin-top: 1px; }
 .comments-task-phase { font-weight: 600; color: var(--text-mu); }
@@ -464,13 +550,19 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .comment-edit-actions { display: flex; gap: 6px; margin-top: 5px; }
 .comment-edit-actions button { font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border-md); cursor: pointer; background: var(--bg); color: var(--text); }
 
-/* ── Dual modal (side-by-side) ─────────────────────────────────────── */
-#dual-modal-overlay { position: fixed; inset: 0; background: var(--modal-overlay); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-#dual-modal { background: var(--bg); border-radius: 8px; width: 900px; max-width: 96%; display: flex; flex-direction: column; box-shadow: 0 10px 25px var(--shadow); height: min(90vh, 740px); font-size: 0.85rem; border: 1px solid var(--border-md); overflow: hidden; }
-#dual-modal-panels { display: flex; flex: 1; overflow: hidden; }
-#dual-modal-edit { flex: 1; border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
-#dual-modal-comments { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-#dual-modal-edit .modal-body, #dual-modal-comments .modal-body { flex: 1; overflow-y: auto; }
+/* ── Unified modal (edit panel + comments panel, side-by-side or single) ── */
+#modal-container { height: min(90vh, 740px); overflow: hidden; }
+#modal-panels { display: flex; flex: 1; overflow: hidden; }
+#modal-edit-panel { flex: 1; border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+#modal-comments-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#modal-edit-panel .modal-body, #modal-comments-panel .modal-body { flex: 1; overflow-y: auto; }
+#modal-edit-panel .modal-header, #modal-comments-panel .modal-header { border-radius: 0; }
+/* View modes: applied as class on #modal-container */
+#modal-container.view-edit { width: 480px; }
+#modal-container.view-edit #modal-comments-panel { display: none; }
+#modal-container.view-comments { width: 500px; }
+#modal-container.view-comments #modal-edit-panel { display: none; }
+#modal-container.view-both { width: 960px; max-width: 96%; }
 </style>
 <script>/*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
 var XLSX={};function make_xlsx_lib(e){e.version="0.20.3";var r=1200,t=1252;var a;var n=[874,932,936,949,950,1250,1251,1252,1253,1254,1255,1256,1257,1258,1e4];var i={0:1252,1:65001,2:65001,77:1e4,128:932,129:949,130:1361,134:936,136:950,161:1253,162:1254,163:1258,177:1255,178:1256,186:1257,204:1251,222:874,238:1250,255:1252,69:6969};var s=function(e){if(n.indexOf(e)==-1)return;t=i[0]=e};function l(){s(1252)}var o=function(e){r=e;s(e)};function c(){o(1200);l()}function f(e){var r=[];for(var t=0,a=e.length;t<a;++t)r[t]=e.charCodeAt(t);return r}function u(e){var r=[];for(var t=0;t<e.length>>1;++t)r[t]=String.fromCharCode(e.charCodeAt(2*t)+(e.charCodeAt(2*t+1)<<8));return r.join("")}function h(e){var r=[];for(var t=0;t<e.length>>1;++t)r[t]=String.fromCharCode(e[2*t]+(e[2*t+1]<<8));return r.join("")}function d(e){var r=[];for(var t=0;t<e.length>>1;++t)r[t]=String.fromCharCode(e.charCodeAt(2*t+1)+(e.charCodeAt(2*t)<<8));return r.join("")}var p=function(e){var r=e.charCodeAt(0),t=e.charCodeAt(1);if(r==255&&t==254)return u(e.slice(2));if(r==254&&t==255)return d(e.slice(2));if(r==65279)return e.slice(1);return e};var m=function Dc(e){return String.fromCharCode(e)};var v=function Oc(e){return String.fromCharCode(e)};function g(e){a=e;o=function(e){r=e;s(e)};p=function(e){if(e.charCodeAt(0)===255&&e.charCodeAt(1)===254){return a.utils.decode(1200,f(e.slice(2)))}return e};m=function n(e){if(r===1200)return String.fromCharCode(e);return a.utils.decode(r,[e&255,e>>8])[0]};v=function i(e){return a.utils.decode(t,[e])[0]};va()}var b=null;var w=true;var k="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";function y(e){var r="";var t=0,a=0,n=0,i=0,s=0,l=0,o=0;for(var c=0;c<e.length;){t=e.charCodeAt(c++);i=t>>2;a=e.charCodeAt(c++);s=(t&3)<<4|a>>4;n=e.charCodeAt(c++);l=(a&15)<<2|n>>6;o=n&63;if(isNaN(a)){l=o=64}else if(isNaN(n)){o=64}r+=k.charAt(i)+k.charAt(s)+k.charAt(l)+k.charAt(o)}return r}function x(e){var r="";var t=0,a=0,n=0,i=0,s=0,l=0,o=0;for(var c=0;c<e.length;){t=e.charCodeAt(c++);if(t>255)t=95;i=t>>2;a=e.charCodeAt(c++);if(a>255)a=95;s=(t&3)<<4|a>>4;n=e.charCodeAt(c++);if(n>255)n=95;l=(a&15)<<2|n>>6;o=n&63;if(isNaN(a)){l=o=64}else if(isNaN(n)){o=64}r+=k.charAt(i)+k.charAt(s)+k.charAt(l)+k.charAt(o)}return r}function C(e){var r="";var t=0,a=0,n=0,i=0,s=0,l=0,o=0;for(var c=0;c<e.length;){t=e[c++];i=t>>2;a=e[c++];s=(t&3)<<4|a>>4;n=e[c++];l=(a&15)<<2|n>>6;o=n&63;if(isNaN(a)){l=o=64}else if(isNaN(n)){o=64}r+=k.charAt(i)+k.charAt(s)+k.charAt(l)+k.charAt(o)}return r}function S(e){var r="";var t=0,a=0,n=0,i=0,s=0,l=0,o=0;if(e.slice(0,5)=="data:"){var c=e.slice(0,1024).indexOf(";base64,");if(c>-1)e=e.slice(c+8)}e=e.replace(/[^\w\+\/\=]/g,"");for(var c=0;c<e.length;){i=k.indexOf(e.charAt(c++));s=k.indexOf(e.charAt(c++));t=i<<2|s>>4;r+=String.fromCharCode(t);l=k.indexOf(e.charAt(c++));a=(s&15)<<4|l>>2;if(l!==64){r+=String.fromCharCode(a)}o=k.indexOf(e.charAt(c++));n=(l&3)<<6|o;if(o!==64){r+=String.fromCharCode(n)}}return r}var _=function(){return typeof Buffer!=="undefined"&&typeof undefined!=="undefined"&&typeof{}!=="undefined"&&!!{}.node}();var A=function(){if(typeof Buffer!=="undefined"){var e=!Buffer.from;if(!e)try{Buffer.from("foo","utf8")}catch(r){e=true}return e?function(e,r){return r?new Buffer(e,r):new Buffer(e)}:Buffer.from.bind(Buffer)}return function(){}}();var T=function(){if(typeof Buffer==="undefined")return false;var e=A([65,0]);if(!e)return false;var r=e.toString("utf16le");return r.length==1}();function E(e){if(_)return Buffer.alloc?Buffer.alloc(e):new Buffer(e);return typeof Uint8Array!="undefined"?new Uint8Array(e):new Array(e)}function F(e){if(_)return Buffer.allocUnsafe?Buffer.allocUnsafe(e):new Buffer(e);return typeof Uint8Array!="undefined"?new Uint8Array(e):new Array(e)}var D=function Nc(e){if(_)return A(e,"binary");return e.split("").map(function(e){return e.charCodeAt(0)&255})};function O(e){if(typeof ArrayBuffer==="undefined")return D(e);var r=new ArrayBuffer(e.length),t=new Uint8Array(r);for(var a=0;a!=e.length;++a)t[a]=e.charCodeAt(a)&255;return r}function N(e){if(Array.isArray(e))return e.map(function(e){return String.fromCharCode(e)}).join("");var r=[];for(var t=0;t<e.length;++t)r[t]=String.fromCharCode(e[t]);return r.join("")}function M(e){if(typeof Uint8Array==="undefined")throw new Error("Unsupported");return new Uint8Array(e)}function I(e){if(typeof ArrayBuffer=="undefined")throw new Error("Unsupported");if(e instanceof ArrayBuffer)return I(new Uint8Array(e));var r=new Array(e.length);for(var t=0;t<e.length;++t)r[t]=e[t];return r}var P=_?function(e){return Buffer.concat(e.map(function(e){return Buffer.isBuffer(e)?e:A(e)}))}:function(e){if(typeof Uint8Array!=="undefined"){var r=0,t=0;for(r=0;r<e.length;++r)t+=e[r].length;var a=new Uint8Array(t);var n=0;for(r=0,t=0;r<e.length;t+=n,++r){n=e[r].length;if(e[r]instanceof Uint8Array)a.set(e[r],t);else if(typeof e[r]=="string")a.set(new Uint8Array(D(e[r])),t);else a.set(new Uint8Array(e[r]),t)}return a}return[].concat.apply([],e.map(function(e){return Array.isArray(e)?e:[].slice.call(e)}))};function R(e){var r=[],t=0,a=e.length+250;var n=E(e.length+255);for(var i=0;i<e.length;++i){var s=e.charCodeAt(i);if(s<128)n[t++]=s;else if(s<2048){n[t++]=192|s>>6&31;n[t++]=128|s&63}else if(s>=55296&&s<57344){s=(s&1023)+64;var l=e.charCodeAt(++i)&1023;n[t++]=240|s>>8&7;n[t++]=128|s>>2&63;n[t++]=128|l>>6&15|(s&3)<<4;n[t++]=128|l&63}else{n[t++]=224|s>>12&15;n[t++]=128|s>>6&63;n[t++]=128|s&63}if(t>a){r.push(n.slice(0,t));t=0;n=E(65535);a=65530}}r.push(n.slice(0,t));return P(r)}var L=/\u0000/g,U=/[\u0001-\u0006]/g;function B(e){var r="",t=e.length-1;while(t>=0)r+=e.charAt(t--);return r}function z(e,r){var t=""+e;return t.length>=r?t:xr("0",r-t.length)+t}function W(e,r){var t=""+e;return t.length>=r?t:xr(" ",r-t.length)+t}function j(e,r){var t=""+e;return t.length>=r?t:t+xr(" ",r-t.length)}function H(e,r){var t=""+Math.round(e);return t.length>=r?t:xr("0",r-t.length)+t}function V(e,r){var t=""+e;return t.length>=r?t:xr("0",r-t.length)+t}var X=Math.pow(2,32);function G(e,r){if(e>X||e<-X)return H(e,r);var t=Math.round(e);return V(t,r)}function Y(e,r){r=r||0;return e.length>=7+r&&(e.charCodeAt(r)|32)===103&&(e.charCodeAt(r+1)|32)===101&&(e.charCodeAt(r+2)|32)===110&&(e.charCodeAt(r+3)|32)===101&&(e.charCodeAt(r+4)|32)===114&&(e.charCodeAt(r+5)|32)===97&&(e.charCodeAt(r+6)|32)===108}var J=[["Sun","Sunday"],["Mon","Monday"],["Tue","Tuesday"],["Wed","Wednesday"],["Thu","Thursday"],["Fri","Friday"],["Sat","Saturday"]];var Z=[["J","Jan","January"],["F","Feb","February"],["M","Mar","March"],["A","Apr","April"],["M","May","May"],["J","Jun","June"],["J","Jul","July"],["A","Aug","August"],["S","Sep","September"],["O","Oct","October"],["N","Nov","November"],["D","Dec","December"]];function K(e){if(!e)e={};e[0]="General";e[1]="0";e[2]="0.00";e[3]="#,##0";e[4]="#,##0.00";e[9]="0%";e[10]="0.00%";e[11]="0.00E+00";e[12]="# ?/?";e[13]="# ??/??";e[14]="m/d/yy";e[15]="d-mmm-yy";e[16]="d-mmm";e[17]="mmm-yy";e[18]="h:mm AM/PM";e[19]="h:mm:ss AM/PM";e[20]="h:mm";e[21]="h:mm:ss";e[22]="m/d/yy h:mm";e[37]="#,##0 ;(#,##0)";e[38]="#,##0 ;[Red](#,##0)";e[39]="#,##0.00;(#,##0.00)";e[40]="#,##0.00;[Red](#,##0.00)";e[45]="mm:ss";e[46]="[h]:mm:ss";e[47]="mmss.0";e[48]="##0.0E+0";e[49]="@";e[56]='"上午/下午 "hh"時"mm"分"ss"秒 "';return e}var q={0:"General",1:"0",2:"0.00",3:"#,##0",4:"#,##0.00",9:"0%",10:"0.00%",11:"0.00E+00",12:"# ?/?",13:"# ??/??",14:"m/d/yy",15:"d-mmm-yy",16:"d-mmm",17:"mmm-yy",18:"h:mm AM/PM",19:"h:mm:ss AM/PM",20:"h:mm",21:"h:mm:ss",22:"m/d/yy h:mm",37:"#,##0 ;(#,##0)",38:"#,##0 ;[Red](#,##0)",39:"#,##0.00;(#,##0.00)",40:"#,##0.00;[Red](#,##0.00)",45:"mm:ss",46:"[h]:mm:ss",47:"mmss.0",48:"##0.0E+0",49:"@",56:'"上午/下午 "hh"時"mm"分"ss"秒 "'};var Q={5:37,6:38,7:39,8:40,23:0,24:0,25:0,26:0,27:14,28:14,29:14,30:14,31:14,50:14,51:14,52:14,53:14,54:14,55:14,56:14,57:14,58:14,59:1,60:2,61:3,62:4,67:9,68:10,69:12,70:13,71:14,72:14,73:15,74:16,75:17,76:20,77:21,78:22,79:45,80:46,81:47,82:0};var ee={5:'"$"#,##0_);\\("$"#,##0\\)',63:'"$"#,##0_);\\("$"#,##0\\)',6:'"$"#,##0_);[Red]\\("$"#,##0\\)',64:'"$"#,##0_);[Red]\\("$"#,##0\\)',7:'"$"#,##0.00_);\\("$"#,##0.00\\)',65:'"$"#,##0.00_);\\("$"#,##0.00\\)',8:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',66:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',41:'_(* #,##0_);_(* \\(#,##0\\);_(* "-"_);_(@_)',42:'_("$"* #,##0_);_("$"* \\(#,##0\\);_("$"* "-"_);_(@_)',43:'_(* #,##0.00_);_(* \\(#,##0.00\\);_(* "-"??_);_(@_)',44:'_("$"* #,##0.00_);_("$"* \\(#,##0.00\\);_("$"* "-"??_);_(@_)'};function re(e,r,t){var a=e<0?-1:1;var n=e*a;var i=0,s=1,l=0;var o=1,c=0,f=0;var u=Math.floor(n);while(c<r){u=Math.floor(n);l=u*s+i;f=u*c+o;if(n-u<5e-8)break;n=1/(n-u);i=s;s=l;o=c;c=f}if(f>r){if(c>r){f=o;l=i}else{f=c;l=s}}if(!t)return[0,a*l,f];var h=Math.floor(a*l/f);return[h,a*l-h*f,f]}function te(e){var r=e.toPrecision(16);if(r.indexOf("e")>-1){var t=r.slice(0,r.indexOf("e"));t=t.indexOf(".")>-1?t.slice(0,t.slice(0,2)=="0."?17:16):t.slice(0,15)+xr("0",t.length-15);return t+r.slice(r.indexOf("e"))}var a=r.indexOf(".")>-1?r.slice(0,r.slice(0,2)=="0."?17:16):r.slice(0,15)+xr("0",r.length-15);return Number(a)}function ae(e,r,t){if(e>2958465||e<0)return null;e=te(e);var a=e|0,n=Math.floor(86400*(e-a)),i=0;var s=[];var l={D:a,T:n,u:86400*(e-a)-n,y:0,m:0,d:0,H:0,M:0,S:0,q:0};if(Math.abs(l.u)<1e-6)l.u=0;if(r&&r.date1904)a+=1462;if(l.u>.9999){l.u=0;if(++n==86400){l.T=n=0;++a;++l.D}}if(a===60){s=t?[1317,10,29]:[1900,2,29];i=3}else if(a===0){s=t?[1317,8,29]:[1900,1,0];i=6}else{if(a>60)--a;var o=new Date(1900,0,1);o.setDate(o.getDate()+a-1);s=[o.getFullYear(),o.getMonth()+1,o.getDate()];i=o.getDay();if(a<60)i=(i+6)%7;if(t)i=fe(o,s)}l.y=s[0];l.m=s[1];l.d=s[2];l.S=n%60;n=Math.floor(n/60);l.M=n%60;n=Math.floor(n/60);l.H=n;l.q=i;return l}function ne(e){return e.indexOf(".")==-1?e:e.replace(/(?:\.0*|(\.\d*[1-9])0+)$/,"$1")}function ie(e){if(e.indexOf("E")==-1)return e;return e.replace(/(?:\.0*|(\.\d*[1-9])0+)[Ee]/,"$1E").replace(/(E[+-])(\d)$/,"$10$2")}function se(e){var r=e<0?12:11;var t=ne(e.toFixed(12));if(t.length<=r)return t;t=e.toPrecision(10);if(t.length<=r)return t;return e.toExponential(5)}function le(e){var r=ne(e.toFixed(11));return r.length>(e<0?12:11)||r==="0"||r==="-0"?e.toPrecision(6):r}function oe(e){if(!isFinite(e))return isNaN(e)?"#NUM!":"#DIV/0!";var r=Math.floor(Math.log(Math.abs(e))*Math.LOG10E),t;if(r>=-4&&r<=-1)t=e.toPrecision(10+r);else if(Math.abs(r)<=9)t=se(e);else if(r===10)t=e.toFixed(10).substr(0,12);else t=le(e);return ne(ie(t.toUpperCase()))}function ce(e,r){switch(typeof e){case"string":return e;case"boolean":return e?"TRUE":"FALSE";case"number":return(e|0)===e?e.toString(10):oe(e);case"undefined":return"";case"object":if(e==null)return"";if(e instanceof Date)return $e(14,dr(e,r&&r.date1904),r);}throw new Error("unsupported value in General format: "+e)}function fe(e,r){r[0]-=581;var t=e.getDay();if(e<60)t=(t+6)%7;return t}function ue(e,r,t,a){var n="",i=0,s=0,l=t.y,o,c=0;switch(e){case 98:l=t.y+543;case 121:switch(r.length){case 1:;case 2:o=l%100;c=2;break;default:o=l%1e4;c=4;break;}break;case 109:switch(r.length){case 1:;case 2:o=t.m;c=r.length;break;case 3:return Z[t.m-1][1];case 5:return Z[t.m-1][0];default:return Z[t.m-1][2];}break;case 100:switch(r.length){case 1:;case 2:o=t.d;c=r.length;break;case 3:return J[t.q][0];default:return J[t.q][1];}break;case 104:switch(r.length){case 1:;case 2:o=1+(t.H+11)%12;c=r.length;break;default:throw"bad hour format: "+r;}break;case 72:switch(r.length){case 1:;case 2:o=t.H;c=r.length;break;default:throw"bad hour format: "+r;}break;case 77:switch(r.length){case 1:;case 2:o=t.M;c=r.length;break;default:throw"bad minute format: "+r;}break;case 115:if(r!="s"&&r!="ss"&&r!=".0"&&r!=".00"&&r!=".000")throw"bad second format: "+r;if(t.u===0&&(r=="s"||r=="ss"))return z(t.S,r.length);if(a>=2)s=a===3?1e3:100;else s=a===1?10:1;i=Math.round(s*(t.S+t.u));if(i>=60*s)i=0;if(r==="s")return i===0?"0":""+i/s;n=z(i,2+a);if(r==="ss")return n.substr(0,2);return"."+n.substr(2,r.length-1);case 90:switch(r){case"[h]":;case"[hh]":o=t.D*24+t.H;break;case"[m]":;case"[mm]":o=(t.D*24+t.H)*60+t.M;break;case"[s]":;case"[ss]":o=((t.D*24+t.H)*60+t.M)*60+(a==0?Math.round(t.S+t.u):t.S);break;default:throw"bad abstime format: "+r;}c=r.length===3?1:2;break;case 101:o=l;c=1;break;}var f=c>0?z(o,c):"";return f}function he(e){var r=3;if(e.length<=r)return e;var t=e.length%r,a=e.substr(0,t);for(;t!=e.length;t+=r)a+=(a.length>0?",":"")+e.substr(t,r);return a}var de=/%/g;function pe(e,r,t){var a=r.replace(de,""),n=r.length-a.length;return Me(e,a,t*Math.pow(10,2*n))+xr("%",n)}function me(e,r,t){var a=r.length-1;while(r.charCodeAt(a-1)===44)--a;return Me(e,r.substr(0,a),t/Math.pow(10,3*(r.length-a)))}function ve(e,r){var t;var a=e.indexOf("E")-e.indexOf(".")-1;if(e.match(/^#+0.0E\+0$/)){if(r==0)return"0.0E+0";else if(r<0)return"-"+ve(e,-r);var n=e.indexOf(".");if(n===-1)n=e.indexOf("E");var i=Math.floor(Math.log(r)*Math.LOG10E)%n;if(i<0)i+=n;t=(r/Math.pow(10,i)).toPrecision(a+1+(n+i)%n);if(t.indexOf("e")===-1){var s=Math.floor(Math.log(r)*Math.LOG10E);if(t.indexOf(".")===-1)t=t.charAt(0)+"."+t.substr(1)+"E+"+(s-t.length+i);else t+="E+"+(s-i);while(t.substr(0,2)==="0."){t=t.charAt(0)+t.substr(2,n)+"."+t.substr(2+n);t=t.replace(/^0+([1-9])/,"$1").replace(/^0+\./,"0.")}t=t.replace(/\+-/,"-")}t=t.replace(/^([+-]?)(\d*)\.(\d*)[Ee]/,function(e,r,t,a){return r+t+a.substr(0,(n+i)%n)+"."+a.substr(i)+"E"})}else t=r.toExponential(a);if(e.match(/E\+00$/)&&t.match(/e[+-]\d$/))t=t.substr(0,t.length-1)+"0"+t.charAt(t.length-1);if(e.match(/E\-/)&&t.match(/e\+/))t=t.replace(/e\+/,"e");return t.replace("e","E")}var ge=/# (\?+)( ?)\/( ?)(\d+)/;function be(e,r,t){var a=parseInt(e[4],10),n=Math.round(r*a),i=Math.floor(n/a);var s=n-i*a,l=a;return t+(i===0?"":""+i)+" "+(s===0?xr(" ",e[1].length+1+e[4].length):W(s,e[1].length)+e[2]+"/"+e[3]+z(l,e[4].length))}function we(e,r,t){return t+(r===0?"":""+r)+xr(" ",e[1].length+2+e[4].length)}var ke=/^#*0*\.([0#]+)/;var ye=/\)[^)]*[0#]/;var xe=/\(###\) ###\\?-####/;function Ce(e){var r="",t;for(var a=0;a!=e.length;++a)switch(t=e.charCodeAt(a)){case 35:break;case 63:r+=" ";break;case 48:r+="0";break;default:r+=String.fromCharCode(t);}return r}function Se(e,r){var t=Math.pow(10,r);return""+Math.round(e*t)/t}function _e(e,r){var t=e-Math.floor(e),a=Math.pow(10,r);if(r<(""+Math.round(t*a)).length)return 0;return Math.round(t*a)}function Ae(e,r){if(r<(""+Math.round((e-Math.floor(e))*Math.pow(10,r))).length){return 1}return 0}function Te(e){if(e<2147483647&&e>-2147483648)return""+(e>=0?e|0:e-1|0);return""+Math.floor(e)}function Ee(e,r,t){if(e.charCodeAt(0)===40&&!r.match(ye)){var a=r.replace(/\( */,"").replace(/ \)/,"").replace(/\)/,"");if(t>=0)return Ee("n",a,t);return"("+Ee("n",a,-t)+")"}if(r.charCodeAt(r.length-1)===44)return me(e,r,t);if(r.indexOf("%")!==-1)return pe(e,r,t);if(r.indexOf("E")!==-1)return ve(r,t);if(r.charCodeAt(0)===36)return"$"+Ee(e,r.substr(r.charAt(1)==" "?2:1),t);var n;var i,s,l,o=Math.abs(t),c=t<0?"-":"";if(r.match(/^00+$/))return c+G(o,r.length);if(r.match(/^[#?]+$/)){n=G(t,0);if(n==="0")n="";return n.length>r.length?n:Ce(r.substr(0,r.length-n.length))+n}if(i=r.match(ge))return be(i,o,c);if(r.match(/^#+0+$/))return c+G(o,r.length-r.indexOf("0"));if(i=r.match(ke)){n=Se(t,i[1].length).replace(/^([^\.]+)$/,"$1."+Ce(i[1])).replace(/\.$/,"."+Ce(i[1])).replace(/\.(\d*)$/,function(e,r){return"."+r+xr("0",Ce(i[1]).length-r.length)});return r.indexOf("0.")!==-1?n:n.replace(/^0\./,".")}r=r.replace(/^#+([0.])/,"$1");if(i=r.match(/^(0*)\.(#*)$/)){return c+Se(o,i[2].length).replace(/\.(\d*[1-9])0*$/,".$1").replace(/^(-?\d*)$/,"$1.").replace(/^0\./,i[1].length?"0.":".")}if(i=r.match(/^#{1,3},##0(\.?)$/))return c+he(G(o,0));if(i=r.match(/^#,##0\.([#0]*0)$/)){return t<0?"-"+Ee(e,r,-t):he(""+(Math.floor(t)+Ae(t,i[1].length)))+"."+z(_e(t,i[1].length),i[1].length)}if(i=r.match(/^#,#*,#0/))return Ee(e,r.replace(/^#,#*,/,""),t);if(i=r.match(/^([0#]+)(\\?-([0#]+))+$/)){n=B(Ee(e,r.replace(/[\\-]/g,""),t));s=0;return B(B(r.replace(/\\/g,"")).replace(/[0#]/g,function(e){return s<n.length?n.charAt(s++):e==="0"?"0":""}))}if(r.match(xe)){n=Ee(e,"##########",t);return"("+n.substr(0,3)+") "+n.substr(3,3)+"-"+n.substr(6)}var f="";if(i=r.match(/^([#0?]+)( ?)\/( ?)([#0?]+)/)){s=Math.min(i[4].length,7);l=re(o,Math.pow(10,s)-1,false);n=""+c;f=Me("n",i[1],l[1]);if(f.charAt(f.length-1)==" ")f=f.substr(0,f.length-1)+"0";n+=f+i[2]+"/"+i[3];f=j(l[2],s);if(f.length<i[4].length)f=Ce(i[4].substr(i[4].length-f.length))+f;n+=f;return n}if(i=r.match(/^# ([#0?]+)( ?)\/( ?)([#0?]+)/)){s=Math.min(Math.max(i[1].length,i[4].length),7);l=re(o,Math.pow(10,s)-1,true);return c+(l[0]||(l[1]?"":"0"))+" "+(l[1]?W(l[1],s)+i[2]+"/"+i[3]+j(l[2],s):xr(" ",2*s+1+i[2].length+i[3].length))}if(i=r.match(/^[#0?]+$/)){n=G(t,0);if(r.length<=n.length)return n;return Ce(r.substr(0,r.length-n.length))+n}if(i=r.match(/^([#0?]+)\.([#0]+)$/)){n=""+t.toFixed(Math.min(i[2].length,10)).replace(/([^0])0+$/,"$1");s=n.indexOf(".");var u=r.indexOf(".")-s,h=r.length-n.length-u;return Ce(r.substr(0,u)+n+r.substr(r.length-h))}if(i=r.match(/^00,000\.([#0]*0)$/)){s=_e(t,i[1].length);return t<0?"-"+Ee(e,r,-t):he(Te(t)).replace(/^\d,\d{3}$/,"0$&").replace(/^\d*$/,function(e){return"00,"+(e.length<3?z(0,3-e.length):"")+e})+"."+z(s,i[1].length)}switch(r){case"###,##0.00":return Ee(e,"#,##0.00",t);case"###,###":;case"##,###":;case"#,###":var d=he(G(o,0));return d!=="0"?c+d:"";case"###,###.00":return Ee(e,"###,##0.00",t).replace(/^0\./,".");case"#,###.00":return Ee(e,"#,##0.00",t).replace(/^0\./,".");default:;}throw new Error("unsupported format |"+r+"|")}function Fe(e,r,t){var a=r.length-1;while(r.charCodeAt(a-1)===44)--a;return Me(e,r.substr(0,a),t/Math.pow(10,3*(r.length-a)))}function De(e,r,t){var a=r.replace(de,""),n=r.length-a.length;return Me(e,a,t*Math.pow(10,2*n))+xr("%",n)}function Oe(e,r){var t;var a=e.indexOf("E")-e.indexOf(".")-1;if(e.match(/^#+0.0E\+0$/)){if(r==0)return"0.0E+0";else if(r<0)return"-"+Oe(e,-r);var n=e.indexOf(".");if(n===-1)n=e.indexOf("E");var i=Math.floor(Math.log(r)*Math.LOG10E)%n;if(i<0)i+=n;t=(r/Math.pow(10,i)).toPrecision(a+1+(n+i)%n);if(!t.match(/[Ee]/)){var s=Math.floor(Math.log(r)*Math.LOG10E);if(t.indexOf(".")===-1)t=t.charAt(0)+"."+t.substr(1)+"E+"+(s-t.length+i);else t+="E+"+(s-i);t=t.replace(/\+-/,"-")}t=t.replace(/^([+-]?)(\d*)\.(\d*)[Ee]/,function(e,r,t,a){return r+t+a.substr(0,(n+i)%n)+"."+a.substr(i)+"E"})}else t=r.toExponential(a);if(e.match(/E\+00$/)&&t.match(/e[+-]\d$/))t=t.substr(0,t.length-1)+"0"+t.charAt(t.length-1);if(e.match(/E\-/)&&t.match(/e\+/))t=t.replace(/e\+/,"e");return t.replace("e","E")}function Ne(e,r,t){if(e.charCodeAt(0)===40&&!r.match(ye)){var a=r.replace(/\( */,"").replace(/ \)/,"").replace(/\)/,"");if(t>=0)return Ne("n",a,t);return"("+Ne("n",a,-t)+")"}if(r.charCodeAt(r.length-1)===44)return Fe(e,r,t);if(r.indexOf("%")!==-1)return De(e,r,t);if(r.indexOf("E")!==-1)return Oe(r,t);if(r.charCodeAt(0)===36)return"$"+Ne(e,r.substr(r.charAt(1)==" "?2:1),t);var n;var i,s,l,o=Math.abs(t),c=t<0?"-":"";if(r.match(/^00+$/))return c+z(o,r.length);if(r.match(/^[#?]+$/)){n=""+t;if(t===0)n="";return n.length>r.length?n:Ce(r.substr(0,r.length-n.length))+n}if(i=r.match(ge))return we(i,o,c);if(r.match(/^#+0+$/))return c+z(o,r.length-r.indexOf("0"));if(i=r.match(ke)){n=(""+t).replace(/^([^\.]+)$/,"$1."+Ce(i[1])).replace(/\.$/,"."+Ce(i[1]));n=n.replace(/\.(\d*)$/,function(e,r){return"."+r+xr("0",Ce(i[1]).length-r.length)});return r.indexOf("0.")!==-1?n:n.replace(/^0\./,".")}r=r.replace(/^#+([0.])/,"$1");if(i=r.match(/^(0*)\.(#*)$/)){return c+(""+o).replace(/\.(\d*[1-9])0*$/,".$1").replace(/^(-?\d*)$/,"$1.").replace(/^0\./,i[1].length?"0.":".")}if(i=r.match(/^#{1,3},##0(\.?)$/))return c+he(""+o);if(i=r.match(/^#,##0\.([#0]*0)$/)){return t<0?"-"+Ne(e,r,-t):he(""+t)+"."+xr("0",i[1].length)}if(i=r.match(/^#,#*,#0/))return Ne(e,r.replace(/^#,#*,/,""),t);if(i=r.match(/^([0#]+)(\\?-([0#]+))+$/)){n=B(Ne(e,r.replace(/[\\-]/g,""),t));s=0;return B(B(r.replace(/\\/g,"")).replace(/[0#]/g,function(e){return s<n.length?n.charAt(s++):e==="0"?"0":""}))}if(r.match(xe)){n=Ne(e,"##########",t);return"("+n.substr(0,3)+") "+n.substr(3,3)+"-"+n.substr(6)}var f="";if(i=r.match(/^([#0?]+)( ?)\/( ?)([#0?]+)/)){s=Math.min(i[4].length,7);l=re(o,Math.pow(10,s)-1,false);n=""+c;f=Me("n",i[1],l[1]);if(f.charAt(f.length-1)==" ")f=f.substr(0,f.length-1)+"0";n+=f+i[2]+"/"+i[3];f=j(l[2],s);if(f.length<i[4].length)f=Ce(i[4].substr(i[4].length-f.length))+f;n+=f;return n}if(i=r.match(/^# ([#0?]+)( ?)\/( ?)([#0?]+)/)){s=Math.min(Math.max(i[1].length,i[4].length),7);l=re(o,Math.pow(10,s)-1,true);return c+(l[0]||(l[1]?"":"0"))+" "+(l[1]?W(l[1],s)+i[2]+"/"+i[3]+j(l[2],s):xr(" ",2*s+1+i[2].length+i[3].length))}if(i=r.match(/^[#0?]+$/)){n=""+t;if(r.length<=n.length)return n;return Ce(r.substr(0,r.length-n.length))+n}if(i=r.match(/^([#0]+)\.([#0]+)$/)){n=""+t.toFixed(Math.min(i[2].length,10)).replace(/([^0])0+$/,"$1");s=n.indexOf(".");var u=r.indexOf(".")-s,h=r.length-n.length-u;return Ce(r.substr(0,u)+n+r.substr(r.length-h))}if(i=r.match(/^00,000\.([#0]*0)$/)){return t<0?"-"+Ne(e,r,-t):he(""+t).replace(/^\d,\d{3}$/,"0$&").replace(/^\d*$/,function(e){return"00,"+(e.length<3?z(0,3-e.length):"")+e})+"."+z(0,i[1].length)}switch(r){case"###,###":;case"##,###":;case"#,###":var d=he(""+o);return d!=="0"?c+d:"";default:if(r.match(/\.[0#?]*$/))return Ne(e,r.slice(0,r.lastIndexOf(".")),t)+Ce(r.slice(r.lastIndexOf(".")));}throw new Error("unsupported format |"+r+"|")}function Me(e,r,t){return(t|0)===t?Ne(e,r,t):Ee(e,r,t)}function Ie(e){var r=[];var t=false;for(var a=0,n=0;a<e.length;++a)switch(e.charCodeAt(a)){case 34:t=!t;break;case 95:;case 42:;case 92:++a;break;case 59:r[r.length]=e.substr(n,a-n);n=a+1;}r[r.length]=e.substr(n);if(t===true)throw new Error("Format |"+e+"| unterminated string ");return r}var Pe=/\[[HhMmSs\u0E0A\u0E19\u0E17]*\]/;function Re(e){var r=0,t="",a="";while(r<e.length){switch(t=e.charAt(r)){case"G":if(Y(e,r))r+=6;r++;break;case'"':for(;e.charCodeAt(++r)!==34&&r<e.length;){}++r;break;case"\\":r+=2;break;case"_":r+=2;break;case"@":++r;break;case"B":;case"b":if(e.charAt(r+1)==="1"||e.charAt(r+1)==="2")return true;case"M":;case"D":;case"Y":;case"H":;case"S":;case"E":;case"m":;case"d":;case"y":;case"h":;case"s":;case"e":;case"g":return true;case"A":;case"a":;case"上":if(e.substr(r,3).toUpperCase()==="A/P")return true;if(e.substr(r,5).toUpperCase()==="AM/PM")return true;if(e.substr(r,5).toUpperCase()==="上午/下午")return true;++r;break;case"[":a=t;while(e.charAt(r++)!=="]"&&r<e.length)a+=e.charAt(r);if(a.match(Pe))return true;break;case".":;case"0":;case"#":while(r<e.length&&("0#?.,E+-%".indexOf(t=e.charAt(++r))>-1||t=="\\"&&e.charAt(r+1)=="-"&&"0#".indexOf(e.charAt(r+2))>-1)){}break;case"?":while(e.charAt(++r)===t){}break;case"*":++r;if(e.charAt(r)==" "||e.charAt(r)=="*")++r;break;case"(":;case")":++r;break;case"1":;case"2":;case"3":;case"4":;case"5":;case"6":;case"7":;case"8":;case"9":while(r<e.length&&"0123456789".indexOf(e.charAt(++r))>-1){}break;case" ":++r;break;default:++r;break;}}return false}function Le(e,r,t,a){var n=[],i="",s=0,l="",o="t",c,f,u;var h="H";while(s<e.length){switch(l=e.charAt(s)){case"G":if(!Y(e,s))throw new Error("unrecognized character "+l+" in "+e);n[n.length]={t:"G",v:"General"};s+=7;break;case'"':for(i="";(u=e.charCodeAt(++s))!==34&&s<e.length;)i+=String.fromCharCode(u);n[n.length]={t:"t",v:i};++s;break;case"\\":var d=e.charAt(++s),p=d==="("||d===")"?d:"t";n[n.length]={t:p,v:d};++s;break;case"_":n[n.length]={t:"t",v:" "};s+=2;break;case"@":n[n.length]={t:"T",v:r};++s;break;case"B":;case"b":if(e.charAt(s+1)==="1"||e.charAt(s+1)==="2"){if(c==null){c=ae(r,t,e.charAt(s+1)==="2");if(c==null)return""}n[n.length]={t:"X",v:e.substr(s,2)};o=l;s+=2;break};case"M":;case"D":;case"Y":;case"H":;case"S":;case"E":l=l.toLowerCase();case"m":;case"d":;case"y":;case"h":;case"s":;case"e":;case"g":if(r<0)return"";if(c==null){c=ae(r,t);if(c==null)return""}i=l;while(++s<e.length&&e.charAt(s).toLowerCase()===l)i+=l;if(l==="m"&&o.toLowerCase()==="h")l="M";if(l==="h")l=h;n[n.length]={t:l,v:i};o=l;break;case"A":;case"a":;case"上":var m={t:l,v:l};if(c==null)c=ae(r,t);if(e.substr(s,3).toUpperCase()==="A/P"){if(c!=null)m.v=c.H>=12?e.charAt(s+2):l;m.t="T";h="h";s+=3}else if(e.substr(s,5).toUpperCase()==="AM/PM"){if(c!=null)m.v=c.H>=12?"PM":"AM";m.t="T";s+=5;h="h"}else if(e.substr(s,5).toUpperCase()==="上午/下午"){if(c!=null)m.v=c.H>=12?"下午":"上午";m.t="T";s+=5;h="h"}else{m.t="t";++s}if(c==null&&m.t==="T")return"";n[n.length]=m;o=l;break;case"[":i=l;while(e.charAt(s++)!=="]"&&s<e.length)i+=e.charAt(s);if(i.slice(-1)!=="]")throw'unterminated "[" block: |'+i+"|";if(i.match(Pe)){if(c==null){c=ae(r,t);if(c==null)return""}n[n.length]={t:"Z",v:i.toLowerCase()};o=i.charAt(1)}else if(i.indexOf("$")>-1){i=(i.match(/\$([^-\[\]]*)/)||[])[1]||"$";if(!Re(e))n[n.length]={t:"t",v:i}}break;case".":if(c!=null){i=l;while(++s<e.length&&(l=e.charAt(s))==="0")i+=l;n[n.length]={t:"s",v:i};break};case"0":;case"#":i=l;while(++s<e.length&&"0#?.,E+-%".indexOf(l=e.charAt(s))>-1)i+=l;n[n.length]={t:"n",v:i};break;case"?":i=l;while(e.charAt(++s)===l)i+=l;n[n.length]={t:l,v:i};o=l;break;case"*":++s;if(e.charAt(s)==" "||e.charAt(s)=="*")++s;break;case"(":;case")":n[n.length]={t:a===1?"t":l,v:l};++s;break;case"1":;case"2":;case"3":;case"4":;case"5":;case"6":;case"7":;case"8":;case"9":i=l;while(s<e.length&&"0123456789".indexOf(e.charAt(++s))>-1)i+=e.charAt(s);n[n.length]={t:"D",v:i};break;case" ":n[n.length]={t:l,v:l};++s;break;case"$":n[n.length]={t:"t",v:"$"};++s;break;default:if(",$-+/():!^&'~{}<>=€acfijklopqrtuvwxzP".indexOf(l)===-1)throw new Error("unrecognized character "+l+" in "+e);n[n.length]={t:"t",v:l};++s;break;}}var v=0,g=0,b;for(s=n.length-1,o="t";s>=0;--s){switch(n[s].t){case"h":;case"H":n[s].t=h;o="h";if(v<1)v=1;break;case"s":if(b=n[s].v.match(/\.0+$/)){g=Math.max(g,b[0].length-1);v=4}if(v<3)v=3;case"d":;case"y":;case"e":o=n[s].t;break;case"M":o=n[s].t;if(v<2)v=2;break;case"m":if(o==="s"){n[s].t="M";if(v<2)v=2}break;case"X":break;case"Z":if(v<1&&n[s].v.match(/[Hh]/))v=1;if(v<2&&n[s].v.match(/[Mm]/))v=2;if(v<3&&n[s].v.match(/[Ss]/))v=3;}}var w;switch(v){case 0:break;case 1:;case 2:;case 3:if(c.u>=.5){c.u=0;++c.S}if(c.S>=60){c.S=0;++c.M}if(c.M>=60){c.M=0;++c.H}if(c.H>=24){c.H=0;++c.D;w=ae(c.D);w.u=c.u;w.S=c.S;w.M=c.M;w.H=c.H;c=w}break;case 4:switch(g){case 1:c.u=Math.round(c.u*10)/10;break;case 2:c.u=Math.round(c.u*100)/100;break;case 3:c.u=Math.round(c.u*1e3)/1e3;break;}if(c.u>=1){c.u=0;++c.S}if(c.S>=60){c.S=0;++c.M}if(c.M>=60){c.M=0;++c.H}if(c.H>=24){c.H=0;++c.D;w=ae(c.D);w.u=c.u;w.S=c.S;w.M=c.M;w.H=c.H;c=w}break;}var k="",y;for(s=0;s<n.length;++s){switch(n[s].t){case"t":;case"T":;case" ":;case"D":break;case"X":n[s].v="";n[s].t=";";break;case"d":;case"m":;case"y":;case"h":;case"H":;case"M":;case"s":;case"e":;case"b":;case"Z":n[s].v=ue(n[s].t.charCodeAt(0),n[s].v,c,g);n[s].t="t";break;case"n":;case"?":y=s+1;while(n[y]!=null&&((l=n[y].t)==="?"||l==="D"||(l===" "||l==="t")&&n[y+1]!=null&&(n[y+1].t==="?"||n[y+1].t==="t"&&n[y+1].v==="/")||n[s].t==="("&&(l===" "||l==="n"||l===")")||l==="t"&&(n[y].v==="/"||n[y].v===" "&&n[y+1]!=null&&n[y+1].t=="?"))){n[s].v+=n[y].v;n[y]={v:"",t:";"};++y}k+=n[s].v;s=y-1;break;case"G":n[s].t="t";n[s].v=ce(r,t);break;}}var x="",C,S;if(k.length>0){if(k.charCodeAt(0)==40){C=r<0&&k.charCodeAt(0)===45?-r:r;S=Me("n",k,C)}else{C=r<0&&a>1?-r:r;S=Me("n",k,C);if(C<0&&n[0]&&n[0].t=="t"){S=S.substr(1);n[0].v="-"+n[0].v}}y=S.length-1;var _=n.length;for(s=0;s<n.length;++s)if(n[s]!=null&&n[s].t!="t"&&n[s].v.indexOf(".")>-1){_=s;break}var A=n.length;if(_===n.length&&S.indexOf("E")===-1){for(s=n.length-1;s>=0;--s){if(n[s]==null||"n?".indexOf(n[s].t)===-1)continue;if(y>=n[s].v.length-1){y-=n[s].v.length;n[s].v=S.substr(y+1,n[s].v.length)}else if(y<0)n[s].v="";else{n[s].v=S.substr(0,y+1);y=-1}n[s].t="t";A=s}if(y>=0&&A<n.length)n[A].v=S.substr(0,y+1)+n[A].v}else if(_!==n.length&&S.indexOf("E")===-1){y=S.indexOf(".")-1;for(s=_;s>=0;--s){if(n[s]==null||"n?".indexOf(n[s].t)===-1)continue;f=n[s].v.indexOf(".")>-1&&s===_?n[s].v.indexOf(".")-1:n[s].v.length-1;x=n[s].v.substr(f+1);for(;f>=0;--f){if(y>=0&&(n[s].v.charAt(f)==="0"||n[s].v.charAt(f)==="#"))x=S.charAt(y--)+x}n[s].v=x;n[s].t="t";A=s}if(y>=0&&A<n.length)n[A].v=S.substr(0,y+1)+n[A].v;y=S.indexOf(".")+1;for(s=_;s<n.length;++s){if(n[s]==null||"n?(".indexOf(n[s].t)===-1&&s!==_)continue;f=n[s].v.indexOf(".")>-1&&s===_?n[s].v.indexOf(".")+1:0;x=n[s].v.substr(0,f);for(;f<n[s].v.length;++f){if(y<S.length)x+=S.charAt(y++)}n[s].v=x;n[s].t="t";A=s}}}for(s=0;s<n.length;++s)if(n[s]!=null&&"n?".indexOf(n[s].t)>-1){C=a>1&&r<0&&s>0&&n[s-1].v==="-"?-r:r;n[s].v=Me(n[s].t,n[s].v,C);n[s].t="t"}var T="";for(s=0;s!==n.length;++s)if(n[s]!=null)T+=n[s].v;return T}var Ue=/\[(=|>[=]?|<[>=]?)(-?\d+(?:\.\d*)?)\]/;function Be(e,r){if(r==null)return false;var t=parseFloat(r[2]);switch(r[1]){case"=":if(e==t)return true;break;case">":if(e>t)return true;break;case"<":if(e<t)return true;break;case"<>":if(e!=t)return true;break;case">=":if(e>=t)return true;break;case"<=":if(e<=t)return true;break;}return false}function ze(e,r){var t=Ie(e);var a=t.length,n=t[a-1].indexOf("@");if(a<4&&n>-1)--a;if(t.length>4)throw new Error("cannot find right format for |"+t.join("|")+"|");if(typeof r!=="number")return[4,t.length===4||n>-1?t[t.length-1]:"@"];if(typeof r==="number"&&!isFinite(r))r=0;switch(t.length){case 1:t=n>-1?["General","General","General",t[0]]:[t[0],t[0],t[0],"@"];break;case 2:t=n>-1?[t[0],t[0],t[0],t[1]]:[t[0],t[1],t[0],"@"];break;case 3:t=n>-1?[t[0],t[1],t[0],t[2]]:[t[0],t[1],t[2],"@"];break;case 4:break;}var i=r>0?t[0]:r<0?t[1]:t[2];if(t[0].indexOf("[")===-1&&t[1].indexOf("[")===-1)return[a,i];if(t[0].match(/\[[=<>]/)!=null||t[1].match(/\[[=<>]/)!=null){var s=t[0].match(Ue);var l=t[1].match(Ue);return Be(r,s)?[a,t[0]]:Be(r,l)?[a,t[1]]:[a,t[s!=null&&l!=null?2:1]]}return[a,i]}function $e(e,r,t){if(t==null)t={};var a="";switch(typeof e){case"string":if(e=="m/d/yy"&&t.dateNF)a=t.dateNF;else a=e;break;case"number":if(e==14&&t.dateNF)a=t.dateNF;else a=(t.table!=null?t.table:q)[e];if(a==null)a=t.table&&t.table[Q[e]]||q[Q[e]];if(a==null)a=ee[e]||"General";break;}if(Y(a,0))return ce(r,t);if(r instanceof Date)r=dr(r,t.date1904);var n=ze(a,r);if(Y(n[1]))return ce(r,t);if(r===true)r="TRUE";else if(r===false)r="FALSE";else if(r===""||r==null)return"";else if(isNaN(r)&&n[1].indexOf("0")>-1)return"#NUM!";else if(!isFinite(r)&&n[1].indexOf("0")>-1)return"#DIV/0!";return Le(n[1],r,t,n[0])}function We(e,r){if(typeof r!="number"){r=+r||-1;for(var t=0;t<392;++t){if(q[t]==undefined){if(r<0)r=t;continue}if(q[t]==e){r=t;break}}if(r<0)r=391}q[r]=e;return r}function je(e){for(var r=0;r!=392;++r)if(e[r]!==undefined)We(e[r],r)}function He(){q=K()}var Ve={format:$e,load:We,_table:q,load_table:je,parse_date_code:ae,is_date:Re,get_table:function Mc(){return Ve._table=q}};var Xe={5:'"$"#,##0_);\\("$"#,##0\\)',6:'"$"#,##0_);[Red]\\("$"#,##0\\)',7:'"$"#,##0.00_);\\("$"#,##0.00\\)',8:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',23:"General",24:"General",25:"General",26:"General",27:"m/d/yy",28:"m/d/yy",29:"m/d/yy",30:"m/d/yy",31:"m/d/yy",32:"h:mm:ss",33:"h:mm:ss",34:"h:mm:ss",35:"h:mm:ss",36:"m/d/yy",41:'_(* #,##0_);_(* (#,##0);_(* "-"_);_(@_)',42:'_("$"* #,##0_);_("$"* (#,##0);_("$"* "-"_);_(@_)',43:'_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)',44:'_("$"* #,##0.00_);_("$"* (#,##0.00);_("$"* "-"??_);_(@_)',50:"m/d/yy",51:"m/d/yy",52:"m/d/yy",53:"m/d/yy",54:"m/d/yy",55:"m/d/yy",56:"m/d/yy",57:"m/d/yy",58:"m/d/yy",59:"0",60:"0.00",61:"#,##0",62:"#,##0.00",63:'"$"#,##0_);\\("$"#,##0\\)',64:'"$"#,##0_);[Red]\\("$"#,##0\\)',65:'"$"#,##0.00_);\\("$"#,##0.00\\)',66:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',67:"0%",68:"0.00%",69:"# ?/?",70:"# ??/??",71:"m/d/yy",72:"m/d/yy",73:"d-mmm-yy",74:"d-mmm",75:"mmm-yy",76:"h:mm",77:"h:mm:ss",78:"m/d/yy h:mm",79:"mm:ss",80:"[h]:mm:ss",81:"mmss.0"};var Ge=/[dD]+|[mM]+|[yYeE]+|[Hh]+|[Ss]+/g;function Ye(e){var r=typeof e=="number"?q[e]:e;r=r.replace(Ge,"(\\d+)");Ge.lastIndex=0;return new RegExp("^"+r+"$");
@@ -490,7 +582,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <div class="drop-card" id="drop-card" style="position: relative;">
         <div class="drop-title">&#128200; Gantt Chart Viewer</div>
         <div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>
-        <div class="drop-version">v2.0</div>
+        <div class="drop-version">v2.3</div>
         <div class="drop-text">
             Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
             with a table of tasks in <em>"Current Planning"</em> or <em>"Sheet 1"</em>. <br><br>
@@ -537,7 +629,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             <span id="snap-pill-text"></span>&thinsp;&#10005;
           </span>
       </div>
-      <div style="display:flex; flex-direction:column; gap:3px; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; gap:3px; align-items:stretch; margin-left:7px;">
         <button class="cbtn" id="stats-btn" data-action="toggleFlyout"
                 style="display:none; width:100%; justify-content:center;" data-tooltip="Toggle comparison stats panel">&#9783;&thinsp;<span class="txt-full">Stats</span></button>
         <button class="cbtn" id="changes-only-btn" data-action="toggleChangesOnly"
@@ -554,8 +646,11 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <button class="btn today-btn" data-action="goToday" data-tooltip="Jump to today"><span class="txt-full">Today</span><span class="txt-short">T</span></button>
       <button class="btn icon-btn" data-action="navigate" data-value="1" data-tooltip="Next time period">&#8594;</button>
     </div>
+    <div class="toolbar-add-task">
+      <button class="btn add-task-toolbar-btn" data-action="openTaskModalNew" data-tooltip="Add a new task"><span class="txt-full">Add Task</span><span class="txt-short">+</span></button>
+    </div>
     <div class="toolbar-right">
-      <span id="unsaved-warning" class="unsaved-warning" style="display:none;"><span class="txt-full">!! Unsaved Changes !!</span><span class="txt-short">!!</span></span>
+      <span id="unsaved-warning" class="unsaved-warning" style="display:none;"><span class="txt-full">Unsaved Changes</span><span class="txt-short">Unsaved</span></span>
       <button class="btn" id="darkmode-btn" data-action="toggleDarkMode" style="margin-right:12px; border-color:#64748b; color:#64748b;" data-tooltip="Toggle dark/light mode">&#9789;</button>
       <button class="btn" id="save-btn" data-action="saveSnapshot" style="margin-right:12px; border-color:#16a34a; color:#16a34a;" data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file.">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short"> Save</span></button>
       <button class="btn" id="export-btn" data-action="exportChart" style="margin-right:12px; border-color:#2563eb; color:#2563eb;" data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart.">&#128228;<span class="txt-full"> Export Chart</span><span class="txt-short"> Export</span></button>
@@ -572,7 +667,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
           <button class="fbtn"        id="fb-unfinished" data-action="setFilter" data-value="unfinished" data-tooltip="Show only active (non-completed) items">Active</button>
           <button class="fbtn"        id="fb-overdue"    data-action="setFilter" data-value="overdue" data-tooltip="Show only items past their end date that are not 100% complete">Overdue</button>
         </div>
-        <button class="add-global-btn" data-action="openTaskModalNew" data-tooltip="Add a new task">Add +</button>
+        <button class="filter-btn" id="filter-btn" data-tooltip="Filter tasks">Filter</button>
       </div>
       <div id="left-subheader">
         <button class="compact-btn" id="toggle-all-btn" data-action="toggleAll" data-tooltip="Expand / Collapse all">&#9660; Collapse all</button>
@@ -610,18 +705,19 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:10px;">
       <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Managing Tasks</p>
       <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li><strong>Edit:</strong> Click any task bar, or hover a bar and click the &#9998; button that appears to its side.</li>
-        <li><strong>Add:</strong> Use the global "Add +" button, or hover a Phase/Category row to reveal an inline "+" button for that group.</li>
-        <li><strong>Duplicate / Chain:</strong> Inside the Edit modal, use <em>Duplicate Task</em> to copy, or <em>Dependent Task</em> to create a follow-on task pre-linked to the current one.</li>
+        <li><strong>Edit:</strong> Click any task bar, or hover a bar and click the &#9998; button that appears to its side. Hovering a task row in the left panel also reveals the same shortcuts.</li>
+        <li><strong>Add:</strong> Use the global "Add +" button, hover a Phase/Category row to reveal an inline "+" button, or press <kbd>n</kbd> while hovering a Phase or Category row.</li>
+        <li><strong>Duplicate / Chain:</strong> Inside the Edit modal, use <em>Duplicate Task</em> to copy (comments are copied too), or <em>Dependent Task</em> to create a follow-on task pre-linked to the current one (comments are <em>not</em> copied). The main view scrolls to the new task after creation.</li>
         <li><strong>Delete:</strong> Click "Delete" inside the task's Edit modal.</li>
-        <li><strong>Rename Phase / Category:</strong> Hover a Phase or Category row to reveal a &#x270F; pencil button, then click to rename. If the new name already exists you will be offered a merge or a numbered duplicate.</li>
+        <li><strong>Rename Phase / Category:</strong> Hover a Phase or Category row to reveal a &#x270F; pencil button, then click to rename (or press <kbd>r</kbd>). If the new name already exists you will be offered a merge or a numbered duplicate.</li>
         <li><strong>Unsaved edits:</strong> While an Edit modal is open, any field that differs from its saved value shows an <span style="color:#d97706; font-style:italic;">amber label *</span> and a coloured left border, so you always know what has changed before saving.</li>
+        <li><strong>Save &amp; Close:</strong> Pressing <em>Save &amp; Close</em> in the Edit modal automatically flushes any pending unsaved comment before saving.</li>
       </ul>
 
       <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Comments</p>
       <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li>Hover a task bar and click &#x1F4AC; to open the Comments modal, or use the keyboard shortcut <kbd>c</kbd> while hovering.</li>
-        <li>Each comment is stored with the author name and date. The task tooltip shows the total comment count and a preview of the latest note.</li>
+        <li>Hover a task bar (or a task row in the left panel) and click &#x1F4AC; to open the Comments modal, or use the keyboard shortcut <kbd>c</kbd> while hovering.</li>
+        <li>Each comment is stored with the author name and date+time. The task tooltip shows the total comment count and a preview of the latest note.</li>
         <li>Comments can be edited or deleted inline &mdash; hover any comment to reveal ✏ Edit and 🗑 Delete buttons.</li>
         <li>Author names are remembered for the session and colour-coded consistently across all comments.</li>
       </ul>
@@ -637,18 +733,23 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
         <li><strong>Scrolling:</strong> Click and drag the chart to pan. Release mid-swipe for momentum scrolling. Click the glowing pills at the timeline edges to extend past or future range.</li>
         <li><strong>Views:</strong> Toggle between Week, Month, and Year timelines. Week mode aligns to Mondays.</li>
-        <li><strong>Filters:</strong> Use "All", "Active", and "Overdue" to focus on specific tasks. Empty categories are automatically hidden.</li>
+        <li><strong>Filters:</strong> Use "All", "Active" (excludes On Hold), and "Overdue" to focus on specific tasks. Empty categories are automatically hidden.</li>
         <li><strong>Compact Mode:</strong> Narrows the left panel and stacks filters vertically to maximise chart space. Hover any row for a full-detail tooltip.</li>
         <li><strong>Reload:</strong> Click the Date Pill in the top-left to reload from the source file without creating a new snapshot.</li>
+        <li><strong>Dependency arrows:</strong> Hovering a task bar with a dependency highlights its incoming arrow in amber.</li>
       </ul>
 
       <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Keyboard Shortcuts</p>
       <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:12px;">
         <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Context</th><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Key</th><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Action</th></tr></thead>
         <tbody>
-          <tr><td style="padding:3px 6px;">Hovering a task bar</td><td style="padding:3px 6px;"><kbd>e</kbd></td><td style="padding:3px 6px;">Open Edit modal</td></tr>
-          <tr><td style="padding:3px 6px;">Hovering a task bar</td><td style="padding:3px 6px;"><kbd>c</kbd></td><td style="padding:3px 6px;">Open Comments modal</td></tr>
-          <tr><td style="padding:3px 6px;">Hovering Phase/Category</td><td style="padding:3px 6px;"><kbd>e</kbd></td><td style="padding:3px 6px;">Open Rename modal</td></tr>
+          <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>e</kbd></td><td style="padding:3px 6px;">Open Edit modal</td></tr>
+          <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>c</kbd></td><td style="padding:3px 6px;">Open Comments modal</td></tr>
+          <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>d</kbd></td><td style="padding:3px 6px;">Create a Dependent Task</td></tr>
+          <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>n</kbd></td><td style="padding:3px 6px;">Duplicate the task</td></tr>
+          <tr><td style="padding:3px 6px;">Hovering Phase/Category row</td><td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>r</kbd></td><td style="padding:3px 6px;">Open Rename modal</td></tr>
+          <tr><td style="padding:3px 6px;">Hovering Phase/Category row</td><td style="padding:3px 6px;"><kbd>n</kbd></td><td style="padding:3px 6px;">Add a new task to that group</td></tr>
+          <tr><td style="padding:3px 6px;">Main view (no modal open)</td><td style="padding:3px 6px;"><kbd>s</kbd></td><td style="padding:3px 6px;">Save Excel</td></tr>
           <tr><td style="padding:3px 6px;">Any task modal open</td><td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>b</kbd> / <kbd>c</kbd></td><td style="padding:3px 6px;">Switch to Edit / Both / Comments view</td></tr>
           <tr><td style="padding:3px 6px;">Any modal open</td><td style="padding:3px 6px;"><kbd>Esc</kbd></td><td style="padding:3px 6px;">Close modal (prompts if unsaved)</td></tr>
         </tbody>
@@ -656,8 +757,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 
       <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Snapshots &amp; Comparison</p>
       <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li>Use the <strong>"Compare"</strong> dropdown to view a historical snapshot alongside current tasks. Ghost rows (muted italic text) show prior states.</li>
-        <li>Review high-level changes in the <strong>Stats</strong> flyout: milestones achieved, tasks completed, progressed, overdue, added, or removed.</li>
+        <li>Use the <strong>"Compare"</strong> dropdown to view a historical snapshot alongside current tasks. Ghost rows (muted italic text) show prior states; the timeline header glows red.</li>
+        <li>Review high-level changes in the <strong>Stats</strong> flyout: milestones achieved, tasks completed, progressed, overdue, added, put on hold, or removed.</li>
         <li><strong>"Save Excel"</strong> appends a new dated snapshot and downloads the updated workbook. <strong>"Export Chart"</strong> saves a standalone read-only HTML file for sharing.</li>
       </ul>
 
@@ -678,152 +779,165 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 
     <p style="margin-top:20px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded &mdash; all processing happens locally.</p>
     <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.0</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.3</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a href="https://github.com/kolfers/public_excel_to_gantt_standalone" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">GitHub Repository</a>.</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">Created by <a href="https://www.universiteitleiden.nl/en/staffmembers/kerwin-olfers#tab-1" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Kerwin Olfers</a> &middot; Released under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">MIT License</a>.</p>
     </div>
   </div>
 </div>
 
-<!-- Task Modal -->
-<div id="task-modal-overlay" class="modal-overlay" style="display:none;">
-    <div class="modal modal-standard">
-        <div class="modal-view-bar" id="edit-view-switcher">
-            <div class="btn-group">
-                <button class="btn active" data-action="modalSwitchEdit" data-tooltip="Edit view">&#9999; Edit</button>
-                <button class="btn" data-action="modalSwitchBoth" data-tooltip="Show Edit &amp; Comments side by side">&#9645;&#9645; Both</button>
-                <button class="btn" data-action="modalSwitchComments" data-tooltip="Switch to Comments view">&#128172; Comments</button>
-            </div>
-            <div id="edit-modal-taskinfo" class="comments-task-info"></div>
-        </div>
-        <div class="modal-header" style="display:flex; align-items:center;">
-            <h3 id="task-modal-title" style="margin:0;">Edit Task</h3>
-            <div style="flex:1;"></div>
-            <button id="modal-btn-dependent" data-action="createDependentTask" style="display:none;">Dependent Task</button>
-            <button id="modal-btn-duplicate" data-action="duplicateTaskFromModal" style="display:none;">Duplicate Task</button>
-            <span class="modal-close" data-action="closeTaskModalConfirm">&times;</span>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="modal-task-title">
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Phase</label>
-                    <input type="text" id="modal-task-phase" style="border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:-1px; z-index:1;" placeholder="Type to create new...">
-                    <select id="modal-phase-sel" onchange="if(this.value){document.getElementById('modal-task-phase').value = this.value; this.value='';}" style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;" title="Select existing phase"></select>
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <input type="text" id="modal-task-cat" style="border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:-1px; z-index:1;" placeholder="Type to create new...">
-                    <select id="modal-cat-sel" onchange="if(this.value){document.getElementById('modal-task-cat').value = this.value; this.value='';}" style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;" title="Select existing category"></select>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Priority</label>
-                    <div id="modal-priority-container" class="pill-container"></div>
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <div id="modal-status-container" class="pill-container"></div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Start Date</label>
-                    <input type="date" id="modal-task-start">
-                </div>
-                <div class="form-group">
-                    <label>End Date</label>
-                    <input type="date" id="modal-task-end">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Progress</label>
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <input type="range" id="modal-task-progress-range" min="0" max="100" style="flex:1" oninput="document.getElementById('modal-task-progress-num').value = this.value">
-                    <input type="number" id="modal-task-progress-num" min="0" max="100" style="width:60px" oninput="document.getElementById('modal-task-progress-range').value = this.value">
-                    <span>%</span>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Dependency</label>
-                    <select id="modal-task-dependency"></select>
-                </div>
-                <div class="form-group">
-                    <label>ID</label>
-                    <input type="text" id="modal-task-id">
-                </div>
-            </div>
-            <div class="form-group" id="modal-comment-info" style="display:none; flex-direction:column; gap:2px;">
-                <label>Comments</label>
-                <div>
-                  <span id="modal-comment-count" data-action="openCommentsFromEdit" style="cursor:pointer; color:var(--accent); font-weight:600;">0 comments</span>
-                  <span id="modal-comment-latest" style="color:var(--text-mu); font-size:0.8rem;"></span>
-                </div>
-            </div>
-            <div class="form-group" style="margin-bottom:0px;">
-                <label>Description</label>
-                <textarea id="modal-task-desc" rows="4" style="resize:vertical;"></textarea>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button id="modal-btn-delete" class="btn btn-delete" data-action="deleteTaskFromModal" style="display:none;">Delete</button>
-            <div style="flex:1"></div>
-            <button class="btn" data-action="closeTaskModalConfirm">Cancel</button>
-            <button id="modal-btn-save" class="btn btn-primary" data-action="saveTaskModal">Save</button>
-        </div>
-    </div>
+<!-- Filter Panel -->
+<div id="filter-panel" style="display:none;">
+  <div class="filter-panel-header">
+    <span class="filter-panel-title">Filters</span>
+    <button class="filter-clear-btn" data-action="clearAllFilters">Clear all</button>
+  </div>
+  <div class="filter-panel-row">
+    <span class="filter-prop-label">Status</span>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="Done">Done</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="On Track">On Track</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="Behind">Behind</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="Waiting">Waiting</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="On Hold">On Hold</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="">none</button>
+  </div>
+  <div class="filter-panel-row">
+    <span class="filter-prop-label">Priority</span>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="priority" data-value="High">High</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="priority" data-value="Medium">Medium</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="priority" data-value="Low">Low</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="priority" data-value="">none</button>
+  </div>
+  <div class="filter-panel-row">
+    <span class="filter-prop-label">Comments</span>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="comments" data-value="yes">Has comments</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="comments" data-value="no">No comments</button>
+  </div>
+  <div class="filter-panel-row">
+    <span class="filter-prop-label">Dependency</span>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="dependency" data-value="yes">Has dependency</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="dependency" data-value="no">No dependency</button>
+  </div>
+  <div class="filter-panel-row">
+    <span class="filter-prop-label">Overdue</span>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="due" data-value="yes">Overdue</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="due" data-value="no">Not overdue</button>
+  </div>
 </div>
 
-<!-- Comments Modal -->
-<div id="comments-modal-overlay" class="modal-overlay" style="display:none;">
-    <div class="modal modal-standard comments-modal" id="comments-modal">
-        <div class="modal-view-bar" id="comments-view-switcher">
+<!-- Unified Task/Comments Modal -->
+<div id="modal-overlay" class="modal-overlay" style="display:none;">
+    <div id="modal-container" class="modal view-both">
+        <div class="modal-view-bar" id="modal-view-switcher">
             <div class="btn-group">
-                <button class="btn" data-action="modalSwitchEdit" data-tooltip="Switch to Edit view">&#9999; Edit</button>
-                <button class="btn" data-action="modalSwitchBoth" data-tooltip="Show Edit &amp; Comments side by side">&#9645;&#9645; Both</button>
-                <button class="btn active" data-action="modalSwitchComments" data-tooltip="Comments view (current)">&#128172; Comments</button>
+                <button class="btn" data-action="modalSwitchEdit" data-tooltip="Edit view">&#9999; Edit</button>
+                <button class="btn active" data-action="modalSwitchBoth" data-tooltip="Show Edit &amp; Comments side by side">&#9645;&#9645; Both</button>
+                <button class="btn" data-action="modalSwitchComments" data-tooltip="Comments view">&#128172; Comments</button>
             </div>
-            <div id="comments-modal-taskinfo" class="comments-task-info"></div>
+            <button class="modal-view-close" data-action="closeModalConfirm" data-tooltip="Close (Esc)">&times;</button>
+            <div id="modal-taskinfo" class="comments-task-info"></div>
         </div>
-        <div class="modal-header">
-            <h3 id="comments-modal-title" style="margin:0; font-size:1rem;">Comments</h3>
-            <span class="modal-close" data-action="closeCommentsModalConfirm">&times;</span>
-        </div>
-        <div class="modal-body comments-modal-body">
-            <div class="form-group">
-                <label>Your name</label>
-                <input type="text" id="comments-name-input" list="comments-name-list" placeholder="Enter or select name...">
-                <datalist id="comments-name-list"></datalist>
+        <div id="modal-panels">
+            <div id="modal-edit-panel">
+                <div class="modal-header" style="display:flex; align-items:center;">
+                    <h3 id="modal-title" style="margin:0;">Edit Task</h3>
+                    <div style="flex:1;"></div>
+                    <button id="modal-btn-dependent" data-action="createDependentTask" style="display:none;">Dependent Task</button>
+                    <button id="modal-btn-duplicate" data-action="duplicateTaskFromModal" style="display:none;">Duplicate Task</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="modal-task-title">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phase</label>
+                            <input type="text" id="modal-task-phase" style="border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:-1px; z-index:1;" placeholder="Type to create new...">
+                            <select id="modal-phase-sel" onchange="if(this.value){document.getElementById('modal-task-phase').value = this.value; this.value='';}" style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;" title="Select existing phase"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" id="modal-task-cat" style="border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:-1px; z-index:1;" placeholder="Type to create new...">
+                            <select id="modal-cat-sel" onchange="if(this.value){document.getElementById('modal-task-cat').value = this.value; this.value='';}" style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;" title="Select existing category"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <div id="modal-priority-container" class="pill-container"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <div id="modal-status-container" class="pill-container"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" id="modal-task-start">
+                        </div>
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" id="modal-task-end">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Progress</label>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <input type="range" id="modal-task-progress-range" min="0" max="100" style="flex:1" oninput="document.getElementById('modal-task-progress-num').value = this.value">
+                            <input type="number" id="modal-task-progress-num" min="0" max="100" style="width:60px" oninput="document.getElementById('modal-task-progress-range').value = this.value">
+                            <span>%</span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Dependency</label>
+                            <select id="modal-task-dependency"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>ID</label>
+                            <input type="text" id="modal-task-id">
+                        </div>
+                    </div>
+                    <div class="form-group" id="modal-comment-info" style="display:none; flex-direction:column; gap:2px;">
+                        <label>Comments</label>
+                        <div>
+                          <span id="modal-comment-count" data-action="openCommentsFromEdit" style="cursor:pointer; color:var(--accent); font-weight:600;">0 comments</span>
+                          <span id="modal-comment-latest" style="color:var(--text-mu); font-size:0.8rem;"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0px;">
+                        <label>Description</label>
+                        <textarea id="modal-task-desc" rows="4" style="resize:vertical;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="modal-btn-delete" class="btn btn-delete" data-action="deleteTaskFromModal" style="display:none;">Delete</button>
+                    <div style="flex:1"></div>
+                    <button class="btn" data-action="closeModalConfirm">Cancel</button>
+                    <button id="modal-btn-save" class="btn btn-primary" data-action="saveTaskModal">Save</button>
+                    <button id="modal-btn-save-close" class="btn btn-primary" data-action="saveTaskModalAndClose">Save &amp; Close</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Comment</label>
-                <textarea id="comments-text-input" rows="4" placeholder="Write a comment..." style="resize:vertical;"></textarea>
+            <div id="modal-comments-panel">
+                <div class="modal-header">
+                    <h3 style="margin:0; font-size:1rem;">Comments</h3>
+                </div>
+                <div class="modal-body comments-modal-body">
+                    <div class="form-group">
+                        <label>Your name</label>
+                        <input type="text" id="comments-name-input" list="comments-name-list" placeholder="Enter or select name...">
+                        <datalist id="comments-name-list"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Comment</label>
+                        <textarea id="comments-text-input" rows="4" placeholder="Write a comment..." style="resize:vertical;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" data-action="saveComment">Save Comment</button>
+                    <div id="comments-list" class="comments-list"></div>
+                </div>
             </div>
-            <button class="btn btn-primary" data-action="saveComment">Save Comment</button>
-            <div id="comments-list" class="comments-list"></div>
-        </div>
-    </div>
-</div>
-
-<!-- Dual modal (side-by-side Edit + Comments) -->
-<div id="dual-modal-overlay" style="display:none;">
-    <div id="dual-modal">
-        <div class="modal-view-bar" id="dual-view-switcher">
-            <div class="btn-group">
-                <button class="btn" data-action="modalSwitchEdit" data-tooltip="Edit view only">&#9999; Edit</button>
-                <button class="btn active" data-action="modalSwitchBoth" data-tooltip="Side-by-side (current)">&#9645;&#9645; Both</button>
-                <button class="btn" data-action="modalSwitchComments" data-tooltip="Comments view only">&#128172; Comments</button>
-            </div>
-            <div id="dual-modal-taskinfo" class="comments-task-info"></div>
-        </div>
-        <div id="dual-modal-panels">
-            <div id="dual-modal-edit"></div>
-            <div id="dual-modal-comments"></div>
         </div>
     </div>
 </div>
@@ -854,7 +968,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 window.IS_EXPORTED = false;
 // ==EXPORT_DATA_PLACEHOLDER==
 let DATA = { tasks: [], snapshots: {}, meta: { source_file: 'None' } };
-const STATUS_COLORS = {"done": "#22c55e", "on track": "#3b82f6", "behind": "#ef4444", "waiting": "#eab308"};
+const STATUS_COLORS = {"done": "#22c55e", "on track": "#3b82f6", "behind": "#ef4444", "waiting": "#eab308", "on hold": "#6b7280"};
 const CAT_COLORS    = ["#0d9488", "#d97706", "#0284c7", "#e11d48", "#65a30d", "#ea580c", "#0891b2", "#db2777", "#059669", "#4338ca"];
 
 function getExampleData() {
@@ -876,12 +990,34 @@ function getExampleData() {
         return `${dStr} ${hh}:${mm}`;
     };
 
+    // Helper: Formats a past date relative to today as "DD-Mon-YYYY"
+    const fmtComment = (daysAgo) => {
+        const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const d = new Date(today); d.setDate(d.getDate() - daysAgo);
+        return `${String(d.getDate()).padStart(2,'0')}-${mo[d.getMonth()]}-${d.getFullYear()}`;
+    };
+
     const tasks = [
-        { ID: "A1", Title: "Project Kickoff (milestone)", Phase: "Initiation", Category: "Management", "Start Date": addDays(-14), "End Date": addDays(-14), Status: "Done", Progress: 100, Priority: "High", Description: "Initial meeting to align stakeholders and define project scope for the upcoming quarters." },
-        { ID: "A2", Title: "Requirements Gathering", Phase: "Initiation", Category: "Analysis", "Start Date": addDays(-13), "End Date": addDays(-3), Status: "Done", Progress: 100, Priority: "Medium", Description: "Collecting user stories and functional requirements from all department heads." },
+        { ID: "A1", Title: "Project Kickoff (milestone)", Phase: "Initiation", Category: "Management", "Start Date": addDays(-14), "End Date": addDays(-14), Status: "Done", Progress: 100, Priority: "High", Description: "Initial meeting to align stakeholders and define project scope for the upcoming quarters.",
+          Comments: [
+            { date: fmtComment(13), name: "Alice", text: "Kickoff went well! All stakeholders present, charter signed." },
+            { date: fmtComment(12), name: "Bob", text: "Action points distributed. Follow-up scheduled for next week." }
+          ]},
+        { ID: "A2", Title: "Requirements Gathering", Phase: "Initiation", Category: "Analysis", "Start Date": addDays(-13), "End Date": addDays(-3), Status: "Done", Progress: 100, Priority: "Medium", Description: "Collecting user stories and functional requirements from all department heads.",
+          Comments: [
+            { date: fmtComment(10), name: "Alice", text: "Finance and HR departments need extended timeline for input. Flagged to PM." },
+            { date: fmtComment(4), name: "Charlie", text: "All requirements collected and baseline documented in Confluence." }
+          ]},
         { ID: "A3", Title: "Architecture Review", Phase: "Planning", Category: "Development", "Start Date": addDays(-2), "End Date": addDays(2), Status: "Done", Progress: 100, Priority: "High", Description: "Technical audit of the proposed system architecture and scalability plans." },
-        { ID: "A10", Title: "Vendor Selection", Phase: "Planning", Category: "Management", "Start Date": addDays(-10), "End Date": addDays(-2), Status: "Behind", Progress: 75, Priority: "Medium", Description: "Evaluating third-party service providers for the cloud infrastructure migration." },
-        { ID: "A4", Title: "API Design", Phase: "Planning", Category: "Development", "Start Date": addDays(3), "End Date": addDays(10), Status: "On Track", Progress: 40, Dependency: "A3", Priority: "High", Description: "Defining RESTful endpoints and data schemas for the internal microservices layer." },
+        { ID: "A10", Title: "Vendor Selection", Phase: "Planning", Category: "Management", "Start Date": addDays(-10), "End Date": addDays(-2), Status: "Behind", Progress: 75, Priority: "Medium", Description: "Evaluating third-party service providers for the cloud infrastructure migration.",
+          Comments: [
+            { date: fmtComment(7), name: "Bob", text: "Shortlisted 3 vendors. Awaiting security compliance docs from Vendor B." },
+            { date: fmtComment(2), name: "Alice", text: "Vendor B docs received. Decision expected by end of week." }
+          ]},
+        { ID: "A4", Title: "API Design", Phase: "Planning", Category: "Development", "Start Date": addDays(3), "End Date": addDays(10), Status: "On Track", Progress: 40, Dependency: "A3", Priority: "High", Description: "Defining RESTful endpoints and data schemas for the internal microservices layer.",
+          Comments: [
+            { date: fmtComment(1), name: "Charlie", text: "Authentication endpoints drafted. Review meeting set for Thursday." }
+          ]},
         { ID: "A11", Title: "Hardware Procurement", Phase: "Planning", Category: "Management", "Start Date": addDays(-5), "End Date": addDays(-1), Status: "Waiting", Progress: 10, Dependency: "A10", Priority: "Low", Description: "Ordering server hardware and network components for the on-premise datacenter." },
         { ID: "A5", Title: "Design Approval (milestone)", Phase: "Planning", Category: "Management", "Start Date": addDays(10), "End Date": addDays(10), Status: "Waiting", Progress: 0, Priority: "Medium", Description: "Final sign-off on the UI design and user experience flows by the product owner." },
         { ID: "A6", Title: "Backend Implementation", Phase: "Execution", Category: "Development", "Start Date": addDays(11), "End Date": addDays(20), Status: "Waiting", Progress: 0, Dependency: "A4", Priority: "High", Description: "Developing the core logic and database integration for the application backend." },
@@ -891,17 +1027,23 @@ function getExampleData() {
     ];
 
     const snapshotTasks = [
-        { ID: "A1", Title: "Project Kickoff (milestone)", "Start Date": addDays(-14), "End Date": addDays(-14), Status: "Done", Progress: 100, Priority: "High", Description: "Initial meeting to align stakeholders and define project scope for the upcoming quarters." },
-        { ID: "A2", Title: "Requirements Gathering", "Start Date": addDays(-13), "End Date": addDays(-1), Status: "Behind", Progress: 75, Priority: "Medium", Description: "Initial requirement gathering session with key department stakeholders." },
-        { ID: "A3", Title: "Architecture Review", "Start Date": addDays(-2), "End Date": addDays(2), Status: "On Track", Progress: 50, Priority: "High", Description: "Technical audit of the proposed system architecture and scalability plans." },
+        { ID: "A1", Title: "Project Kickoff (milestone)", "Start Date": addDays(-14), "End Date": addDays(-14), Status: "Done", Progress: 100, Priority: "High", Description: "Initial meeting to align stakeholders and define project scope for the upcoming quarters.",
+          Comments: [
+            { date: fmtComment(13), name: "Alice", text: "Kickoff went well! All stakeholders present, charter signed." }
+          ]},
+        { ID: "A2", Title: "Requirements Gathering", "Start Date": addDays(-13), "End Date": addDays(-1), Status: "Behind", Progress: 75, Priority: "Medium", Description: "Initial requirement gathering session with key department stakeholders.",
+          Comments: [
+            { date: fmtComment(10), name: "Alice", text: "Finance and HR departments need extended timeline for input. Flagged to PM." }
+          ]},
+        { ID: "A3", Title: "Architecture Review", "Start Date": addDays(-2), "End Date": addDays(4), Status: "On Track", Progress: 50, Priority: "High", Description: "Technical audit of the proposed system architecture and scalability plans." },
         { ID: "A10", Title: "Vendor Selection", "Start Date": addDays(-10), "End Date": addDays(-2), Status: "Behind", Progress: 40, Priority: "Medium", Description: "Vendor research and initial long-list creation for infrastructure services." }, 
-        { ID: "A4", Title: "API Design", "Start Date": addDays(3), "End Date": addDays(10), Status: "Waiting", Progress: 0, Priority: "High", Description: "Preliminary API design and initial documentation draft." },
+        { ID: "A4", Title: "API Design", "Start Date": addDays(5), "End Date": addDays(12), Status: "Waiting", Progress: 0, Priority: "High", Description: "Preliminary API design and initial documentation draft." },
         { ID: "A11", Title: "Hardware Procurement", "Start Date": addDays(-5), "End Date": addDays(-1), Status: "Waiting", Progress: 0, Priority: "Low", Description: "Ordering server hardware and network components for the on-premise datacenter." },
-        { ID: "A5", Title: "Design Approval (milestone)", "Start Date": addDays(10), "End Date": addDays(10), Status: "Waiting", Progress: 0, Priority: "Medium", Description: "Final sign-off on the UI design and user experience flows by the product owner." },
-        { ID: "A6", Title: "Backend Implementation", "Start Date": addDays(11), "End Date": addDays(20), Status: "Waiting", Progress: 0, Priority: "High", Description: "Developing the core logic and database integration for the application backend." },
-        { ID: "A7", Title: "Frontend Integration", "Start Date": addDays(21), "End Date": addDays(30), Status: "Waiting", Progress: 0, Priority: "Medium", Description: "Building the responsive user interface and connecting it to the backend APIs." },
-        { ID: "A8", Title: "Testing", "Start Date": addDays(25), "End Date": addDays(40), Status: "Waiting", Progress: 0, Priority: "High", Description: "Comprehensive quality assurance testing, including unit, integration, and user acceptance tests." },
-        { ID: "A9", Title: "Go Live (milestone)", "Start Date": addDays(45), "End Date": addDays(45), Status: "Waiting", Progress: 0, Priority: "High", Description: "Official production launch and handover to the operations team." }
+        { ID: "A5", Title: "Design Approval (milestone)", "Start Date": addDays(12), "End Date": addDays(12), Status: "Waiting", Progress: 0, Priority: "Medium", Description: "Final sign-off on the UI design and user experience flows by the product owner." },
+        { ID: "A6", Title: "Backend Implementation", "Start Date": addDays(13), "End Date": addDays(25), Status: "Waiting", Progress: 0, Priority: "High", Description: "Developing the core logic and database integration for the application backend." },
+        { ID: "A7", Title: "Frontend Integration", "Start Date": addDays(26), "End Date": addDays(35), Status: "Waiting", Progress: 0, Priority: "Medium", Description: "Building the responsive user interface and connecting it to the backend APIs." },
+        { ID: "A8", Title: "Testing", "Start Date": addDays(30), "End Date": addDays(45), Status: "Waiting", Progress: 0, Priority: "High", Description: "Comprehensive quality assurance testing, including unit, integration, and user acceptance tests." },
+        { ID: "A9", Title: "Go Live (milestone)", "Start Date": addDays(50), "End Date": addDays(50), Status: "Waiting", Progress: 0, Priority: "High", Description: "Official production launch and handover to the operations team." }
     ];
 
     const snapshotDate = new Date(today);
@@ -950,8 +1092,12 @@ const AppState = {
   _hoveredTask: null,      // task object currently hovered in chart (for keyboard shortcuts)
   _hoveredPhase: null,     // phase name currently hovered in left panel
   _hoveredCatInfo: null,   // {phase, cat} currently hovered in left panel
+  _hoveredLeftTask: null,  // task object currently hovered in left panel task rows
   _commenterName: '',      // last used commenter name (session only)
-  _modalLayout: 'single',  // 'single' | 'both'
+  _modalLayout: 'both',    // 'edit' | 'comments' | 'both'  — persisted view preference for unified modal
+  _highlightCat: null,     // {phase, cat} for category row highlight after expand
+  _customFilters: { status: [], priority: [], comments: [], dependency: [], due: [] },
+  _filterPanelOpen: false,
 };
 
 // ── Title trimmer & snapshot formatter ───────────────────────────────
@@ -969,8 +1115,15 @@ function formatSnapKey(key) {
 // ── Date helpers ─────────────────────────────────────────────────────
 function parseDate(s) {
   if (!s) return null;
-  const m = /^(\d{2})-([A-Za-z]{3})-(\d{4})$/.exec(s);
-  if (m) { const mo = MONTH_ABBR.indexOf(m[2]); if (mo >= 0) return new Date(+m[3], mo, +m[1]); }
+  const m = /^(\d{2})-([A-Za-z]{3})-(\d{4})(?:\s+(\d{2}):(\d{2}))?/.exec(s);
+  if (m) {
+    const mo = MONTH_ABBR.indexOf(m[2]);
+    if (mo >= 0) {
+      const d = new Date(+m[3], mo, +m[1]);
+      if (m[4]) d.setHours(+m[4], +m[5], 0, 0);
+      return d;
+    }
+  }
   const d = new Date(s); return isNaN(d) ? null : d;
 }
 function fmtDate(d) { if(!d)return''; return`${String(d.getDate()).padStart(2,'0')}-${MONTH_ABBR[d.getMonth()]}-${d.getFullYear()}`; }
@@ -1037,10 +1190,47 @@ function overdueInfo(task, today) {
   const color = days < 7 ? '#92400e' : days < 30 ? '#c2410c' : '#b91c1c';
   return { days, label, color };
 }
+function hasCustomFilters() {
+  const f = AppState._customFilters;
+  return f.status.length > 0 || f.priority.length > 0 || f.comments.length > 0 || f.dependency.length > 0 || f.due.length > 0;
+}
+
+function isCustomFilterMatch(task, today) {
+  const f = AppState._customFilters;
+  if (f.status.length > 0) {
+    const taskStatus = (task.Status || '').trim();
+    if (!f.status.some(v => v === taskStatus)) return false;
+  }
+  if (f.priority.length > 0) {
+    const taskPriority = (task.Priority || '').trim();
+    if (!f.priority.some(v => v === taskPriority)) return false;
+  }
+  if (f.comments.length > 0) {
+    const hasC = Array.isArray(task.Comments) ? task.Comments.length > 0 : false;
+    if (!f.comments.some(v => (v === 'yes' && hasC) || (v === 'no' && !hasC))) return false;
+  }
+  if (f.dependency.length > 0) {
+    const hasDep = !!(task.Dependency && String(task.Dependency).trim());
+    if (!f.dependency.some(v => (v === 'yes' && hasDep) || (v === 'no' && !hasDep))) return false;
+  }
+  if (f.due.length > 0) {
+    const prog = Number(task.Progress) || 0;
+    const end = parseDate(task['End Date']);
+    const isOverdue = prog < 100 && end && end < today;
+    if (!f.due.some(v => (v === 'yes' && isOverdue) || (v === 'no' && !isOverdue))) return false;
+  }
+  return true;
+}
+
 function isTaskVisible(task, today) {
+  if (hasCustomFilters()) return isCustomFilterMatch(task, today);
   const prog = Number(task.Progress)||0;
   if (AppState.filterMode==='all') return true;
-  if (AppState.filterMode==='unfinished') return prog < 100;
+  if (AppState.filterMode==='unfinished') {
+    if (prog >= 100) return false;
+    if ((task.Status||'').toLowerCase() === 'on hold') return false;
+    return true;
+  }
   if (AppState.filterMode==='overdue') {
     if (prog >= 100) return false;
     const end = parseDate(task['End Date']); return end && end < today;
@@ -1210,10 +1400,11 @@ function formatNum(v) {
 function parseComments(raw) {
     if (!raw || typeof raw !== 'string') return [];
     const results = [];
-    const re = /\[([^\]:]+):([^\]]+)\]\s*([\s\S]*?)(?=\[|$)/g;
+    // Matches [DD-Mon-YYYY] or [DD-Mon-YYYY HH:MM] optionally followed by :Name
+    const re = /\[(\d{2}-[A-Za-z]{3}-\d{4}(?:\s+\d{2}:\d{2})?):([^\]]+)\]\s*([\s\S]*?)(?=\[|$)/g;
     let m;
     while ((m = re.exec(raw)) !== null) {
-        const dateStr = formatDateStr(m[1].trim()) || sanitizeInput(m[1].trim());
+        const dateStr = sanitizeInput(m[1].trim());
         const name = sanitizeInput(m[2].trim());
         const text = sanitizeInput(m[3].trim());
         if (name && text) results.push({ date: dateStr, name, text });
@@ -1406,19 +1597,25 @@ function downloadDataAsExcel(data, fileName) {
     return nowStr;
 }
 
-// Build filename in format: {source}_gantt_{d}-{month}-{yyyy}.xlsx
-// Strips any existing _gantt_{date} suffix before appending the new one.
+// Build filename in format: {source}_gantt_{d}-{month}-{yyyy}_{HH}-{MM}.xlsx
+// Strips any existing _gantt_{date}[_{time}] suffix before appending the new one.
 function buildGanttFileName(sourceName, date) {
     const FULL_MONTHS = ['january','february','march','april','may','june','july','august','september','october','november','december'];
     const d = date || new Date();
     const dateStr = `${d.getDate()}-${FULL_MONTHS[d.getMonth()]}-${d.getFullYear()}`;
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
     // Strip extension
     let base = String(sourceName || 'Plan').replace(/\.xls[xm]?$/i, '');
-    // Strip existing _gantt_{date} suffix (case-insensitive)
+    // Strip existing _gantt_{date}_{HH}-{MM} suffix with optional OS-appended (N) increment
+    base = base.replace(/_gantt_\d{1,2}-[a-z]+-\d{4}[_-]\d{2}-\d{2}\s*\(\d+\)$/i, '');
+    base = base.replace(/_gantt_\d{1,2}-[a-z]+-\d{4}[_-]\d{2}-\d{2}$/i, '');
+    // Strip existing _gantt_{date} suffix (old format) with optional OS-appended (N) increment
+    base = base.replace(/_gantt_\d{1,2}-[a-z]+-\d{4}\s*\(\d+\)$/i, '');
     base = base.replace(/_gantt_\d{1,2}-[a-z]+-\d{4}$/i, '');
     // Strip trailing separators
     base = base.replace(/[-_\s]+$/, '');
-    return `${base}_gantt_${dateStr}.xlsx`;
+    return `${base}_gantt_${dateStr}_${hh}-${mm}.xlsx`;
 }
 
 function saveSnapshot() {
@@ -1741,7 +1938,16 @@ function buildStatsMap(tasks, today) {
 function populateCompare() {
   const sel = document.getElementById('compare-sel');
   sel.innerHTML = '<option value=""><strong>\u2014 Compare \u2014</strong></option>';
-  Object.keys(DATA.snapshots).forEach(l => {
+  const sortedSnapKeys = Object.keys(DATA.snapshots).sort((a, b) => {
+    const parseSnapDate = k => {
+      const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})/.exec(k);
+      if (!m) return 0;
+      const mo = MONTH_ABBR.indexOf(m[2]);
+      return new Date(+m[3], mo, +m[1]).getTime();
+    };
+    return parseSnapDate(b) - parseSnapDate(a); // latest first
+  });
+  sortedSnapKeys.forEach(l => {
     const n = countDiffs(DATA.snapshots[l]);
     const o = document.createElement('option');
     o.value = l;
@@ -1801,9 +2007,9 @@ function toggleCompact() {
   const fbOverdue = document.getElementById('fb-overdue');
   if (fbOverdue) fbOverdue.textContent = AppState.compactMode ? 'Due' : 'Overdue';
   
-  const addBtn = document.querySelector('.add-global-btn');
-  if (addBtn) addBtn.textContent = AppState.compactMode ? '+' : 'Add +';
-  
+  const filterBtn = document.getElementById('filter-btn');
+  if (filterBtn) filterBtn.textContent = AppState.compactMode ? 'Filt' : 'Filter';
+
   render();
 }
 
@@ -1935,7 +2141,7 @@ function getVisibleRows(rows, today) {
   // 1. Pre-calculate which phases and categories actually hold matching tasks
   const validPhases = new Set();
   const validCats = new Set();
-  if (changedIds !== null || AppState.filterMode !== 'all') {
+  if (changedIds !== null || AppState.filterMode !== 'all' || hasCustomFilters()) {
     rows.forEach(r => {
       if (r.type === 'task') {
         let isMatch = false;
@@ -1955,13 +2161,13 @@ function getVisibleRows(rows, today) {
   // 2. Filter rows, handling visibility logic and collapse state
   return rows.filter(r => {
     if (r.type === 'phase') {
-      if (changedIds !== null || AppState.filterMode !== 'all') return validPhases.has(r.phase);
+      if (changedIds !== null || AppState.filterMode !== 'all' || hasCustomFilters()) return validPhases.has(r.phase);
       return true;
     }
     if (AppState.collapsed['p:'+r.phase]) return false;
 
     if (r.type === 'category') {
-      if (changedIds !== null || AppState.filterMode !== 'all') return validCats.has(r.phase+'||'+r.cat);
+      if (changedIds !== null || AppState.filterMode !== 'all' || hasCustomFilters()) return validCats.has(r.phase+'||'+r.cat);
       return true;
     }
     if (AppState.collapsed['c:'+r.phase+':'+r.cat]) return false;
@@ -2001,14 +2207,18 @@ function renderLeft(visible, today, statsMap) {
   const c = document.getElementById('left-rows'); c.innerHTML = '';
   // Empty state when filter gives no results
   let taskCount = 0;
-  if (AppState.filterMode === 'all') {
+  if (AppState.filterMode === 'all' && !hasCustomFilters()) {
     taskCount = visible.filter(r=>r.type==='task'&&!r.ghost).length;
   } else {
     taskCount = AppState.currentTasks.filter(t=>isTaskVisible(t, today)).length;
   }
-  if (taskCount === 0 && AppState.filterMode !== 'all') {
+  if (taskCount === 0 && (AppState.filterMode !== 'all' || hasCustomFilters())) {
     const msg = document.createElement('div'); msg.className='empty-state';
-    msg.innerHTML = AppState.filterMode==='overdue' ? '\uD83C\uDF89 No overdue items!' : '\uD83D\uDCCB No active items';
+    if (hasCustomFilters()) {
+      msg.innerHTML = '\uD83D\uDD0D No items match the active filters';
+    } else {
+      msg.innerHTML = AppState.filterMode==='overdue' ? '\uD83C\uDF89 No overdue items!' : '\uD83D\uDCCB No active items';
+    }
     c.appendChild(msg); return;
   }
   visible.forEach(r => {
@@ -2152,7 +2362,14 @@ function renderLeft(visible, today, statsMap) {
         circ.style.flexShrink = '0'; circ.style.verticalAlign = 'middle';
         lbl.appendChild(circ);
         const ov = overdueInfo(r.task, today);
-        if (ov) { const tag=document.createElement('span'); tag.className='overdue-tag'; tag.style.color=ov.color; tag.textContent=`(${ov.label})`; lbl.appendChild(tag); }
+        if (ov) {
+          const tag = document.createElement('span'); tag.className = 'overdue-tag';
+          // Use brighter colors in dark mode so the tag is legible on dark backgrounds
+          tag.style.color = _leftDark
+            ? (ov.days < 7 ? '#fbbf24' : ov.days < 30 ? '#fb923c' : '#f87171')
+            : ov.color;
+          tag.textContent = `(${ov.label})`; lbl.appendChild(tag);
+        }
 
         const rawTaskTitle = r.task.Title || '';
         let htmlContext = `<b>${escHtml(rawTaskTitle)}</b>`;
@@ -2165,18 +2382,59 @@ function renderLeft(visible, today, statsMap) {
         div.onmouseleave = hideTooltip;
       }
       div.appendChild(lbl);
+      // Track hovered left-panel task for keyboard shortcuts
+      if (!r.ghost) {
+        div.addEventListener('mouseenter', () => { AppState._hoveredLeftTask = r.task; });
+        div.addEventListener('mouseleave', () => { AppState._hoveredLeftTask = null; });
+      }
       // All task rows (current + ghost) are clickable
       div.onclick = () => scrollToTask(r.task);
     }
     c.appendChild(div);
   });
+  // Extra bottom padding matching the chart area so left and right panels stay aligned
+  const _leftSpacer = document.createElement('div');
+  _leftSpacer.style.cssText = `height:${Math.floor(window.innerHeight/2)}px;flex-shrink:0;pointer-events:none;`;
+  c.appendChild(_leftSpacer);
+}
+
+// ── Dependency dropdown helper ─────────────────────────────────────────
+function _buildDepOptions(depSel, excludeId) {
+  depSel.innerHTML = '<option value="">-- None --</option>';
+  const sorted = AppState.currentTasks
+    .filter(t => !excludeId || getTaskId(t) !== excludeId)
+    .slice()
+    .sort((a, b) => {
+      const pa = (a.Phase||'').toLowerCase(), pb = (b.Phase||'').toLowerCase();
+      if (pa !== pb) return pa < pb ? -1 : 1;
+      const ca = (a.Category||'').toLowerCase(), cb = (b.Category||'').toLowerCase();
+      if (ca !== cb) return ca < cb ? -1 : 1;
+      return (a.Title||'').toLowerCase() < (b.Title||'').toLowerCase() ? -1 : 1;
+    });
+  sorted.forEach(t => {
+    const op = document.createElement('option');
+    op.value = getTaskId(t);
+    op.textContent = `${t.Phase} \u203a ${t.Category} \u203a ${t.Title}`;
+    op.style.color = catColor(t.Category);
+    depSel.appendChild(op);
+  });
 }
 
 // ── Bar hover overlay helpers ─────────────────────────────────────────
 let _hoverOverlayTimer = null;
+let _highlightedDepArrow = null;
+
+function _clearDepArrowHighlight() {
+  if (_highlightedDepArrow) {
+    _highlightedDepArrow.setAttribute('stroke', '#94a3b8');
+    _highlightedDepArrow.setAttribute('stroke-width', '1.5');
+    _highlightedDepArrow = null;
+  }
+}
 
 function _removeBarHoverOverlay() {
   clearTimeout(_hoverOverlayTimer); _hoverOverlayTimer = null;
+  _clearDepArrowHighlight();
   const ov = document.getElementById('bar-hover-overlay');
   if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
   AppState._hoveredTask = null;
@@ -2192,6 +2450,23 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
 
   // If already showing for the same task, just keep it — don't move the buttons
   if (AppState._hoveredTask === task && document.getElementById('bar-hover-overlay')) return;
+
+  // Highlight the dependency arrow for this task (amber) if it has a parent
+  _clearDepArrowHighlight();
+  if (task.Dependency) {
+    const childId = getTaskId(task);
+    const svg = document.getElementById('gantt-svg');
+    if (svg) {
+      const allArrows = svg.querySelectorAll('[data-dep-child-id]');
+      allArrows.forEach(a => {
+        if (a.getAttribute('data-dep-child-id') === childId) {
+          a.setAttribute('stroke', '#f59e0b');
+          a.setAttribute('stroke-width', '2.5');
+          _highlightedDepArrow = a;
+        }
+      });
+    }
+  }
 
   AppState._hoveredTask = task;
   const chartArea = document.getElementById('chart-area');
@@ -2211,24 +2486,16 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
   ov.style.width  = hitClientRect.width  + 'px';
   ov.style.height = hitClientRect.height + 'px';
 
-  // Place buttons to whichever side of the cursor has more room.
-  // The clear zone equals one button width so the tooltip is visible first.
-  // If neither side fits inside the bar, float the group just outside the right edge.
+  // Always place buttons to the right of the cursor (clear zone = cursorGap).
+  // If that overflows the right edge, float the group just past the right edge.
   const cursorInBar = cursorClientX - hitClientRect.left;
   const btnGroupW   = 68;   // approx total width: 2 buttons + 4px gap
-  const cursorGap   = 32;   // clear zone ≈ one button width
+  const cursorGap   = 20;   // small clear zone so cursor doesn't cover buttons
 
-  const roomRight = hitClientRect.width - cursorInBar - cursorGap;
-  const roomLeft  = cursorInBar - cursorGap;
-
-  let btnLeft;
-  if (roomLeft < btnGroupW && roomRight < btnGroupW) {
-    // Bar too short to fit on either side — float just past the right edge
+  let btnLeft = cursorInBar + cursorGap;
+  if (btnLeft + btnGroupW > hitClientRect.width) {
+    // No room to the right — float just past the right edge
     btnLeft = hitClientRect.width + 4;
-  } else if (roomRight >= roomLeft) {
-    btnLeft = cursorInBar + cursorGap;
-  } else {
-    btnLeft = cursorInBar - cursorGap - btnGroupW;
   }
   const btnTop = (hitClientRect.height - 26) / 2;
 
@@ -2237,17 +2504,18 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
   actions.style.left = btnLeft + 'px';
   actions.style.top  = btnTop  + 'px';
 
-  const btnC = document.createElement('button'); btnC.textContent = '\uD83D\uDCAC'; btnC.dataset.tooltip = 'Comments (c)';
-  btnC.addEventListener('mouseenter', () => clearTimeout(_hoverOverlayTimer));
-  btnC.addEventListener('mouseleave', _scheduleHideBarHover);
-  btnC.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openCommentsModal(task); };
-
+  // Edit button (✎) is leftmost, Comments (💬) is to the right
   const btnE = document.createElement('button'); btnE.textContent = '\u270E'; btnE.dataset.tooltip = 'Edit task (e)';
   btnE.addEventListener('mouseenter', () => clearTimeout(_hoverOverlayTimer));
   btnE.addEventListener('mouseleave', _scheduleHideBarHover);
   btnE.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openTaskModal(task, 'edit'); };
 
-  actions.appendChild(btnC); actions.appendChild(btnE);
+  const btnC = document.createElement('button'); btnC.textContent = '\uD83D\uDCAC'; btnC.dataset.tooltip = 'Comments (c)';
+  btnC.addEventListener('mouseenter', () => clearTimeout(_hoverOverlayTimer));
+  btnC.addEventListener('mouseleave', _scheduleHideBarHover);
+  btnC.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openCommentsModal(task); };
+
+  actions.appendChild(btnE); actions.appendChild(btnC);
   ov.appendChild(actions);
 }
 
@@ -2259,7 +2527,9 @@ function renderChart(visible, today) {
   
   // Note: previously year AppState.view was clamped to exactly rightW, preventing scrolling
   const totalW = Math.max(cols.length*cw, rightW);
-  const totalH = Math.max(visible.length*ROW_H, 400);
+  // Extra bottom padding so the user can scroll the last item bar into view comfortably
+  const extraBottomPad = Math.floor(window.innerHeight / 2);
+  const totalH = Math.max(visible.length*ROW_H + extraBottomPad, 400);
 
   svg.setAttribute('width', totalW); svg.setAttribute('height', totalH);
   while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -2294,6 +2564,9 @@ function renderChart(visible, today) {
   // Pre-compute highlight row index (rect drawn after grid lines so it covers them)
   const _highlightRi = AppState._highlightId
     ? visible.findIndex(r => r.type==='task' && !r.ghost && getTaskId(r.task) === AppState._highlightId)
+    : -1;
+  const _highlightCatRi = AppState._highlightCat
+    ? visible.findIndex(r => r.type==='category' && r.phase === AppState._highlightCat.phase && r.cat === AppState._highlightCat.cat)
     : -1;
 
   // Row backgrounds
@@ -2386,6 +2659,9 @@ function renderChart(visible, today) {
     svg.appendChild(svgEl('rect',{x:0,y:_highlightRi*ROW_H,width:totalW,height:ROW_H,fill:_barBg}));
     svg.appendChild(svgEl('rect',{x:0,y:_highlightRi*ROW_H,width:totalW,height:ROW_H,fill:_dark?'rgba(251,191,36,0.18)':'rgba(239,68,68,0.10)'}));
   }
+  if (_highlightCatRi >= 0) {
+    svg.appendChild(svgEl('rect',{x:0,y:_highlightCatRi*ROW_H,width:totalW,height:ROW_H,fill:_dark?'rgba(56,189,248,0.18)':'rgba(239,68,68,0.10)'}));
+  }
 
   // ── Today line ──
   const todayX=dateToX(today);
@@ -2418,7 +2694,9 @@ function renderChart(visible, today) {
       const gY = y1 + (y2 > y1 ? 16 : -16);
       d = `M${x1},${y1} H${x1+6} V${gY} H${x2-12} V${y2} H${x2}`;
     }
-    arrG.appendChild(svgEl('path',{d, fill:'none',stroke:'#94a3b8','stroke-width':1.5,'marker-end':'url(#arr)',style:'pointer-events:none'}));
+    const arrPath = svgEl('path',{d, fill:'none',stroke:'#94a3b8','stroke-width':1.5,'marker-end':'url(#arr)',style:'pointer-events:none'});
+    arrPath.dataset.depChildId = getTaskId(r.task);
+    arrG.appendChild(arrPath);
   });
   
   // ── Load More Buttons ──
@@ -2521,7 +2799,9 @@ function renderChart(visible, today) {
               render();
               setTimeout(() => scrollToTask(realParent), 60);
             };
-            attG.onmousemove = (e) => showHTMLTooltip(e, `Hidden dependency: <b>${escHtml(realParent.Title)}</b>`);
+            const _depPColor = catColor(realParent.Category||'');
+            const _depHtml = `Hidden dependency:<br/><span style="color:#64748b;font-size:0.7rem;">${escHtml(realParent.Phase)} \u203A <span style="color:${_depPColor};font-weight:600;">${escHtml(realParent.Category)}</span> \u203A </span><b>${escHtml(realParent.Title)}</b>`;
+            attG.onmousemove = (e) => showHTMLTooltip(e, _depHtml);
             attG.onmouseleave = hideTooltip;
             svg.appendChild(attG);
           }
@@ -2545,6 +2825,7 @@ function renderChart(visible, today) {
   });
 
   syncScroll();
+  _renderFilterSummary();
 }
 
 // ── Scroll sync ───────────────────────────────────────────────────────
@@ -2557,7 +2838,7 @@ function syncScroll(){
 
 
 // ── Tooltip ───────────────────────────────────────────────────────────
-function _getVal(task, key, contextTasks=[]) {
+function _getVal(task, key) {
   const v = task[key];
   if (v === null || v === undefined || v === '') return '\u2014';
   if (key === 'Start Date' || key === 'End Date') {
@@ -2567,10 +2848,8 @@ function _getVal(task, key, contextTasks=[]) {
       return String(d.getDate()).padStart(2, '0') + ' ' + moFull[d.getMonth()] + ' ' + d.getFullYear();
     }
   }
-  if (key === 'Dependency' && contextTasks.length > 0) {
-    const depId = String(v).trim();
-    const parent = contextTasks.find(pt => getTaskId(pt) === depId);
-    if (parent) return `${parent.Title} (${parent.Category})`;
+  if (key === 'Dependency') {
+    return String(v).trim() || '\u2014';
   }
   const suffix = key === 'Progress' ? '%' : '';
   return String(v) + suffix;
@@ -2602,32 +2881,70 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
 
   let rows = '';
   fields.forEach(({label,key,skip_diff,is_status}) => {
-    const myVal  = _getVal(t, key, isGhost ? snapList : currentList);
+    const myVal  = _getVal(t, key);
     let diffHtml = '';
     if (!skip_diff && partnerTask) {
-      const partVal = _getVal(partnerTask, key, isGhost ? currentList : snapList);
+      const partVal = _getVal(partnerTask, key);
       if (myVal !== partVal) {
-        // isGhost: show current (partner) value in green. !isGhost: show snapshot (partner) value in red.
         const cls   = isGhost ? 'tt-diff-curr' : 'tt-diff-snap';
         diffHtml = `<span class="${cls}">${escHtml(partVal)}</span>`;
       }
     }
-    if (is_status) {
-      rows += `<div class="tt-row"><span class="tt-label">${label}</span>${escHtml(myVal)}<span class="tt-sc" style="background:${sc}"></span>${diffHtml}</div>`;
+    // Build display HTML for this value
+    let valHtml;
+    if (key === 'Dependency' && myVal !== '\u2014') {
+      const ctxList = isGhost ? snapList : currentList;
+      const parent = ctxList.find(pt => getTaskId(pt) === myVal);
+      if (parent) {
+        const pColor = catColor(parent.Category||'');
+        valHtml = `${escHtml(parent.Phase)} \u203A <span style="color:${pColor};font-weight:600;">${escHtml(parent.Category)}</span> \u203A ${escHtml(parent.Title)} <span style="color:#94a3b8;font-size:0.7em;">(${escHtml(myVal)})</span>`;
+      } else {
+        valHtml = escHtml(myVal);
+      }
     } else {
-      rows += `<div class="tt-row"><span class="tt-label">${label}</span>${escHtml(myVal)}${diffHtml}</div>`;
+      valHtml = escHtml(myVal);
+    }
+    if (is_status) {
+      rows += `<div class="tt-row"><span class="tt-label">${label}</span>${valHtml}<span class="tt-sc" style="background:${sc}"></span>${diffHtml}</div>`;
+    } else {
+      rows += `<div class="tt-row"><span class="tt-label">${label}</span>${valHtml}${diffHtml}</div>`;
     }
   });
 
   // Append note count and latest note at bottom
   const ttComments = t.Comments || [];
   const noteCountLabel = ttComments.length === 0 ? 'No notes yet' : `${ttComments.length} note${ttComments.length !== 1 ? 's' : ''}`;
-  rows += `<div class="tt-row" style="margin-top:4px;border-top:1px solid var(--border);padding-top:4px;"><span class="tt-label">Notes</span>${escHtml(noteCountLabel)}</div>`;
+  rows += `<div class="tt-row" style="margin-top:4px;border-top:1px solid var(--border);padding-top:4px;"><span class="tt-label">Notes</span>${escHtml(noteCountLabel)}`;
+  // Comment count diff vs partner
+  if (partnerTask) {
+    const partnerComments = partnerTask.Comments || [];
+    const delta = ttComments.length - partnerComments.length;
+    if (delta !== 0) {
+      const diffCls = delta > 0 ? 'tt-diff-curr' : 'tt-diff-snap';
+      const sign = delta > 0 ? '+' : '';
+      rows += ` <span class="${diffCls}">${sign}${delta} vs snapshot</span>`;
+    }
+  }
+  rows += `</div>`;
   if (ttComments.length > 0) {
-    const latest = ttComments[ttComments.length - 1];
+    const latest = ttComments.slice().sort((a,b)=>{ const da=parseDate(a.date),db=parseDate(b.date); return (da&&db)?db-da:0; })[0];
     const cColor = commenterColor(latest.name);
-    const shortText = latest.text.length > 55 ? latest.text.slice(0, 55) + '\u2026' : latest.text;
-    rows += `<div class="tt-row"><span class="tt-label">Latest note</span><span style="color:${cColor};font-weight:700">${escHtml(latest.name)}</span> <span style="color:var(--text-mu);font-size:0.75em;">${escHtml(latest.date)}</span>: ${escHtml(shortText)}</div>`;
+    // Truncate at ~400 chars to avoid runaway tooltips (10 lines at ~40 chars each)
+    const shortText = latest.text.length > 400 ? latest.text.slice(0, 400) + '\u2026' : latest.text;
+    rows += `<div class="tt-row" style="flex-direction:column;align-items:flex-start;gap:2px;">` +
+      `<div style="display:flex;align-items:center;"><span class="tt-label">Latest note</span><span style="color:${cColor};font-weight:700">${escHtml(latest.name)}</span>&nbsp;<span style="color:var(--text-mu);font-size:0.75em;">${escHtml(latest.date)}</span></div>` +
+      `<div style="padding-left:78px;white-space:pre-wrap;word-break:break-word;line-height:1.5;max-height:calc(10 * 1.5em);overflow:hidden;">${escHtml(shortText)}</div>` +
+      `</div>`;
+  }
+  // Show snapshot's latest comment for comparison context
+  if (partnerTask) {
+    const partnerComments = partnerTask.Comments || [];
+    if (partnerComments.length > 0) {
+      const snapLatest = partnerComments.slice().sort((a,b)=>{ const da=parseDate(a.date),db=parseDate(b.date); return (da&&db)?db-da:0; })[0];
+      const spColor = commenterColor(snapLatest.name);
+      const snapShort = snapLatest.text.length > 45 ? snapLatest.text.slice(0, 45) + '\u2026' : snapLatest.text;
+      rows += `<div class="tt-row"><span class="tt-label">Snap note</span><span style="color:${spColor};font-weight:700">${escHtml(snapLatest.name)}</span> <span style="color:var(--text-mu);font-size:0.75em;">${escHtml(snapLatest.date)}</span>: ${escHtml(snapShort)}</div>`;
+    }
   }
 
   tt.innerHTML = `${snap}<div class="tt-title">${escHtml(t.Title||'')}</div>${phaseCatHtml}${rows}`;
@@ -2779,7 +3096,7 @@ function updateFlyout(){
   const snapIds=new Set(Object.keys(snapById));
 
   let milestonesAchieved=[], itemsCompleted=[], itemsProgressed=[],
-      itemsOverdue=[], itemsAdded=[], itemsRemoved=[];
+      itemsOverdue=[], itemsAdded=[], itemsOnHold=[], itemsRemoved=[];
 
   AppState.currentTasks.forEach(t=>{
     const id=getTaskId(t);
@@ -2795,6 +3112,10 @@ function updateFlyout(){
       if(cp>sp) itemsProgressed.push(t);
     }
     if(isOverdueNow(t,today)&&!isOverdueNow(snap,today)) itemsOverdue.push(t);
+    // On hold: status is now 'on hold' but wasn't before
+    const wasOnHold=(snap.Status||'').toLowerCase()==='on hold';
+    const nowOnHold=(t.Status||'').toLowerCase()==='on hold';
+    if(nowOnHold&&!wasOnHold) itemsOnHold.push(t);
   });
   snapIds.forEach(id=>{ if(!currIds.has(id)) itemsRemoved.push(snapById[id]); });
 
@@ -2807,6 +3128,7 @@ function updateFlyout(){
     {label:'Items progressed',    items:itemsProgressed,    color:'#0284c7', icon:'\u2191'},
     {label:'Items overdue',       items:itemsOverdue,       color:'#dc2626', icon:'\u26a0'},
     {label:'Items added',         items:itemsAdded,         color:'#7c3aed', icon:'+'},
+    {label:'Items on hold',       items:itemsOnHold,        color:'#6b7280', icon:'\u23f8'},
     {label:'Items removed',       items:itemsRemoved,       color:'#64748b', icon:'\u2212'},
   ];
   rows.forEach(s=>{
@@ -2955,7 +3277,49 @@ function goToday(){
 
 // ── Collapse / expand ─────────────────────────────────────────────────
 function togglePhase(ph){AppState.collapsed['p:'+ph]=!AppState.collapsed['p:'+ph];render();}
-function toggleCategory(ph,ca){AppState.collapsed['c:'+ph+':'+ca]=!AppState.collapsed['c:'+ph+':'+ca];render();}
+function toggleCategory(ph, ca) {
+  const wasCollapsed = AppState.collapsed['c:' + ph + ':' + ca];
+  AppState.collapsed['c:' + ph + ':' + ca] = !wasCollapsed;
+  if (wasCollapsed) {
+    // Expanding: highlight category row and scroll chart to it
+    AppState._highlightCat = { phase: ph, cat: ca };
+    if (AppState._highlightTimer) clearTimeout(AppState._highlightTimer);
+    AppState._highlightTimer = setTimeout(() => { AppState._highlightCat = null; render(); }, 2500);
+    render();
+    setTimeout(() => {
+      const today2 = new Date(); today2.setHours(0,0,0,0);
+      const cmpT = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
+      const allR = buildAllRows(AppState.currentTasks, cmpT, AppState.compareLabel);
+      const vis = getVisibleRows(allR, today2);
+      const rowIdx = vis.findIndex(r => r.type === 'category' && r.phase === ph && r.cat === ca);
+      if (rowIdx >= 0) {
+        const chartArea = document.getElementById('chart-area');
+        const lr = document.getElementById('left-rows');
+        chartArea.scrollTop = rowIdx * ROW_H;
+        lr.scrollTop = rowIdx * ROW_H;
+      }
+      // Scroll horizontally to the task in this category whose end date is closest to today
+      const catTasks = AppState.currentTasks.filter(t => t.Phase === ph && t.Category === ca);
+      if (catTasks.length > 0) {
+        const closest = catTasks.reduce((best, t) => {
+          const end = parseDate(t['End Date']);
+          if (!end) return best;
+          const diff = Math.abs(end - today2);
+          if (!best || diff < best.diff) return { task: t, diff };
+          return best;
+        }, null);
+        if (closest) {
+          const targetDate = parseDate(closest.task['End Date']);
+          const chartArea = document.getElementById('chart-area');
+          chartArea.scrollLeft = Math.max(0, dateToX(targetDate) - chartArea.clientWidth / 2);
+        }
+      }
+    }, 60);
+  } else {
+    AppState._highlightCat = null;
+    render();
+  }
+}
 function expandAll(){AppState.collapsed={};render();}
 function collapseAll(){
   AppState.currentTasks.forEach(t=>{AppState.collapsed['p:'+t.Phase]=true;AppState.collapsed['c:'+t.Phase+':'+t.Category]=true;});
@@ -2972,8 +3336,100 @@ function updateToggleBtn(){
 function toggleAll(){ isAllCollapsed()?expandAll():collapseAll(); }
 
 // ── Filter ────────────────────────────────────────────────────────────
+function _updateFilterBtnState() {
+  const filterBtn = document.getElementById('filter-btn');
+  const active = hasCustomFilters();
+  if (filterBtn) filterBtn.classList.toggle('active', active);
+  if (active) {
+    ['all','unfinished','overdue'].forEach(m => {
+      const el = document.getElementById('fb-'+m); if (el) el.classList.remove('active');
+    });
+  } else {
+    ['all','unfinished','overdue'].forEach(m => {
+      const el = document.getElementById('fb-'+m);
+      if (el) el.classList.toggle('active', m === AppState.filterMode);
+    });
+  }
+}
+
+function _refreshFilterChips() {
+  const panel = document.getElementById('filter-panel');
+  if (!panel) return;
+  panel.querySelectorAll('.filter-chip').forEach(chip => {
+    const prop = chip.dataset.prop;
+    const val = chip.dataset.value;
+    const active = AppState._customFilters[prop] && AppState._customFilters[prop].includes(val);
+    chip.classList.toggle('active', active);
+  });
+}
+
+function _renderFilterSummary() {
+  const existing = document.getElementById('filter-summary');
+  if (existing) existing.remove();
+  if (!hasCustomFilters()) return;
+  const f = AppState._customFilters;
+  const propLabels = { status:'Status', priority:'Priority', comments:'Comments', dependency:'Dependency', due:'Overdue' };
+  const valDisplay = (prop, v) => {
+    if (v === '') return 'none';
+    if (prop === 'comments') return v === 'yes' ? 'Has comments' : 'No comments';
+    if (prop === 'dependency') return v === 'yes' ? 'Has dep' : 'No dep';
+    if (prop === 'due') return v === 'yes' ? 'Overdue' : 'Not overdue';
+    return v;
+  };
+  const wrap = document.createElement('div');
+  wrap.id = 'filter-summary';
+  // Position at left edge of the right panel
+  const rp = document.getElementById('right-panel');
+  if (rp) wrap.style.left = rp.getBoundingClientRect().left + 'px';
+  Object.entries(f).forEach(([prop, vals]) => {
+    if (!vals.length) return;
+    vals.forEach(v => {
+      const label = propLabels[prop] + ': ' + valDisplay(prop, v);
+      const chip = document.createElement('span');
+      chip.className = 'filter-summary-chip';
+      chip.dataset.prop = prop;
+      chip.dataset.value = v;
+      chip.title = 'Click to remove this filter';
+      chip.textContent = label + ' \u00d7';
+      chip.addEventListener('click', () => {
+        AppState._customFilters[prop] = AppState._customFilters[prop].filter(x => x !== v);
+        _updateFilterBtnState();
+        _refreshFilterChips();
+        render();
+      });
+      wrap.appendChild(chip);
+    });
+  });
+  const app = document.getElementById('app');
+  if (app) app.appendChild(wrap);
+}
+
+function toggleFilterPanel() {
+  if (AppState._filterPanelOpen) _closeFilterPanel(); else _openFilterPanel();
+}
+
+function toggleFilterChip(prop, value) {
+  const arr = AppState._customFilters[prop];
+  if (!arr) return;
+  const idx = arr.indexOf(value);
+  if (idx >= 0) arr.splice(idx, 1); else arr.push(value);
+  _updateFilterBtnState();
+  _refreshFilterChips();
+  render();
+}
+
+function clearAllFilters() {
+  AppState._customFilters = { status:[], priority:[], comments:[], dependency:[], due:[] };
+  _updateFilterBtnState();
+  _refreshFilterChips();
+  render();
+}
+
 function setFilter(mode){
   AppState.filterMode=mode;
+  AppState._customFilters={ status:[], priority:[], comments:[], dependency:[], due:[] };
+  const filterBtn=document.getElementById('filter-btn');
+  if(filterBtn) filterBtn.classList.remove('active');
   ['all','unfinished','overdue'].forEach(m=>document.getElementById('fb-'+m).classList.toggle('active',m===mode));
   render();
 }
@@ -3078,52 +3534,35 @@ function _setModalTaskInfo(elId, task) {
     `<span class="comments-task-title" data-tooltip="${escHtml(task.Title||'')}">${escHtml(task.Title||'')}</span>`;
 }
 
-// ── Comments Modal ────────────────────────────────────────────────────
+// ── Comments task ref (alias for _modalTask in unified modal) ─────────
 let _commentsTask = null;
 
 function openCommentsModal(task) {
     if (!task) return;
-    _commentsTask = task;
-    if (!_commentsTask.Comments) _commentsTask.Comments = [];
-    // Populate name datalist
-    const nameSet = new Set();
-    AppState.currentTasks.forEach(t => (t.Comments||[]).forEach(c => { if(c.name) nameSet.add(c.name); }));
-    const dl = document.getElementById('comments-name-list');
-    if (dl) { dl.innerHTML = ''; nameSet.forEach(n => { const o = document.createElement('option'); o.value = n; dl.appendChild(o); }); }
-    // Pre-fill name
-    const nameInput = document.getElementById('comments-name-input');
-    if (nameInput && AppState._commenterName) nameInput.value = AppState._commenterName;
-    // Clear textarea
-    const textInput = document.getElementById('comments-text-input');
-    if (textInput) textInput.value = '';
-    // Update title and task info bar
-    const title = document.getElementById('comments-modal-title');
-    if (title) title.textContent = 'Comments';
-    _setModalTaskInfo('comments-modal-taskinfo', task);
-    // Render list
-    renderCommentList();
-    document.getElementById('comments-modal-overlay').style.display = 'flex';
-    AppState._modalLayout = 'comments';
+    openTaskModal(task, 'edit');
+    // If user's layout preference hides comments, force comments view
+    if (AppState._modalLayout === 'edit') _setView('comments');
 }
 
-function closeCommentsModal() {
-    document.getElementById('comments-modal-overlay').style.display = 'none';
-    _commentsTask = null;
-}
+function closeCommentsModal() { closeModal(); }
 
 function renderCommentList() {
     const list = document.getElementById('comments-list');
-    if (!list || !_commentsTask) return;
+    if (!list || !_modalTask) return;
     list.innerHTML = '';
-    const comments = (_commentsTask.Comments || []).slice().reverse(); // newest first
+    const comments = (_modalTask.Comments || []).slice().sort((a, b) => {
+        const da = parseDate(a.date), db = parseDate(b.date);
+        if (da && db) return db - da; // newest first
+        return 0;
+    });
     if (comments.length === 0) {
         const empty = document.createElement('div');
         empty.style.cssText = 'text-align:center;color:var(--text-lt);font-size:0.8rem;padding:16px 0;';
         empty.textContent = 'No comments yet.';
         list.appendChild(empty); return;
     }
-    comments.forEach((c, revIdx) => {
-        const realIdx = (_commentsTask.Comments.length - 1) - revIdx; // index in original array
+    comments.forEach((c) => {
+        const realIdx = _modalTask.Comments.indexOf(c); // index in original array
         const item = document.createElement('div'); item.className = 'comment-item';
         const color = commenterColor(c.name);
         item.innerHTML = `
@@ -3149,15 +3588,16 @@ function renderCommentList() {
             saveBtn.addEventListener('click', () => {
                 const newText = sanitizeInput(ta.value);
                 if (!newText) return;
-                _commentsTask.Comments[realIdx].text = newText;
+                _modalTask.Comments[realIdx].text = newText;
                 syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
             });
             cancelBtn.addEventListener('click', () => renderCommentList());
         });
         // Delete button
         item.querySelector('.comment-delete-btn').addEventListener('click', () => {
+            hideTooltip();
             if (confirm('Delete this comment?')) {
-                _commentsTask.Comments.splice(realIdx, 1);
+                _modalTask.Comments.splice(realIdx, 1);
                 syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
             }
         });
@@ -3166,216 +3606,105 @@ function renderCommentList() {
 }
 
 function saveComment() {
-    if (!_commentsTask) return;
+    if (!_modalTask) return;
     const name = sanitizeInput(document.getElementById('comments-name-input').value);
     const text = sanitizeInput(document.getElementById('comments-text-input').value);
     if (!name || !text) { alert('Please enter both your name and a comment.'); return; }
     AppState._commenterName = name;
-    if (!_commentsTask.Comments) _commentsTask.Comments = [];
-    _commentsTask.Comments.push({ date: formatDateStr(new Date()), name, text });
+    if (!_modalTask.Comments) _modalTask.Comments = [];
+    _modalTask.Comments.push({ date: formatDateTimeStr(new Date()), name, text });
     syncCurrentTasksToData(); setUnsavedChanges(true);
     document.getElementById('comments-text-input').value = '';
+    _clearCommentsDirty();
     // Update datalist
     const dl = document.getElementById('comments-name-list');
     if (dl && !Array.from(dl.options).some(o => o.value === name)) {
         const o = document.createElement('option'); o.value = name; dl.appendChild(o);
     }
     renderCommentList();
+    _refreshCommentInfo();
+}
+
+function _refreshCommentInfo() {
+    if (!_modalTask) return;
+    const comments = _modalTask.Comments || [];
+    const infoEl = document.getElementById('modal-comment-info');
+    if (infoEl) {
+        infoEl.style.display = comments.length > 0 ? 'block' : 'none';
+        const countEl = document.getElementById('modal-comment-count');
+        if (countEl) countEl.textContent = `${comments.length} comment${comments.length !== 1 ? 's' : ''}`;
+        const latestEl = document.getElementById('modal-comment-latest');
+        if (latestEl && comments.length > 0) {
+            const sorted = comments.slice().sort((a,b) => { const da=parseDate(a.date),db=parseDate(b.date); return (db||0)-(da||0); });
+            latestEl.textContent = ` \xB7 last: ${sorted[0].date} by ${sorted[0].name}`;
+        }
+    }
 }
 
 function openCommentsFromEdit() {
-    const task = _modalTask;
-    closeTaskModal();
-    openCommentsModal(task);
+    _setView('comments');
 }
 
 // ── Modal view switching ───────────────────────────────────────────────
-function modalSwitchEdit() {
-    if (!_checkDirtyBeforeSwitch()) return;
-    const task = _commentsTask || _modalTask;
-    closeDualModal(); closeCommentsModal();
-    if (task) openTaskModal(task, 'edit');
-}
-
-function modalSwitchComments() {
-    if (!_checkDirtyBeforeSwitch()) return;
-    const task = _modalTask || _commentsTask;
-    closeDualModal(); closeTaskModal();
-    if (task) openCommentsModal(task);
-}
-
-function modalSwitchBoth() {
-    if (!_checkDirtyBeforeSwitch()) return;
-    const task = _modalTask || _commentsTask;
-    if (!task) return;
-    closeTaskModal(); closeCommentsModal();
-    openDualModal(task);
-}
-
-function openDualModal(task) {
-    if (!task) return;
-    _commentsTask = task;
-    _modalTask = task;
-    _modalMode = 'edit';
-    AppState._modalLayout = 'both';
-    const overlay = document.getElementById('dual-modal-overlay');
-    if (!overlay) return;
-
-    // Populate task info in dual modal view bar
-    _setModalTaskInfo('dual-modal-taskinfo', task);
-
-    // Build edit panel content by cloning the modal body/header/footer structure
-    const editDiv = document.getElementById('dual-modal-edit');
-    const commentsDiv = document.getElementById('dual-modal-comments');
-    editDiv.innerHTML = ''; commentsDiv.innerHTML = '';
-
-    // ── Edit panel header ──
-    const eh = document.createElement('div'); eh.className = 'modal-header';
-    eh.innerHTML = `<h3 style="margin:0;">Edit Task</h3>`;
-    editDiv.appendChild(eh);
-
-    // Clone the task modal body form fields
-    const origBody = document.querySelector('#task-modal-overlay .modal-body');
-    if (origBody) {
-        const bodyClone = origBody.cloneNode(true);
-        bodyClone.id = 'dual-edit-body';
-        editDiv.appendChild(bodyClone);
-        // Populate the cloned fields by opening modal (it writes to IDs directly),
-        // then copy values across
-        openTaskModal(task, 'edit');
-        // Transfer values from original IDs to cloned fields
-        const fields = ['modal-task-title','modal-task-phase','modal-task-cat','modal-task-desc',
-                        'modal-task-id','modal-task-start','modal-task-end',
-                        'modal-task-progress-range','modal-task-progress-num','modal-task-dependency'];
-        fields.forEach(id => {
-            const orig = document.getElementById(id);
-            const clone = bodyClone.querySelector('#'+id);
-            if (orig && clone) { clone.value = orig.value; clone.id = 'dual-'+id; }
-        });
-        // Re-hide the original modal (we just used it for population)
-        document.getElementById('task-modal-overlay').style.display = 'none';
+function _setView(view) {
+    AppState._modalLayout = view;
+    const c = document.getElementById('modal-container');
+    if (!c) return;
+    c.classList.remove('view-edit', 'view-comments', 'view-both');
+    c.classList.add('view-' + view);
+    const vs = document.getElementById('modal-view-switcher');
+    if (vs) {
+        vs.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        const map = { edit: 'modalSwitchEdit', both: 'modalSwitchBoth', comments: 'modalSwitchComments' };
+        const btn = vs.querySelector(`[data-action="${map[view]}"]`);
+        if (btn) btn.classList.add('active');
     }
-    // Attach dirty tracking to dual edit panel
-    const dualEditBody = document.getElementById('dual-edit-body');
-    if (dualEditBody) {
-        dualEditBody.addEventListener('input', _updateDualDirtyHighlights);
-        dualEditBody.addEventListener('change', _updateDualDirtyHighlights);
-    }
-
-    // Edit panel footer
-    const ef = document.createElement('div'); ef.className = 'modal-footer';
-    ef.innerHTML = `<button class="btn btn-delete" data-action="deleteTaskFromModal" style="${task?'':'display:none'}">Delete</button><div style="flex:1"></div><button class="btn" data-action="closeDualModalConfirm">Cancel</button><button class="btn btn-primary" data-action="saveDualEdit">Save</button>`;
-    editDiv.appendChild(ef);
-
-    // ── Comments panel ──
-    const ch = document.createElement('div'); ch.className = 'modal-header';
-    ch.innerHTML = `<h3 style="margin:0;">Comments</h3>`;
-    commentsDiv.appendChild(ch);
-
-    // Clone comments body
-    const origCBody = document.querySelector('#comments-modal-overlay .modal-body');
-    if (origCBody) {
-        const cBodyClone = origCBody.cloneNode(true);
-        cBodyClone.id = 'dual-comments-body';
-        // Update IDs to avoid conflicts
-        ['comments-name-input','comments-text-input','comments-list'].forEach(id => {
-            const el = cBodyClone.querySelector('#'+id);
-            if (el) el.id = 'dual-'+id;
-        });
-        const dl = cBodyClone.querySelector('#comments-name-list');
-        if (dl) dl.id = 'dual-comments-name-list';
-        commentsDiv.appendChild(cBodyClone);
-        // Populate comments panel
-        const nameSet = new Set();
-        AppState.currentTasks.forEach(t => (t.Comments||[]).forEach(c => { if(c.name) nameSet.add(c.name); }));
-        const dualDl = cBodyClone.querySelector('#dual-comments-name-list');
-        if (dualDl) { dualDl.innerHTML=''; nameSet.forEach(n=>{const o=document.createElement('option');o.value=n;dualDl.appendChild(o);}); }
-        const nameInput = cBodyClone.querySelector('#dual-comments-name-input');
-        if (nameInput && AppState._commenterName) nameInput.value = AppState._commenterName;
-        // Render comments list in dual panel
-        _renderCommentListInEl(cBodyClone.querySelector('#dual-comments-list'), task);
-        // Save comment button in dual panel
-        const saveCommentBtn = cBodyClone.querySelector('[data-action="saveComment"]');
-        if (saveCommentBtn) {
-            saveCommentBtn.removeAttribute('data-action');
-            saveCommentBtn.addEventListener('click', () => {
-                const n = sanitizeInput(nameInput ? nameInput.value : '');
-                const t2 = sanitizeInput(cBodyClone.querySelector('#dual-comments-text-input') ? cBodyClone.querySelector('#dual-comments-text-input').value : '');
-                if (!n || !t2) { alert('Please enter both your name and a comment.'); return; }
-                AppState._commenterName = n;
-                if (!task.Comments) task.Comments = [];
-                task.Comments.push({date:formatDateStr(new Date()), name:n, text:t2});
-                syncCurrentTasksToData(); setUnsavedChanges(true);
-                if (cBodyClone.querySelector('#dual-comments-text-input')) cBodyClone.querySelector('#dual-comments-text-input').value='';
-                _renderCommentListInEl(cBodyClone.querySelector('#dual-comments-list'), task);
-            });
-        }
-    }
-
-    // View switcher for dual modal
-    const vs = document.getElementById('dual-view-switcher');
-    if (vs) { vs.querySelectorAll('button').forEach(b=>b.classList.remove('active')); const bb=vs.querySelector('[data-action="modalSwitchBoth"]'); if(bb) bb.classList.add('active'); }
-
-    overlay.style.display = 'flex';
 }
 
-function _renderCommentListInEl(listEl, task) {
-    if (!listEl || !task) return;
-    listEl.innerHTML = '';
-    const comments = (task.Comments || []).slice().reverse();
-    if (comments.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center;color:var(--text-lt);font-size:0.8rem;padding:16px 0;">No comments yet.</div>';
-        return;
-    }
-    comments.forEach((c, revIdx) => {
-        const realIdx = (task.Comments.length - 1) - revIdx;
-        const item = document.createElement('div'); item.className = 'comment-item';
-        const color = commenterColor(c.name);
-        item.innerHTML = `<div class="comment-header"><span style="font-weight:700;color:${color}">${escHtml(c.name)}</span> &middot; ${escHtml(c.date)}</div><div class="comment-text">${escHtml(c.text)}</div>`;
-        listEl.appendChild(item);
-    });
-}
+function modalSwitchEdit()     { _setView('edit'); }
+function modalSwitchComments() { _setView('comments'); }
+function modalSwitchBoth()     { _setView('both'); }
 
-function saveDualEdit() {
-    // Read values from dual-edit-body cloned fields
-    const get = id => { const el = document.getElementById('dual-'+id); return el ? el.value : ''; };
-    if (!_modalTask) return;
-    const t = _modalTask;
-    t.Title = sanitizeInput(get('modal-task-title')) || 'New Task';
-    t.Phase = sanitizeInput(get('modal-task-phase')) || 'Phase 1';
-    t.Category = sanitizeInput(get('modal-task-cat')) || 'Category 1';
-    t.Description = sanitizeInput(get('modal-task-desc'));
-    const sd = get('modal-task-start'); if(sd) t['Start Date'] = sd;
-    const ed = get('modal-task-end'); if(ed) t['End Date'] = ed;
-    t.Progress = get('modal-task-progress-range');
-    t.Dependency = get('modal-task-dependency');
-    const idVal = sanitizeInput(get('modal-task-id'));
-    t.ID = idVal || t.Title.replace(/[^a-zA-Z0-9 ]/g,'');
-    syncCurrentTasksToData(); setUnsavedChanges(true);
-    closeDualModal(); render();
-}
+// ── (openDualModal removed — unified modal handles all views) ─────────
+function openDualModal(task) { if (task) openTaskModal(task, 'edit'); } // stub for safety
 
-function closeDualModal() {
-    _modalOriginal = null;
-    const overlay = document.getElementById('dual-modal-overlay');
-    if (overlay) overlay.style.display = 'none';
-    AppState._modalLayout = 'single';
-}
+// ── Pending duplicate comments (set by duplicateTaskFromModal, consumed by saveTaskModal) ─────
+let _pendingDuplicateComments = null;
 
-// ── Confirm-close helpers ──────────────────────────────────────────────
-function closeTaskModalConfirm() {
-    if (_isEditDirty() && !confirm('Discard unsaved changes?')) return;
-    closeTaskModal();
-}
-function closeDualModalConfirm() {
-    if (_isDualDirty() && !confirm('Discard unsaved changes?')) return;
-    closeDualModal();
-}
-function closeCommentsModalConfirm() {
+// ── Pending-comment dirty flag ────────────────────────────────────────
+let _commentsDirty = false;
+function _markCommentsDirty() {
     const txt = document.getElementById('comments-text-input');
-    if (txt && txt.value.trim() && !confirm('You have an unsaved comment. Discard it?')) return;
-    closeCommentsModal();
+    _commentsDirty = !!(txt && txt.value.trim());
 }
+function _clearCommentsDirty() { _commentsDirty = false; }
+
+// ── Unified modal close ────────────────────────────────────────────────
+function closeModal() {
+    _modalOriginal = null;
+    _modalTask = null;
+    _commentsTask = null;
+    document.querySelectorAll('#modal-overlay .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
+    const txt = document.getElementById('comments-text-input');
+    if (txt) txt.value = '';
+    _clearCommentsDirty();
+    const overlay = document.getElementById('modal-overlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function closeModalConfirm() {
+    _markCommentsDirty();
+    if ((_isEditDirty() || _commentsDirty) && !confirm('Discard unsaved changes?')) return;
+    _clearCommentsDirty();
+    closeModal();
+}
+
+// Backward-compat aliases (keyboard shortcuts and any lingering references)
+function closeTaskModal()           { closeModal(); }
+function closeDualModal()           { closeModal(); }
+function closeTaskModalConfirm()    { closeModalConfirm(); }
+function closeDualModalConfirm()    { closeModalConfirm(); }
+function closeCommentsModalConfirm(){ closeModalConfirm(); }
 
 // ── Rename Modal ───────────────────────────────────────────────────────
 let _renameType = null, _renameOldValue = null, _renamePhase = null;
@@ -3461,6 +3790,24 @@ function saveRename() {
 
 // ── Init Events ───────────────────────────────────────────────────────
 let _eventsInit = false;
+let _filterCloseTimeout = null;
+function _openFilterPanel() {
+  const panel = document.getElementById('filter-panel');
+  const btn   = document.getElementById('filter-btn');
+  if (!panel || !btn) return;
+  AppState._filterPanelOpen = true;
+  const rect = btn.getBoundingClientRect();
+  panel.style.top  = (rect.bottom + 2) + 'px';
+  panel.style.left = rect.left + 'px';
+  panel.style.display = 'block';
+  _refreshFilterChips();
+}
+function _closeFilterPanel() {
+  const panel = document.getElementById('filter-panel');
+  if (!panel) return;
+  AppState._filterPanelOpen = false;
+  panel.style.display = 'none';
+}
 function initEvents() {
     if (_eventsInit) return;
     document.body.addEventListener('click', (e) => {
@@ -3484,31 +3831,37 @@ function initEvents() {
                 case 'startEmptyChart': startEmptyChart(); break;
                 case 'loadExampleData': loadExampleData(); break;
                 case 'setFilter': setFilter(val); break;
+                case 'toggleFilterPanel': toggleFilterPanel(); break;
+                case 'toggleFilterChip': toggleFilterChip(actionEl.dataset.prop, actionEl.dataset.value); break;
+                case 'clearAllFilters': clearAllFilters(); break;
                 case 'toggleAll': toggleAll(); break;
                 case 'toggleCompact': toggleCompact(); break;
                 case 'toggleDarkMode': toggleDarkMode(); break;
                 case 'browseFile': document.getElementById('file-input').click(); break;
                 // Task modal actions
                 case 'openTaskModalNew': openTaskModal(null, 'add'); break;
-                case 'closeTaskModal': closeTaskModal(); break;
-                case 'closeTaskModalConfirm': closeTaskModalConfirm(); break;
+                case 'closeTaskModal': closeModal(); break;
+                case 'closeTaskModalConfirm': closeModalConfirm(); break;
+                case 'closeModalConfirm': closeModalConfirm(); break;
                 case 'saveTaskModal': saveTaskModal(); break;
+                case 'saveTaskModalAndClose': saveTaskModalAndClose(); break;
                 case 'deleteTaskFromModal': deleteTaskFromModal(); break;
                 case 'duplicateTaskFromModal': duplicateTaskFromModal(); break;
                 case 'createDependentTask': createDependentTask(); break;
-                // Comments modal actions
+                // Comments panel actions
                 case 'openCommentsFromEdit': openCommentsFromEdit(); break;
-                case 'closeCommentsModal': closeCommentsModal(); break;
-                case 'closeCommentsModalConfirm': closeCommentsModalConfirm(); break;
+                case 'closeCommentsModal': closeModal(); break;
+                case 'closeCommentsModalConfirm': closeModalConfirm(); break;
                 case 'saveComment': saveComment(); break;
-                // Modal layout switch actions
+                // Modal view-switch actions
                 case 'modalSwitchEdit': modalSwitchEdit(); break;
                 case 'modalSwitchBoth': modalSwitchBoth(); break;
                 case 'modalSwitchComments': modalSwitchComments(); break;
-                // Dual modal actions
-                case 'closeDualModal': closeDualModal(); break;
-                case 'closeDualModalConfirm': closeDualModalConfirm(); break;
-                case 'saveDualEdit': saveDualEdit(); break;
+                // Legacy dual modal action names (kept for safety)
+                case 'closeDualModal': closeModal(); break;
+                case 'closeDualModalConfirm': closeModalConfirm(); break;
+                case 'saveDualEdit': saveTaskModal(); break;
+                case 'saveDualEditAndClose': saveTaskModalAndClose(); break;
                 // Rename modal actions
                 case 'closeRenameModal': closeRenameModal(); break;
                 case 'saveRename': saveRename(); break;
@@ -3516,43 +3869,70 @@ function initEvents() {
         }
     });
 
+    // Close filter panel when clicking outside
+    document.addEventListener('mousedown', (e) => {
+      if (!AppState._filterPanelOpen) return;
+      const panel = document.getElementById('filter-panel');
+      const btn   = document.getElementById('filter-btn');
+      if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+        AppState._filterPanelOpen = false;
+        panel.style.display = 'none';
+      }
+    });
+
     // Delegated dirty-state tracking for Edit modal form
-    const _taskOverlay = document.getElementById('task-modal-overlay');
-    if (_taskOverlay) {
-        _taskOverlay.addEventListener('input', _updateEditDirtyHighlights);
-        _taskOverlay.addEventListener('change', _updateEditDirtyHighlights);
-        _taskOverlay.addEventListener('click', (e) => {
+    const _editPanel = document.getElementById('modal-edit-panel');
+    if (_editPanel) {
+        _editPanel.addEventListener('input', _updateEditDirtyHighlights);
+        _editPanel.addEventListener('change', _updateEditDirtyHighlights);
+        _editPanel.addEventListener('click', (e) => {
             if (e.target.classList.contains('select-pill')) setTimeout(_updateEditDirtyHighlights, 0);
         });
     }
 
     document.addEventListener('keydown', (e) => {
+      // Let browser handle all Ctrl/Cmd shortcuts (copy, paste, undo, etc.)
+      if (e.ctrlKey || e.metaKey) return;
       if (e.key !== 'Escape' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
-      const taskModalOpen = document.getElementById('task-modal-overlay') && document.getElementById('task-modal-overlay').style.display !== 'none';
-      const commentsModalOpen = document.getElementById('comments-modal-overlay') && document.getElementById('comments-modal-overlay').style.display !== 'none';
+      const modalOpen = document.getElementById('modal-overlay') && document.getElementById('modal-overlay').style.display !== 'none';
       const renameModalOpen = document.getElementById('rename-modal-overlay') && document.getElementById('rename-modal-overlay').style.display !== 'none';
-      const dualModalOpen = document.getElementById('dual-modal-overlay') && document.getElementById('dual-modal-overlay').style.display !== 'none';
-      const anyModalOpen = taskModalOpen || commentsModalOpen || renameModalOpen || dualModalOpen;
+      const anyModalOpen = modalOpen || renameModalOpen;
       // Escape closes whichever modal is open (with unsaved-change prompt where relevant)
       if (e.key === 'Escape') {
-        if (taskModalOpen)     { e.preventDefault(); closeTaskModalConfirm(); }
-        else if (dualModalOpen)     { e.preventDefault(); closeDualModalConfirm(); }
-        else if (commentsModalOpen) { e.preventDefault(); closeCommentsModalConfirm(); }
+        if (modalOpen)        { e.preventDefault(); closeModalConfirm(); }
         else if (renameModalOpen)   { e.preventDefault(); closeRenameModal(); }
         return;
       }
-      if (taskModalOpen || commentsModalOpen || dualModalOpen) {
+      if (modalOpen) {
         if (e.key === 'e') { e.preventDefault(); modalSwitchEdit(); }
         if (e.key === 'c') { e.preventDefault(); modalSwitchComments(); }
         if (e.key === 'b') { e.preventDefault(); modalSwitchBoth(); }
       } else if (!anyModalOpen) {
-        if (AppState._hoveredTask) {
-          if (e.key === 'c') { e.preventDefault(); openCommentsModal(AppState._hoveredTask); }
-          if (e.key === 'e') { e.preventDefault(); openTaskModal(AppState._hoveredTask, 'edit'); }
+        if (e.key === 's') { e.preventDefault(); saveSnapshot(); }
+        const _activeHoverTask = AppState._hoveredTask || AppState._hoveredLeftTask;
+        if (_activeHoverTask) {
+          if (e.key === 'c') { e.preventDefault(); openCommentsModal(_activeHoverTask); }
+          if (e.key === 'e') { e.preventDefault(); openTaskModal(_activeHoverTask, 'edit'); }
+          if (e.key === 'd') {
+            e.preventDefault();
+            openTaskModal(_activeHoverTask, 'edit');
+            createDependentTask();
+          }
+          if (e.key === 'n') {
+            e.preventDefault();
+            openTaskModal(_activeHoverTask, 'edit');
+            duplicateTaskFromModal();
+          }
         }
-        if (e.key === 'e' && !AppState._hoveredTask) {
-          if (AppState._hoveredPhase) { e.preventDefault(); openRenameModal('phase', AppState._hoveredPhase); }
-          else if (AppState._hoveredCatInfo) { e.preventDefault(); openRenameModal('category', AppState._hoveredCatInfo.cat, AppState._hoveredCatInfo.phase); }
+        if (!_activeHoverTask) {
+          if (e.key === 'e' || e.key === 'r') {
+            if (AppState._hoveredPhase) { e.preventDefault(); openRenameModal('phase', AppState._hoveredPhase); }
+            else if (AppState._hoveredCatInfo) { e.preventDefault(); openRenameModal('category', AppState._hoveredCatInfo.cat, AppState._hoveredCatInfo.phase); }
+          }
+          if (e.key === 'n') {
+            if (AppState._hoveredPhase) { e.preventDefault(); openTaskModal(null, 'add', AppState._hoveredPhase, null); }
+            else if (AppState._hoveredCatInfo) { e.preventDefault(); openTaskModal(null, 'add', AppState._hoveredCatInfo.phase, AppState._hoveredCatInfo.cat); }
+          }
         }
       }
     });
@@ -3568,6 +3948,10 @@ function initEvents() {
     document.body.addEventListener('input', (e) => {
         if (e.target.id === 'modal-task-title') {
             onTaskTitleInput();
+        }
+        // Track pending unsaved comment text for dirty-state warning (single and dual modal)
+        if (e.target.id === 'comments-text-input') {
+            _commentsDirty = !!(e.target.value.trim());
         }
     });
 
@@ -3587,6 +3971,29 @@ function initEvents() {
         if (e.target.closest('#unsaved-warning')) hideTooltip();
         if (e.target.closest('#toolbar')) onToolbarOut(e);
     });
+    // ── Click outside modal to close ──────────────────────────────────
+    const _modalOverlay = document.getElementById('modal-overlay');
+    if (_modalOverlay) _modalOverlay.addEventListener('click', e => { if (e.target === _modalOverlay) closeModalConfirm(); });
+
+    // ── Hover open/close filter panel ────────────────────────────────
+    const _filterBtnEl  = document.getElementById('filter-btn');
+    const _filterPanelEl = document.getElementById('filter-panel');
+    if (_filterBtnEl && _filterPanelEl) {
+      _filterBtnEl.addEventListener('mouseenter', () => {
+        clearTimeout(_filterCloseTimeout);
+        if (!AppState._filterPanelOpen) _openFilterPanel();
+      });
+      _filterBtnEl.addEventListener('mouseleave', () => {
+        _filterCloseTimeout = setTimeout(() => { if (!AppState._filterPanelOpen || !_filterPanelEl.matches(':hover')) _closeFilterPanel(); }, 120);
+      });
+      _filterPanelEl.addEventListener('mouseenter', () => {
+        clearTimeout(_filterCloseTimeout);
+      });
+      _filterPanelEl.addEventListener('mouseleave', () => {
+        _closeFilterPanel();
+      });
+    }
+
     _eventsInit = true;
 }
 
@@ -3660,7 +4067,7 @@ window.addEventListener('load',init);
 let _modalTask = null;
 let _modalMode = 'edit';
 let _modalOriginal = null;
-const PREDEFINED_STATUSES = ['done', 'on track', 'behind', 'waiting', 'none'];
+const PREDEFINED_STATUSES = ['done', 'on track', 'behind', 'waiting', 'on hold', 'none'];
 const PREDEFINED_PRIORITIES = ['high', 'medium', 'low', 'none'];
 
 // ── Edit / Dual modal dirty-state helpers ─────────────────────────────
@@ -3700,45 +4107,13 @@ function _updateEditDirtyHighlights() {
         fg.classList.toggle('form-group--dirty', cur[key] !== _modalOriginal[key]);
     });
 }
-function _getDualFieldValues() {
-    const g = id => document.getElementById('dual-modal-task-'+id)?.value ?? '';
-    return {
-        title: g('title'), phase: g('phase'), cat: g('cat'), desc: g('desc'),
-        start: g('start'), end: g('end'), progress: g('progress-range') || '0',
-        dep: g('dependency'), id: g('id'),
-    };
-}
-function _isDualDirty() {
-    if (!_modalOriginal) return false;
-    const cur = _getDualFieldValues();
-    return Object.keys(cur).some(k => _modalOriginal[k] !== undefined && cur[k] !== _modalOriginal[k]);
-}
-function _updateDualDirtyHighlights() {
-    if (!_modalOriginal) return;
-    const cur = _getDualFieldValues();
-    [['title','dual-modal-task-title'],['phase','dual-modal-task-phase'],
-     ['cat','dual-modal-task-cat'],['desc','dual-modal-task-desc'],
-     ['start','dual-modal-task-start'],['end','dual-modal-task-end'],
-     ['progress','dual-modal-task-progress-range'],['dep','dual-modal-task-dependency'],
-     ['id','dual-modal-task-id']
-    ].forEach(([key, elId]) => {
-        const el = document.getElementById(elId); if (!el) return;
-        const fg = el.closest('.form-group'); if (!fg) return;
-        fg.classList.toggle('form-group--dirty', cur[key] !== _modalOriginal[key]);
-    });
-}
-function _checkDirtyBeforeSwitch() {
-    if (_isEditDirty() || _isDualDirty())
-        return confirm('Switching views will discard unsaved edits. Continue?');
-    return true;
-}
-
 function openTaskModal(task, mode, defaultPhase, defaultCat) {
     _modalTask = task;
+    _commentsTask = task;
     _modalMode = mode;
     const isEdit = mode === 'edit';
-    
-    document.getElementById('task-modal-title').textContent = isEdit ? 'Edit Task' : 'Add Task';
+
+    document.getElementById('modal-title').textContent = isEdit ? 'Edit Task' : 'Add Task';
     
     const titleVal = isEdit ? task.Title : '';
     document.getElementById('modal-task-title').value = titleVal;
@@ -3781,15 +4156,8 @@ function openTaskModal(task, mode, defaultPhase, defaultCat) {
     
     // Dependencies
     const depSel = document.getElementById('modal-task-dependency');
-    depSel.innerHTML = '<option value="">-- None --</option>';
-    AppState.currentTasks.forEach(t => {
-        if (isEdit && getTaskId(t) === getTaskId(task)) return;
-        const op = document.createElement('option');
-        op.value = getTaskId(t);
-        op.textContent = trimTitle(t.Title, false) + ' (' + op.value + ')';
-        depSel.appendChild(op);
-    });
-    depSel.value = isEdit ? task.Dependency : '';
+    _buildDepOptions(depSel, isEdit ? getTaskId(task) : null);
+    depSel.value = isEdit ? (task.Dependency || '') : '';
     
     // Select Pills
     renderPills('modal-priority-container', PREDEFINED_PRIORITIES, isEdit ? (task.Priority || 'medium') : 'medium');
@@ -3815,14 +4183,38 @@ function openTaskModal(task, mode, defaultPhase, defaultCat) {
       }
     }
 
-    // Populate task info in edit modal view bar
-    _setModalTaskInfo('edit-modal-taskinfo', isEdit ? task : null);
+    // Task info strip in view bar
+    _setModalTaskInfo('modal-taskinfo', isEdit ? task : null);
 
-    // Reset then capture dirty-state snapshot
-    document.querySelectorAll('#task-modal-overlay .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
+    // Populate comments panel
+    if (isEdit && task) {
+        if (!task.Comments) task.Comments = [];
+        const nameSet = new Set();
+        AppState.currentTasks.forEach(t2 => (t2.Comments||[]).forEach(c => { if(c.name) nameSet.add(c.name); }));
+        const dl = document.getElementById('comments-name-list');
+        if (dl) { dl.innerHTML = ''; nameSet.forEach(n => { const o = document.createElement('option'); o.value = n; dl.appendChild(o); }); }
+        const nameInput = document.getElementById('comments-name-input');
+        if (nameInput && AppState._commenterName) nameInput.value = AppState._commenterName;
+        const textInput = document.getElementById('comments-text-input');
+        if (textInput) { textInput.value = ''; _clearCommentsDirty(); }
+        renderCommentList();
+    }
+
+    // Reset dirty highlights and capture snapshot
+    document.querySelectorAll('#modal-edit-panel .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
     _captureEditSnapshot();
 
-    document.getElementById('task-modal-overlay').style.display = 'flex';
+    // Hide view-switcher for add mode (no comments on a brand-new task yet)
+    const _vs = document.getElementById('modal-view-switcher');
+    if (_vs) _vs.style.display = isEdit ? '' : 'none';
+
+    // Apply view preference (always 'edit' for add mode)
+    _setView(isEdit ? AppState._modalLayout : 'edit');
+    document.getElementById('modal-overlay').style.display = 'flex';
+    // Auto-focus title field when creating a new task
+    if (!isEdit) {
+        setTimeout(() => { const el = document.getElementById('modal-task-title'); if (el) { el.focus(); el.select(); } }, 80);
+    }
 }
 
 function renderPills(containerId, options, currentValue) {
@@ -3855,7 +4247,12 @@ function onTaskTitleInput() {
     const idInput = document.getElementById('modal-task-id');
     if (idInput.dataset.autoGenerated === 'true') {
         const titleVal = document.getElementById('modal-task-title').value;
-        idInput.value = titleVal.replace(/[^a-zA-Z0-9 ]/g, '');
+        const baseId = titleVal.replace(/[^a-zA-Z0-9 ]/g, '');
+        const existingIds = new Set(AppState.currentTasks.map(t => getTaskId(t)));
+        let candidate = baseId;
+        let n = 2;
+        while (candidate && existingIds.has(candidate)) { candidate = baseId + ' (' + n++ + ')'; }
+        idInput.value = candidate;
     }
 }
 
@@ -3869,48 +4266,91 @@ function ensureModalIdHandler() {
     }
 }
 
-function closeTaskModal() {
-    _modalOriginal = null;
-    document.querySelectorAll('#task-modal-overlay .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
-    document.getElementById('task-modal-overlay').style.display = 'none';
-}
+// closeTaskModal is now an alias defined above in the backward-compat block
 
 function saveTaskModal() {
     ensureModalIdHandler();
     const isEdit = _modalMode === 'edit';
     const t = isEdit ? _modalTask : {};
-    
+
     t.Title = sanitizeInput(document.getElementById('modal-task-title').value) || 'New Task';
     t.Phase = sanitizeInput(document.getElementById('modal-task-phase').value) || 'Phase 1';
     t.Category = sanitizeInput(document.getElementById('modal-task-cat').value) || 'Category 1';
     t.Description = sanitizeInput(document.getElementById('modal-task-desc').value);
-    
+
     let priorityStr = document.getElementById('modal-priority-container').dataset.value;
     t.Priority = priorityStr === 'none' ? '' : priorityStr.charAt(0).toUpperCase() + priorityStr.slice(1);
-    
+
     let statusStr = document.getElementById('modal-status-container').dataset.value;
     t.Status = statusStr === 'none' ? '' : statusStr;
-    
+
     const sdInput = document.getElementById('modal-task-start').value;
     if (sdInput) t['Start Date'] = sdInput;
     const edInput = document.getElementById('modal-task-end').value;
     if (edInput) t['End Date'] = edInput;
-    
+
     t.Progress = document.getElementById('modal-task-progress-range').value;
     t.Dependency = document.getElementById('modal-task-dependency').value;
-    
+
     let idVal = sanitizeInput(document.getElementById('modal-task-id').value);
     if (!idVal) idVal = t.Title.replace(/[^a-zA-Z0-9 ]/g, '');
-    t.ID = idVal;
-    
     if (!isEdit) {
-        AppState.currentTasks.push(t);
+        // Ensure uniqueness for new tasks
+        const existingIds = new Set(AppState.currentTasks.map(t2 => getTaskId(t2)));
+        let candidate = idVal; let n = 2;
+        while (candidate && existingIds.has(candidate)) { candidate = idVal + ' (' + n++ + ')'; }
+        idVal = candidate;
     }
-    
+    t.ID = idVal;
+
+    if (!isEdit) {
+        // Copy comments from duplicate source if present (not for dependent tasks)
+        if (_pendingDuplicateComments) {
+            t.Comments = _pendingDuplicateComments;
+            _pendingDuplicateComments = null;
+        }
+        AppState.currentTasks.push(t);
+        syncCurrentTasksToData();
+        setUnsavedChanges(true);
+        closeModal();
+        scrollToTask(t);
+        return;
+    }
+
     syncCurrentTasksToData();
     setUnsavedChanges(true);
-    closeTaskModal();
+    // Keep edit modal open — refresh dep dropdown and reset dirty state
+    const depSel = document.getElementById('modal-task-dependency');
+    _buildDepOptions(depSel, getTaskId(t));
+    depSel.value = t.Dependency || '';
+    const comments = t.Comments || [];
+    const infoEl = document.getElementById('modal-comment-info');
+    if (infoEl) {
+        infoEl.style.display = comments.length > 0 ? 'block' : 'none';
+        const countEl = document.getElementById('modal-comment-count');
+        if (countEl) countEl.textContent = `${comments.length} comment${comments.length !== 1 ? 's' : ''}`;
+        const latestEl = document.getElementById('modal-comment-latest');
+        if (latestEl && comments.length > 0) {
+            const latest = comments[comments.length - 1];
+            latestEl.textContent = ` \xB7 last: ${latest.date} by ${latest.name}`;
+        }
+    }
+    document.querySelectorAll('#modal-edit-panel .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
+    _captureEditSnapshot();
     render();
+}
+
+function saveTaskModalAndClose() {
+    ensureModalIdHandler();
+    const isEdit = _modalMode === 'edit';
+    // Auto-flush any pending comment (if both name and text are filled)
+    const _cNameEl = document.getElementById('comments-name-input');
+    const _cTextEl = document.getElementById('comments-text-input');
+    if (_cNameEl && _cTextEl && _cNameEl.value.trim() && _cTextEl.value.trim()) {
+        saveComment();
+    }
+    saveTaskModal();
+    if (isEdit) closeModal();
 }
 
 function deleteTaskFromModal() {
@@ -3919,12 +4359,16 @@ function deleteTaskFromModal() {
         AppState.currentTasks = AppState.currentTasks.filter(t => t !== _modalTask);
         syncCurrentTasksToData();
         setUnsavedChanges(true);
-        closeTaskModal();
+        closeModal();
         render();
     }
 }
 
 function duplicateTaskFromModal() {
+    // Copy comments from the original task to the new duplicate
+    _pendingDuplicateComments = (_modalTask && _modalTask.Comments && _modalTask.Comments.length)
+        ? _modalTask.Comments.map(c => ({...c}))
+        : null;
     document.getElementById('modal-task-title').value += " - COPY";
     document.getElementById('modal-task-id').value = "";
     document.getElementById('modal-task-id').dataset.autoGenerated = "true";
@@ -3932,24 +4376,20 @@ function duplicateTaskFromModal() {
     // Repopulate dependencies dropdown since we are switching to add mode
     const currentDep = document.getElementById('modal-task-dependency').value;
     const depSel = document.getElementById('modal-task-dependency');
-    depSel.innerHTML = '<option value="">-- None --</option>';
-    AppState.currentTasks.forEach(t => {
-        const op = document.createElement('option');
-        op.value = getTaskId(t);
-        op.textContent = trimTitle(t.Title, false) + ' (' + op.value + ')';
-        depSel.appendChild(op);
-    });
+    _buildDepOptions(depSel, null); // allow depending on the duplicated task
     depSel.value = currentDep;
     _modalMode = 'add';
-    document.getElementById('task-modal-title').textContent = 'Add Task';
+    document.getElementById('modal-title').textContent = 'Add Task';
     document.getElementById('modal-btn-delete').style.display = 'none';
     const dupBtn = document.getElementById('modal-btn-duplicate');
     if (dupBtn) dupBtn.style.display = 'none';
     const depBtn = document.getElementById('modal-btn-dependent');
     if (depBtn) depBtn.style.display = 'none';
+    setTimeout(() => { const el = document.getElementById('modal-task-title'); if (el) { el.focus(); el.select(); } }, 80);
 }
 
 function createDependentTask() {
+    _pendingDuplicateComments = null; // dependent tasks never copy parent comments
     const parentId = document.getElementById('modal-task-id').value || document.getElementById('modal-task-title').value.replace(/[^a-zA-Z0-9 ]/g, '');
     
     document.getElementById('modal-task-title').value = "";
@@ -3958,33 +4398,33 @@ function createDependentTask() {
     
     // Re-populate dependencies since we are now adding a new task, which allows depending on the previous one
     const depSel = document.getElementById('modal-task-dependency');
-    depSel.innerHTML = '<option value="">-- None --</option>';
-    AppState.currentTasks.forEach(t => {
-        const op = document.createElement('option');
-        op.value = getTaskId(t);
-        op.textContent = trimTitle(t.Title, false) + ' (' + op.value + ')';
-        depSel.appendChild(op);
-    });
+    _buildDepOptions(depSel, null); // include all tasks — new task can depend on the parent
     depSel.value = parentId;
 
-    // Prefill Start Date with parent's End Date
+    // Clear the comment info section — the new dependent task starts with no comments
+    const _depInfoEl = document.getElementById('modal-comment-info');
+    if (_depInfoEl) _depInfoEl.style.display = 'none';
+
+    // Prefill Start Date with parent's End Date + 1 day
     const parentTask = AppState.currentTasks.find(t => getTaskId(t) === parentId);
     if (parentTask && parentTask['End Date']) {
         const parentEnd = parseDate(parentTask['End Date']);
         if (parentEnd && !isNaN(parentEnd)) {
-            document.getElementById('modal-task-start').value = parentEnd.toISOString().split('T')[0];
-            const newEnd = addDays(parentEnd, 7);
+            const depStart = addDays(parentEnd, 1);
+            document.getElementById('modal-task-start').value = depStart.toISOString().split('T')[0];
+            const newEnd = addDays(depStart, 7);
             document.getElementById('modal-task-end').value = newEnd.toISOString().split('T')[0];
         }
     }
 
     _modalMode = 'add';
-    document.getElementById('task-modal-title').textContent = 'Add Task';
+    document.getElementById('modal-title').textContent = 'Add Task';
     document.getElementById('modal-btn-delete').style.display = 'none';
     const dupBtn = document.getElementById('modal-btn-duplicate');
     if (dupBtn) dupBtn.style.display = 'none';
     const depBtn = document.getElementById('modal-btn-dependent');
     if (depBtn) depBtn.style.display = 'none';
+    setTimeout(() => { const el = document.getElementById('modal-task-title'); if (el) { el.focus(); } }, 80);
 }
 
 </script>
