@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Gantt Chart (Standalone)</title>
 <style>
+html{margin:0;padding:0;height:100%;overflow:hidden}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#fff;--surface:#f8fafc;--surface2:#f1f5f9;
@@ -44,19 +45,19 @@
 }
 
 [data-theme='dark'] {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface2: #334155;
-  --border: #334155;
-  --border-md: #475569;
+  --bg: #000000;
+  --surface: #0d1117;
+  --surface2: #161b22;
+  --border: #21262d;
+  --border-md: #30363d;
   --text: #f1f5f9;
   --text-mu: #94a3b8;
   --text-lt: #64748b;
   --accent: #38bdf8;
   --today: #fbbf24;
   --danger: #ef4444;
-  --slate-700: #1e293b;
-  --slate-600: #334155;
+  --slate-700: #0d1117;
+  --slate-600: #161b22;
   --green-800: #064e40;
   --green-900: #065f46;
   --green-old: #059669;
@@ -74,23 +75,24 @@
   --cat-6: #fb923c; --cat-7: #22d3ee; --cat-8: #f472b6; --cat-9: #34d399; --cat-10: #818cf8;
 
   /* Semantic tokens for dark mode */
-  --header-bg: #1e293b;
+  --header-bg: #1e3a5f;
   --header-text: #f1f5f9;
   --pill-date-bg: #064e40;
   --pill-date-hover: #065f46;
-  --btn-active-bg: #38bdf8;
-  --btn-hover-bg: #334155;
-  --row-phase-bg: #334155;
+  --btn-active-bg: #1e3a5f;
+  --btn-hover-bg: #161b22;
+  --row-phase-bg: #1e3a5f;
   --row-phase-text: #f1f5f9;
-  --row-task-hover: #1e293b;
-  --tooltip-bg: #1e293b;
+  --row-task-hover: #0d1117;
+  --tooltip-bg: #0d1117;
   --modal-overlay: rgba(0,0,0,0.7);
-  --modal-header-bg: #1e293b;
-  --timeline-line: #1e293b;
-  --timeline-grid: #334155;
+  --modal-header-bg: #0d1117;
+  --timeline-line: #000000;
+  --timeline-grid: #0d0d0d;
   --shadow: rgba(0,0,0,0.4);
   --glow: rgba(239, 68, 68, 0.6);
 }
+[data-theme='dark'] .left-row.category-row { background: var(--bg); }
 body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
 #app{display:flex;flex-direction:column;height:100vh}
 
@@ -116,7 +118,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh
 
 /* View buttons */
 .btn{background:var(--bg);border:1px solid var(--border-md);color:var(--text);border-radius:5px;
-  padding:4px 12px;font-size:.79rem;cursor:pointer;transition:background .1s;font-family:var(--font)}
+  padding:4px 12px;font-size:.79rem;line-height:1.5;cursor:pointer;transition:background .1s;font-family:var(--font)}
 .btn:hover{background:var(--btn-hover-bg)}
 .btn.active{background:var(--btn-active-bg);color:#fff;border-color:var(--btn-active-bg);font-weight:600}
 .btn-group{display:flex;border-radius:5px;overflow:hidden;border:1px solid var(--border-md)}
@@ -148,7 +150,9 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
   text-shadow: -1px -1px 0 var(--bg), 1px -1px 0 var(--bg), -1px 1px 0 var(--bg), 1px 1px 0 var(--bg);
 }
 
-.toolbar-unsaved { background-color: #fefce8 !important; transition: background-color 0.3s; }
+.toolbar-unsaved { background-color: #fefce8 !important; transition: background-color 0.3s, box-shadow 0.3s; }
+[data-theme='dark'] .toolbar-unsaved { background-color: transparent !important; box-shadow: inset 0 2px 8px rgba(253,211,77,0.85); }
+[data-theme='dark'] .toolbar-unsaved .unsaved-warning { color: #fbbf24; text-shadow: none; }
 
 /* Layout */
 #gantt-container{display:flex;flex:1;overflow:hidden}
@@ -197,7 +201,7 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .left-row.phase-row .row-label{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.4px;color:#f8fafc}
 .left-row.phase-row .chevron{color:#94a3b8}
 .left-row.category-row{background:var(--surface);padding-left:16px;cursor:pointer}
-.left-row.category-row .row-label{font-weight:600}
+.left-row.category-row .row-label{font-weight:700}
 .left-row.task-row{padding-left:28px;cursor:pointer;position:relative}
 .left-row.task-row:hover{background:var(--surface2)}
 .left-row.ghost-row .row-label{color:var(--text-lt);font-style:italic;font-size:.73rem}
@@ -372,8 +376,12 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .form-row .form-group { flex: 1; min-width: 0; }
 .form-group { display: flex; flex-direction: column; }
 .form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-mu); margin-bottom: 4px; }
-.form-group input[type="text"], .form-group input[type="number"], .form-group input[type="date"], .form-group select { padding: 6px 8px; border: 1px solid var(--border-md); border-radius: 4px; font-family: var(--font); color: var(--text); background: var(--bg); font-size: 0.85rem; }
-.form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(2,132,199,0.2); }
+.form-group--dirty label { color: #d97706; font-style: italic; }
+.form-group--dirty label::after { content: ' *'; }
+.form-group--dirty > input[type="text"], .form-group--dirty > input[type="date"], .form-group--dirty > textarea, .form-group--dirty > select { border-left: 2px solid #d97706; }
+.form-group input[type="text"], .form-group input[type="number"], .form-group input[type="date"], .form-group select, .form-group textarea { padding: 6px 8px; border: 1px solid var(--border-md); border-radius: 4px; font-family: var(--font); color: var(--text); background: var(--bg); font-size: 0.85rem; }
+.form-group textarea { resize: vertical; line-height: 1.45; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(2,132,199,0.2); }
 .pill-container { display: flex; gap: 4px; flex-wrap: wrap; }
 .select-pill { padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; opacity: 0.6; transition: all 0.15s; }
 .select-pill.active { opacity: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
@@ -388,6 +396,81 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .add-task-btn:hover { background: rgba(255,255,255,0.3); color: #fff; }
 .category-row .add-task-btn { color: var(--text-lt); }
 .category-row .add-task-btn:hover { background: rgba(0,0,0,0.08); color: var(--text); }
+
+/* ── Rename button on phase/category rows ────────────────────────────── */
+.rename-btn {
+  opacity: 0; font-size: 0.8rem; cursor: pointer; padding: 1px 5px;
+  border-radius: 4px; color: rgba(255,255,255,0.75); transition: opacity 0.15s; flex-shrink: 0;
+  background: transparent; border: none; line-height: 1;
+}
+.left-row:hover .rename-btn { opacity: 1; }
+.rename-btn:hover { background: rgba(255,255,255,0.25); }
+.category-row .rename-btn { color: var(--text-lt); }
+.category-row .rename-btn:hover { background: rgba(0,0,0,0.08); color: var(--text); }
+
+/* ── Bar hover overlay (absolute positioned over chart-area) ────────── */
+#chart-area { position: relative; }
+.bar-hover-overlay {
+  position: absolute; pointer-events: none;
+  background: transparent;
+}
+.bar-hover-actions {
+  position: absolute; display: flex; gap: 4px;
+  align-items: center; pointer-events: auto;
+}
+.bar-hover-actions button {
+  background: var(--bg); border: 1px solid var(--border-md);
+  border-radius: 6px; padding: 2px 8px; cursor: pointer;
+  font-size: 0.88rem; color: var(--text);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18); line-height: 1.5;
+  white-space: nowrap;
+}
+.bar-hover-actions button:hover { background: var(--surface2); border-color: var(--accent); }
+
+/* ── Modal view bar (top row above modal header, same style as toolbar view buttons) ── */
+.modal-view-bar {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 8px 16px 6px;
+  background: var(--modal-header-bg);
+  border-radius: 8px 8px 0 0;
+  flex-shrink: 0; gap: 6px;
+}
+.modal-view-bar .btn-group { font-size: 0.8rem; }
+.modal-view-bar .btn-group .btn { padding: 4px 14px; font-size: 0.8rem; }
+/* Task info row inside all view bars — no border above, border below separates from modal-header */
+.modal-view-bar .comments-task-info { padding-bottom: 6px; border-bottom: 1px solid var(--border); width: 100%; justify-content: center; }
+/* When task info is absent (e.g. "Add Task" mode), the view bar itself provides the bottom border */
+.modal-view-bar:not(:has(.comments-task-info:not(:empty))) { border-bottom: 1px solid var(--border); }
+
+/* ── Comments modal ────────────────────────────────────────────────── */
+.modal-standard { height: min(90vh, 740px); }
+.comments-modal { width: 500px; }
+.comments-modal .modal-body { flex: 1; overflow-y: auto; }
+.comments-modal-body { gap: 10px; }
+.comments-task-info { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 0.75rem; margin-top: 1px; }
+.comments-task-phase { font-weight: 600; color: var(--text-mu); }
+.comments-task-cat { font-weight: 600; padding: 1px 6px; border-radius: 4px; color: #fff; font-size: 0.72rem; }
+.comments-task-title { font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+.comments-list { overflow-y: auto; max-height: 280px; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; padding-right: 2px; }
+.comment-item { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; position: relative; }
+.comment-item:hover { border-color: var(--border-md); }
+.comment-item:hover .comment-actions { display: flex; }
+.comment-actions { display: none; position: absolute; top: 6px; right: 8px; gap: 4px; }
+.comment-actions button { font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-md); background: var(--bg); cursor: pointer; color: var(--text-mu); }
+.comment-actions button:hover { background: var(--surface2); color: var(--text); }
+.comment-header { font-size: 0.72rem; color: var(--text-mu); margin-bottom: 4px; }
+.comment-text { font-size: 0.82rem; color: var(--text); line-height: 1.45; white-space: pre-wrap; }
+.comment-edit-area { width: 100%; padding: 5px 7px; border: 1px solid var(--border-md); border-radius: 4px; font-family: var(--font); font-size: 0.82rem; color: var(--text); background: var(--bg); resize: vertical; margin-top: 4px; }
+.comment-edit-actions { display: flex; gap: 6px; margin-top: 5px; }
+.comment-edit-actions button { font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border-md); cursor: pointer; background: var(--bg); color: var(--text); }
+
+/* ── Dual modal (side-by-side) ─────────────────────────────────────── */
+#dual-modal-overlay { position: fixed; inset: 0; background: var(--modal-overlay); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+#dual-modal { background: var(--bg); border-radius: 8px; width: 900px; max-width: 96%; display: flex; flex-direction: column; box-shadow: 0 10px 25px var(--shadow); height: min(90vh, 740px); font-size: 0.85rem; border: 1px solid var(--border-md); overflow: hidden; }
+#dual-modal-panels { display: flex; flex: 1; overflow: hidden; }
+#dual-modal-edit { flex: 1; border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
+#dual-modal-comments { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+#dual-modal-edit .modal-body, #dual-modal-comments .modal-body { flex: 1; overflow-y: auto; }
 </style>
 <script>/*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
 var XLSX={};function make_xlsx_lib(e){e.version="0.20.3";var r=1200,t=1252;var a;var n=[874,932,936,949,950,1250,1251,1252,1253,1254,1255,1256,1257,1258,1e4];var i={0:1252,1:65001,2:65001,77:1e4,128:932,129:949,130:1361,134:936,136:950,161:1253,162:1254,163:1258,177:1255,178:1256,186:1257,204:1251,222:874,238:1250,255:1252,69:6969};var s=function(e){if(n.indexOf(e)==-1)return;t=i[0]=e};function l(){s(1252)}var o=function(e){r=e;s(e)};function c(){o(1200);l()}function f(e){var r=[];for(var t=0,a=e.length;t<a;++t)r[t]=e.charCodeAt(t);return r}function u(e){var r=[];for(var t=0;t<e.length>>1;++t)r[t]=String.fromCharCode(e.charCodeAt(2*t)+(e.charCodeAt(2*t+1)<<8));return r.join("")}function h(e){var r=[];for(var t=0;t<e.length>>1;++t)r[t]=String.fromCharCode(e[2*t]+(e[2*t+1]<<8));return r.join("")}function d(e){var r=[];for(var t=0;t<e.length>>1;++t)r[t]=String.fromCharCode(e.charCodeAt(2*t+1)+(e.charCodeAt(2*t)<<8));return r.join("")}var p=function(e){var r=e.charCodeAt(0),t=e.charCodeAt(1);if(r==255&&t==254)return u(e.slice(2));if(r==254&&t==255)return d(e.slice(2));if(r==65279)return e.slice(1);return e};var m=function Dc(e){return String.fromCharCode(e)};var v=function Oc(e){return String.fromCharCode(e)};function g(e){a=e;o=function(e){r=e;s(e)};p=function(e){if(e.charCodeAt(0)===255&&e.charCodeAt(1)===254){return a.utils.decode(1200,f(e.slice(2)))}return e};m=function n(e){if(r===1200)return String.fromCharCode(e);return a.utils.decode(r,[e&255,e>>8])[0]};v=function i(e){return a.utils.decode(t,[e])[0]};va()}var b=null;var w=true;var k="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";function y(e){var r="";var t=0,a=0,n=0,i=0,s=0,l=0,o=0;for(var c=0;c<e.length;){t=e.charCodeAt(c++);i=t>>2;a=e.charCodeAt(c++);s=(t&3)<<4|a>>4;n=e.charCodeAt(c++);l=(a&15)<<2|n>>6;o=n&63;if(isNaN(a)){l=o=64}else if(isNaN(n)){o=64}r+=k.charAt(i)+k.charAt(s)+k.charAt(l)+k.charAt(o)}return r}function x(e){var r="";var t=0,a=0,n=0,i=0,s=0,l=0,o=0;for(var c=0;c<e.length;){t=e.charCodeAt(c++);if(t>255)t=95;i=t>>2;a=e.charCodeAt(c++);if(a>255)a=95;s=(t&3)<<4|a>>4;n=e.charCodeAt(c++);if(n>255)n=95;l=(a&15)<<2|n>>6;o=n&63;if(isNaN(a)){l=o=64}else if(isNaN(n)){o=64}r+=k.charAt(i)+k.charAt(s)+k.charAt(l)+k.charAt(o)}return r}function C(e){var r="";var t=0,a=0,n=0,i=0,s=0,l=0,o=0;for(var c=0;c<e.length;){t=e[c++];i=t>>2;a=e[c++];s=(t&3)<<4|a>>4;n=e[c++];l=(a&15)<<2|n>>6;o=n&63;if(isNaN(a)){l=o=64}else if(isNaN(n)){o=64}r+=k.charAt(i)+k.charAt(s)+k.charAt(l)+k.charAt(o)}return r}function S(e){var r="";var t=0,a=0,n=0,i=0,s=0,l=0,o=0;if(e.slice(0,5)=="data:"){var c=e.slice(0,1024).indexOf(";base64,");if(c>-1)e=e.slice(c+8)}e=e.replace(/[^\w\+\/\=]/g,"");for(var c=0;c<e.length;){i=k.indexOf(e.charAt(c++));s=k.indexOf(e.charAt(c++));t=i<<2|s>>4;r+=String.fromCharCode(t);l=k.indexOf(e.charAt(c++));a=(s&15)<<4|l>>2;if(l!==64){r+=String.fromCharCode(a)}o=k.indexOf(e.charAt(c++));n=(l&3)<<6|o;if(o!==64){r+=String.fromCharCode(n)}}return r}var _=function(){return typeof Buffer!=="undefined"&&typeof undefined!=="undefined"&&typeof{}!=="undefined"&&!!{}.node}();var A=function(){if(typeof Buffer!=="undefined"){var e=!Buffer.from;if(!e)try{Buffer.from("foo","utf8")}catch(r){e=true}return e?function(e,r){return r?new Buffer(e,r):new Buffer(e)}:Buffer.from.bind(Buffer)}return function(){}}();var T=function(){if(typeof Buffer==="undefined")return false;var e=A([65,0]);if(!e)return false;var r=e.toString("utf16le");return r.length==1}();function E(e){if(_)return Buffer.alloc?Buffer.alloc(e):new Buffer(e);return typeof Uint8Array!="undefined"?new Uint8Array(e):new Array(e)}function F(e){if(_)return Buffer.allocUnsafe?Buffer.allocUnsafe(e):new Buffer(e);return typeof Uint8Array!="undefined"?new Uint8Array(e):new Array(e)}var D=function Nc(e){if(_)return A(e,"binary");return e.split("").map(function(e){return e.charCodeAt(0)&255})};function O(e){if(typeof ArrayBuffer==="undefined")return D(e);var r=new ArrayBuffer(e.length),t=new Uint8Array(r);for(var a=0;a!=e.length;++a)t[a]=e.charCodeAt(a)&255;return r}function N(e){if(Array.isArray(e))return e.map(function(e){return String.fromCharCode(e)}).join("");var r=[];for(var t=0;t<e.length;++t)r[t]=String.fromCharCode(e[t]);return r.join("")}function M(e){if(typeof Uint8Array==="undefined")throw new Error("Unsupported");return new Uint8Array(e)}function I(e){if(typeof ArrayBuffer=="undefined")throw new Error("Unsupported");if(e instanceof ArrayBuffer)return I(new Uint8Array(e));var r=new Array(e.length);for(var t=0;t<e.length;++t)r[t]=e[t];return r}var P=_?function(e){return Buffer.concat(e.map(function(e){return Buffer.isBuffer(e)?e:A(e)}))}:function(e){if(typeof Uint8Array!=="undefined"){var r=0,t=0;for(r=0;r<e.length;++r)t+=e[r].length;var a=new Uint8Array(t);var n=0;for(r=0,t=0;r<e.length;t+=n,++r){n=e[r].length;if(e[r]instanceof Uint8Array)a.set(e[r],t);else if(typeof e[r]=="string")a.set(new Uint8Array(D(e[r])),t);else a.set(new Uint8Array(e[r]),t)}return a}return[].concat.apply([],e.map(function(e){return Array.isArray(e)?e:[].slice.call(e)}))};function R(e){var r=[],t=0,a=e.length+250;var n=E(e.length+255);for(var i=0;i<e.length;++i){var s=e.charCodeAt(i);if(s<128)n[t++]=s;else if(s<2048){n[t++]=192|s>>6&31;n[t++]=128|s&63}else if(s>=55296&&s<57344){s=(s&1023)+64;var l=e.charCodeAt(++i)&1023;n[t++]=240|s>>8&7;n[t++]=128|s>>2&63;n[t++]=128|l>>6&15|(s&3)<<4;n[t++]=128|l&63}else{n[t++]=224|s>>12&15;n[t++]=128|s>>6&63;n[t++]=128|s&63}if(t>a){r.push(n.slice(0,t));t=0;n=E(65535);a=65530}}r.push(n.slice(0,t));return P(r)}var L=/\u0000/g,U=/[\u0001-\u0006]/g;function B(e){var r="",t=e.length-1;while(t>=0)r+=e.charAt(t--);return r}function z(e,r){var t=""+e;return t.length>=r?t:xr("0",r-t.length)+t}function W(e,r){var t=""+e;return t.length>=r?t:xr(" ",r-t.length)+t}function j(e,r){var t=""+e;return t.length>=r?t:t+xr(" ",r-t.length)}function H(e,r){var t=""+Math.round(e);return t.length>=r?t:xr("0",r-t.length)+t}function V(e,r){var t=""+e;return t.length>=r?t:xr("0",r-t.length)+t}var X=Math.pow(2,32);function G(e,r){if(e>X||e<-X)return H(e,r);var t=Math.round(e);return V(t,r)}function Y(e,r){r=r||0;return e.length>=7+r&&(e.charCodeAt(r)|32)===103&&(e.charCodeAt(r+1)|32)===101&&(e.charCodeAt(r+2)|32)===110&&(e.charCodeAt(r+3)|32)===101&&(e.charCodeAt(r+4)|32)===114&&(e.charCodeAt(r+5)|32)===97&&(e.charCodeAt(r+6)|32)===108}var J=[["Sun","Sunday"],["Mon","Monday"],["Tue","Tuesday"],["Wed","Wednesday"],["Thu","Thursday"],["Fri","Friday"],["Sat","Saturday"]];var Z=[["J","Jan","January"],["F","Feb","February"],["M","Mar","March"],["A","Apr","April"],["M","May","May"],["J","Jun","June"],["J","Jul","July"],["A","Aug","August"],["S","Sep","September"],["O","Oct","October"],["N","Nov","November"],["D","Dec","December"]];function K(e){if(!e)e={};e[0]="General";e[1]="0";e[2]="0.00";e[3]="#,##0";e[4]="#,##0.00";e[9]="0%";e[10]="0.00%";e[11]="0.00E+00";e[12]="# ?/?";e[13]="# ??/??";e[14]="m/d/yy";e[15]="d-mmm-yy";e[16]="d-mmm";e[17]="mmm-yy";e[18]="h:mm AM/PM";e[19]="h:mm:ss AM/PM";e[20]="h:mm";e[21]="h:mm:ss";e[22]="m/d/yy h:mm";e[37]="#,##0 ;(#,##0)";e[38]="#,##0 ;[Red](#,##0)";e[39]="#,##0.00;(#,##0.00)";e[40]="#,##0.00;[Red](#,##0.00)";e[45]="mm:ss";e[46]="[h]:mm:ss";e[47]="mmss.0";e[48]="##0.0E+0";e[49]="@";e[56]='"上午/下午 "hh"時"mm"分"ss"秒 "';return e}var q={0:"General",1:"0",2:"0.00",3:"#,##0",4:"#,##0.00",9:"0%",10:"0.00%",11:"0.00E+00",12:"# ?/?",13:"# ??/??",14:"m/d/yy",15:"d-mmm-yy",16:"d-mmm",17:"mmm-yy",18:"h:mm AM/PM",19:"h:mm:ss AM/PM",20:"h:mm",21:"h:mm:ss",22:"m/d/yy h:mm",37:"#,##0 ;(#,##0)",38:"#,##0 ;[Red](#,##0)",39:"#,##0.00;(#,##0.00)",40:"#,##0.00;[Red](#,##0.00)",45:"mm:ss",46:"[h]:mm:ss",47:"mmss.0",48:"##0.0E+0",49:"@",56:'"上午/下午 "hh"時"mm"分"ss"秒 "'};var Q={5:37,6:38,7:39,8:40,23:0,24:0,25:0,26:0,27:14,28:14,29:14,30:14,31:14,50:14,51:14,52:14,53:14,54:14,55:14,56:14,57:14,58:14,59:1,60:2,61:3,62:4,67:9,68:10,69:12,70:13,71:14,72:14,73:15,74:16,75:17,76:20,77:21,78:22,79:45,80:46,81:47,82:0};var ee={5:'"$"#,##0_);\\("$"#,##0\\)',63:'"$"#,##0_);\\("$"#,##0\\)',6:'"$"#,##0_);[Red]\\("$"#,##0\\)',64:'"$"#,##0_);[Red]\\("$"#,##0\\)',7:'"$"#,##0.00_);\\("$"#,##0.00\\)',65:'"$"#,##0.00_);\\("$"#,##0.00\\)',8:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',66:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',41:'_(* #,##0_);_(* \\(#,##0\\);_(* "-"_);_(@_)',42:'_("$"* #,##0_);_("$"* \\(#,##0\\);_("$"* "-"_);_(@_)',43:'_(* #,##0.00_);_(* \\(#,##0.00\\);_(* "-"??_);_(@_)',44:'_("$"* #,##0.00_);_("$"* \\(#,##0.00\\);_("$"* "-"??_);_(@_)'};function re(e,r,t){var a=e<0?-1:1;var n=e*a;var i=0,s=1,l=0;var o=1,c=0,f=0;var u=Math.floor(n);while(c<r){u=Math.floor(n);l=u*s+i;f=u*c+o;if(n-u<5e-8)break;n=1/(n-u);i=s;s=l;o=c;c=f}if(f>r){if(c>r){f=o;l=i}else{f=c;l=s}}if(!t)return[0,a*l,f];var h=Math.floor(a*l/f);return[h,a*l-h*f,f]}function te(e){var r=e.toPrecision(16);if(r.indexOf("e")>-1){var t=r.slice(0,r.indexOf("e"));t=t.indexOf(".")>-1?t.slice(0,t.slice(0,2)=="0."?17:16):t.slice(0,15)+xr("0",t.length-15);return t+r.slice(r.indexOf("e"))}var a=r.indexOf(".")>-1?r.slice(0,r.slice(0,2)=="0."?17:16):r.slice(0,15)+xr("0",r.length-15);return Number(a)}function ae(e,r,t){if(e>2958465||e<0)return null;e=te(e);var a=e|0,n=Math.floor(86400*(e-a)),i=0;var s=[];var l={D:a,T:n,u:86400*(e-a)-n,y:0,m:0,d:0,H:0,M:0,S:0,q:0};if(Math.abs(l.u)<1e-6)l.u=0;if(r&&r.date1904)a+=1462;if(l.u>.9999){l.u=0;if(++n==86400){l.T=n=0;++a;++l.D}}if(a===60){s=t?[1317,10,29]:[1900,2,29];i=3}else if(a===0){s=t?[1317,8,29]:[1900,1,0];i=6}else{if(a>60)--a;var o=new Date(1900,0,1);o.setDate(o.getDate()+a-1);s=[o.getFullYear(),o.getMonth()+1,o.getDate()];i=o.getDay();if(a<60)i=(i+6)%7;if(t)i=fe(o,s)}l.y=s[0];l.m=s[1];l.d=s[2];l.S=n%60;n=Math.floor(n/60);l.M=n%60;n=Math.floor(n/60);l.H=n;l.q=i;return l}function ne(e){return e.indexOf(".")==-1?e:e.replace(/(?:\.0*|(\.\d*[1-9])0+)$/,"$1")}function ie(e){if(e.indexOf("E")==-1)return e;return e.replace(/(?:\.0*|(\.\d*[1-9])0+)[Ee]/,"$1E").replace(/(E[+-])(\d)$/,"$10$2")}function se(e){var r=e<0?12:11;var t=ne(e.toFixed(12));if(t.length<=r)return t;t=e.toPrecision(10);if(t.length<=r)return t;return e.toExponential(5)}function le(e){var r=ne(e.toFixed(11));return r.length>(e<0?12:11)||r==="0"||r==="-0"?e.toPrecision(6):r}function oe(e){if(!isFinite(e))return isNaN(e)?"#NUM!":"#DIV/0!";var r=Math.floor(Math.log(Math.abs(e))*Math.LOG10E),t;if(r>=-4&&r<=-1)t=e.toPrecision(10+r);else if(Math.abs(r)<=9)t=se(e);else if(r===10)t=e.toFixed(10).substr(0,12);else t=le(e);return ne(ie(t.toUpperCase()))}function ce(e,r){switch(typeof e){case"string":return e;case"boolean":return e?"TRUE":"FALSE";case"number":return(e|0)===e?e.toString(10):oe(e);case"undefined":return"";case"object":if(e==null)return"";if(e instanceof Date)return $e(14,dr(e,r&&r.date1904),r);}throw new Error("unsupported value in General format: "+e)}function fe(e,r){r[0]-=581;var t=e.getDay();if(e<60)t=(t+6)%7;return t}function ue(e,r,t,a){var n="",i=0,s=0,l=t.y,o,c=0;switch(e){case 98:l=t.y+543;case 121:switch(r.length){case 1:;case 2:o=l%100;c=2;break;default:o=l%1e4;c=4;break;}break;case 109:switch(r.length){case 1:;case 2:o=t.m;c=r.length;break;case 3:return Z[t.m-1][1];case 5:return Z[t.m-1][0];default:return Z[t.m-1][2];}break;case 100:switch(r.length){case 1:;case 2:o=t.d;c=r.length;break;case 3:return J[t.q][0];default:return J[t.q][1];}break;case 104:switch(r.length){case 1:;case 2:o=1+(t.H+11)%12;c=r.length;break;default:throw"bad hour format: "+r;}break;case 72:switch(r.length){case 1:;case 2:o=t.H;c=r.length;break;default:throw"bad hour format: "+r;}break;case 77:switch(r.length){case 1:;case 2:o=t.M;c=r.length;break;default:throw"bad minute format: "+r;}break;case 115:if(r!="s"&&r!="ss"&&r!=".0"&&r!=".00"&&r!=".000")throw"bad second format: "+r;if(t.u===0&&(r=="s"||r=="ss"))return z(t.S,r.length);if(a>=2)s=a===3?1e3:100;else s=a===1?10:1;i=Math.round(s*(t.S+t.u));if(i>=60*s)i=0;if(r==="s")return i===0?"0":""+i/s;n=z(i,2+a);if(r==="ss")return n.substr(0,2);return"."+n.substr(2,r.length-1);case 90:switch(r){case"[h]":;case"[hh]":o=t.D*24+t.H;break;case"[m]":;case"[mm]":o=(t.D*24+t.H)*60+t.M;break;case"[s]":;case"[ss]":o=((t.D*24+t.H)*60+t.M)*60+(a==0?Math.round(t.S+t.u):t.S);break;default:throw"bad abstime format: "+r;}c=r.length===3?1:2;break;case 101:o=l;c=1;break;}var f=c>0?z(o,c):"";return f}function he(e){var r=3;if(e.length<=r)return e;var t=e.length%r,a=e.substr(0,t);for(;t!=e.length;t+=r)a+=(a.length>0?",":"")+e.substr(t,r);return a}var de=/%/g;function pe(e,r,t){var a=r.replace(de,""),n=r.length-a.length;return Me(e,a,t*Math.pow(10,2*n))+xr("%",n)}function me(e,r,t){var a=r.length-1;while(r.charCodeAt(a-1)===44)--a;return Me(e,r.substr(0,a),t/Math.pow(10,3*(r.length-a)))}function ve(e,r){var t;var a=e.indexOf("E")-e.indexOf(".")-1;if(e.match(/^#+0.0E\+0$/)){if(r==0)return"0.0E+0";else if(r<0)return"-"+ve(e,-r);var n=e.indexOf(".");if(n===-1)n=e.indexOf("E");var i=Math.floor(Math.log(r)*Math.LOG10E)%n;if(i<0)i+=n;t=(r/Math.pow(10,i)).toPrecision(a+1+(n+i)%n);if(t.indexOf("e")===-1){var s=Math.floor(Math.log(r)*Math.LOG10E);if(t.indexOf(".")===-1)t=t.charAt(0)+"."+t.substr(1)+"E+"+(s-t.length+i);else t+="E+"+(s-i);while(t.substr(0,2)==="0."){t=t.charAt(0)+t.substr(2,n)+"."+t.substr(2+n);t=t.replace(/^0+([1-9])/,"$1").replace(/^0+\./,"0.")}t=t.replace(/\+-/,"-")}t=t.replace(/^([+-]?)(\d*)\.(\d*)[Ee]/,function(e,r,t,a){return r+t+a.substr(0,(n+i)%n)+"."+a.substr(i)+"E"})}else t=r.toExponential(a);if(e.match(/E\+00$/)&&t.match(/e[+-]\d$/))t=t.substr(0,t.length-1)+"0"+t.charAt(t.length-1);if(e.match(/E\-/)&&t.match(/e\+/))t=t.replace(/e\+/,"e");return t.replace("e","E")}var ge=/# (\?+)( ?)\/( ?)(\d+)/;function be(e,r,t){var a=parseInt(e[4],10),n=Math.round(r*a),i=Math.floor(n/a);var s=n-i*a,l=a;return t+(i===0?"":""+i)+" "+(s===0?xr(" ",e[1].length+1+e[4].length):W(s,e[1].length)+e[2]+"/"+e[3]+z(l,e[4].length))}function we(e,r,t){return t+(r===0?"":""+r)+xr(" ",e[1].length+2+e[4].length)}var ke=/^#*0*\.([0#]+)/;var ye=/\)[^)]*[0#]/;var xe=/\(###\) ###\\?-####/;function Ce(e){var r="",t;for(var a=0;a!=e.length;++a)switch(t=e.charCodeAt(a)){case 35:break;case 63:r+=" ";break;case 48:r+="0";break;default:r+=String.fromCharCode(t);}return r}function Se(e,r){var t=Math.pow(10,r);return""+Math.round(e*t)/t}function _e(e,r){var t=e-Math.floor(e),a=Math.pow(10,r);if(r<(""+Math.round(t*a)).length)return 0;return Math.round(t*a)}function Ae(e,r){if(r<(""+Math.round((e-Math.floor(e))*Math.pow(10,r))).length){return 1}return 0}function Te(e){if(e<2147483647&&e>-2147483648)return""+(e>=0?e|0:e-1|0);return""+Math.floor(e)}function Ee(e,r,t){if(e.charCodeAt(0)===40&&!r.match(ye)){var a=r.replace(/\( */,"").replace(/ \)/,"").replace(/\)/,"");if(t>=0)return Ee("n",a,t);return"("+Ee("n",a,-t)+")"}if(r.charCodeAt(r.length-1)===44)return me(e,r,t);if(r.indexOf("%")!==-1)return pe(e,r,t);if(r.indexOf("E")!==-1)return ve(r,t);if(r.charCodeAt(0)===36)return"$"+Ee(e,r.substr(r.charAt(1)==" "?2:1),t);var n;var i,s,l,o=Math.abs(t),c=t<0?"-":"";if(r.match(/^00+$/))return c+G(o,r.length);if(r.match(/^[#?]+$/)){n=G(t,0);if(n==="0")n="";return n.length>r.length?n:Ce(r.substr(0,r.length-n.length))+n}if(i=r.match(ge))return be(i,o,c);if(r.match(/^#+0+$/))return c+G(o,r.length-r.indexOf("0"));if(i=r.match(ke)){n=Se(t,i[1].length).replace(/^([^\.]+)$/,"$1."+Ce(i[1])).replace(/\.$/,"."+Ce(i[1])).replace(/\.(\d*)$/,function(e,r){return"."+r+xr("0",Ce(i[1]).length-r.length)});return r.indexOf("0.")!==-1?n:n.replace(/^0\./,".")}r=r.replace(/^#+([0.])/,"$1");if(i=r.match(/^(0*)\.(#*)$/)){return c+Se(o,i[2].length).replace(/\.(\d*[1-9])0*$/,".$1").replace(/^(-?\d*)$/,"$1.").replace(/^0\./,i[1].length?"0.":".")}if(i=r.match(/^#{1,3},##0(\.?)$/))return c+he(G(o,0));if(i=r.match(/^#,##0\.([#0]*0)$/)){return t<0?"-"+Ee(e,r,-t):he(""+(Math.floor(t)+Ae(t,i[1].length)))+"."+z(_e(t,i[1].length),i[1].length)}if(i=r.match(/^#,#*,#0/))return Ee(e,r.replace(/^#,#*,/,""),t);if(i=r.match(/^([0#]+)(\\?-([0#]+))+$/)){n=B(Ee(e,r.replace(/[\\-]/g,""),t));s=0;return B(B(r.replace(/\\/g,"")).replace(/[0#]/g,function(e){return s<n.length?n.charAt(s++):e==="0"?"0":""}))}if(r.match(xe)){n=Ee(e,"##########",t);return"("+n.substr(0,3)+") "+n.substr(3,3)+"-"+n.substr(6)}var f="";if(i=r.match(/^([#0?]+)( ?)\/( ?)([#0?]+)/)){s=Math.min(i[4].length,7);l=re(o,Math.pow(10,s)-1,false);n=""+c;f=Me("n",i[1],l[1]);if(f.charAt(f.length-1)==" ")f=f.substr(0,f.length-1)+"0";n+=f+i[2]+"/"+i[3];f=j(l[2],s);if(f.length<i[4].length)f=Ce(i[4].substr(i[4].length-f.length))+f;n+=f;return n}if(i=r.match(/^# ([#0?]+)( ?)\/( ?)([#0?]+)/)){s=Math.min(Math.max(i[1].length,i[4].length),7);l=re(o,Math.pow(10,s)-1,true);return c+(l[0]||(l[1]?"":"0"))+" "+(l[1]?W(l[1],s)+i[2]+"/"+i[3]+j(l[2],s):xr(" ",2*s+1+i[2].length+i[3].length))}if(i=r.match(/^[#0?]+$/)){n=G(t,0);if(r.length<=n.length)return n;return Ce(r.substr(0,r.length-n.length))+n}if(i=r.match(/^([#0?]+)\.([#0]+)$/)){n=""+t.toFixed(Math.min(i[2].length,10)).replace(/([^0])0+$/,"$1");s=n.indexOf(".");var u=r.indexOf(".")-s,h=r.length-n.length-u;return Ce(r.substr(0,u)+n+r.substr(r.length-h))}if(i=r.match(/^00,000\.([#0]*0)$/)){s=_e(t,i[1].length);return t<0?"-"+Ee(e,r,-t):he(Te(t)).replace(/^\d,\d{3}$/,"0$&").replace(/^\d*$/,function(e){return"00,"+(e.length<3?z(0,3-e.length):"")+e})+"."+z(s,i[1].length)}switch(r){case"###,##0.00":return Ee(e,"#,##0.00",t);case"###,###":;case"##,###":;case"#,###":var d=he(G(o,0));return d!=="0"?c+d:"";case"###,###.00":return Ee(e,"###,##0.00",t).replace(/^0\./,".");case"#,###.00":return Ee(e,"#,##0.00",t).replace(/^0\./,".");default:;}throw new Error("unsupported format |"+r+"|")}function Fe(e,r,t){var a=r.length-1;while(r.charCodeAt(a-1)===44)--a;return Me(e,r.substr(0,a),t/Math.pow(10,3*(r.length-a)))}function De(e,r,t){var a=r.replace(de,""),n=r.length-a.length;return Me(e,a,t*Math.pow(10,2*n))+xr("%",n)}function Oe(e,r){var t;var a=e.indexOf("E")-e.indexOf(".")-1;if(e.match(/^#+0.0E\+0$/)){if(r==0)return"0.0E+0";else if(r<0)return"-"+Oe(e,-r);var n=e.indexOf(".");if(n===-1)n=e.indexOf("E");var i=Math.floor(Math.log(r)*Math.LOG10E)%n;if(i<0)i+=n;t=(r/Math.pow(10,i)).toPrecision(a+1+(n+i)%n);if(!t.match(/[Ee]/)){var s=Math.floor(Math.log(r)*Math.LOG10E);if(t.indexOf(".")===-1)t=t.charAt(0)+"."+t.substr(1)+"E+"+(s-t.length+i);else t+="E+"+(s-i);t=t.replace(/\+-/,"-")}t=t.replace(/^([+-]?)(\d*)\.(\d*)[Ee]/,function(e,r,t,a){return r+t+a.substr(0,(n+i)%n)+"."+a.substr(i)+"E"})}else t=r.toExponential(a);if(e.match(/E\+00$/)&&t.match(/e[+-]\d$/))t=t.substr(0,t.length-1)+"0"+t.charAt(t.length-1);if(e.match(/E\-/)&&t.match(/e\+/))t=t.replace(/e\+/,"e");return t.replace("e","E")}function Ne(e,r,t){if(e.charCodeAt(0)===40&&!r.match(ye)){var a=r.replace(/\( */,"").replace(/ \)/,"").replace(/\)/,"");if(t>=0)return Ne("n",a,t);return"("+Ne("n",a,-t)+")"}if(r.charCodeAt(r.length-1)===44)return Fe(e,r,t);if(r.indexOf("%")!==-1)return De(e,r,t);if(r.indexOf("E")!==-1)return Oe(r,t);if(r.charCodeAt(0)===36)return"$"+Ne(e,r.substr(r.charAt(1)==" "?2:1),t);var n;var i,s,l,o=Math.abs(t),c=t<0?"-":"";if(r.match(/^00+$/))return c+z(o,r.length);if(r.match(/^[#?]+$/)){n=""+t;if(t===0)n="";return n.length>r.length?n:Ce(r.substr(0,r.length-n.length))+n}if(i=r.match(ge))return we(i,o,c);if(r.match(/^#+0+$/))return c+z(o,r.length-r.indexOf("0"));if(i=r.match(ke)){n=(""+t).replace(/^([^\.]+)$/,"$1."+Ce(i[1])).replace(/\.$/,"."+Ce(i[1]));n=n.replace(/\.(\d*)$/,function(e,r){return"."+r+xr("0",Ce(i[1]).length-r.length)});return r.indexOf("0.")!==-1?n:n.replace(/^0\./,".")}r=r.replace(/^#+([0.])/,"$1");if(i=r.match(/^(0*)\.(#*)$/)){return c+(""+o).replace(/\.(\d*[1-9])0*$/,".$1").replace(/^(-?\d*)$/,"$1.").replace(/^0\./,i[1].length?"0.":".")}if(i=r.match(/^#{1,3},##0(\.?)$/))return c+he(""+o);if(i=r.match(/^#,##0\.([#0]*0)$/)){return t<0?"-"+Ne(e,r,-t):he(""+t)+"."+xr("0",i[1].length)}if(i=r.match(/^#,#*,#0/))return Ne(e,r.replace(/^#,#*,/,""),t);if(i=r.match(/^([0#]+)(\\?-([0#]+))+$/)){n=B(Ne(e,r.replace(/[\\-]/g,""),t));s=0;return B(B(r.replace(/\\/g,"")).replace(/[0#]/g,function(e){return s<n.length?n.charAt(s++):e==="0"?"0":""}))}if(r.match(xe)){n=Ne(e,"##########",t);return"("+n.substr(0,3)+") "+n.substr(3,3)+"-"+n.substr(6)}var f="";if(i=r.match(/^([#0?]+)( ?)\/( ?)([#0?]+)/)){s=Math.min(i[4].length,7);l=re(o,Math.pow(10,s)-1,false);n=""+c;f=Me("n",i[1],l[1]);if(f.charAt(f.length-1)==" ")f=f.substr(0,f.length-1)+"0";n+=f+i[2]+"/"+i[3];f=j(l[2],s);if(f.length<i[4].length)f=Ce(i[4].substr(i[4].length-f.length))+f;n+=f;return n}if(i=r.match(/^# ([#0?]+)( ?)\/( ?)([#0?]+)/)){s=Math.min(Math.max(i[1].length,i[4].length),7);l=re(o,Math.pow(10,s)-1,true);return c+(l[0]||(l[1]?"":"0"))+" "+(l[1]?W(l[1],s)+i[2]+"/"+i[3]+j(l[2],s):xr(" ",2*s+1+i[2].length+i[3].length))}if(i=r.match(/^[#0?]+$/)){n=""+t;if(r.length<=n.length)return n;return Ce(r.substr(0,r.length-n.length))+n}if(i=r.match(/^([#0]+)\.([#0]+)$/)){n=""+t.toFixed(Math.min(i[2].length,10)).replace(/([^0])0+$/,"$1");s=n.indexOf(".");var u=r.indexOf(".")-s,h=r.length-n.length-u;return Ce(r.substr(0,u)+n+r.substr(r.length-h))}if(i=r.match(/^00,000\.([#0]*0)$/)){return t<0?"-"+Ne(e,r,-t):he(""+t).replace(/^\d,\d{3}$/,"0$&").replace(/^\d*$/,function(e){return"00,"+(e.length<3?z(0,3-e.length):"")+e})+"."+z(0,i[1].length)}switch(r){case"###,###":;case"##,###":;case"#,###":var d=he(""+o);return d!=="0"?c+d:"";default:if(r.match(/\.[0#?]*$/))return Ne(e,r.slice(0,r.lastIndexOf(".")),t)+Ce(r.slice(r.lastIndexOf(".")));}throw new Error("unsupported format |"+r+"|")}function Me(e,r,t){return(t|0)===t?Ne(e,r,t):Ee(e,r,t)}function Ie(e){var r=[];var t=false;for(var a=0,n=0;a<e.length;++a)switch(e.charCodeAt(a)){case 34:t=!t;break;case 95:;case 42:;case 92:++a;break;case 59:r[r.length]=e.substr(n,a-n);n=a+1;}r[r.length]=e.substr(n);if(t===true)throw new Error("Format |"+e+"| unterminated string ");return r}var Pe=/\[[HhMmSs\u0E0A\u0E19\u0E17]*\]/;function Re(e){var r=0,t="",a="";while(r<e.length){switch(t=e.charAt(r)){case"G":if(Y(e,r))r+=6;r++;break;case'"':for(;e.charCodeAt(++r)!==34&&r<e.length;){}++r;break;case"\\":r+=2;break;case"_":r+=2;break;case"@":++r;break;case"B":;case"b":if(e.charAt(r+1)==="1"||e.charAt(r+1)==="2")return true;case"M":;case"D":;case"Y":;case"H":;case"S":;case"E":;case"m":;case"d":;case"y":;case"h":;case"s":;case"e":;case"g":return true;case"A":;case"a":;case"上":if(e.substr(r,3).toUpperCase()==="A/P")return true;if(e.substr(r,5).toUpperCase()==="AM/PM")return true;if(e.substr(r,5).toUpperCase()==="上午/下午")return true;++r;break;case"[":a=t;while(e.charAt(r++)!=="]"&&r<e.length)a+=e.charAt(r);if(a.match(Pe))return true;break;case".":;case"0":;case"#":while(r<e.length&&("0#?.,E+-%".indexOf(t=e.charAt(++r))>-1||t=="\\"&&e.charAt(r+1)=="-"&&"0#".indexOf(e.charAt(r+2))>-1)){}break;case"?":while(e.charAt(++r)===t){}break;case"*":++r;if(e.charAt(r)==" "||e.charAt(r)=="*")++r;break;case"(":;case")":++r;break;case"1":;case"2":;case"3":;case"4":;case"5":;case"6":;case"7":;case"8":;case"9":while(r<e.length&&"0123456789".indexOf(e.charAt(++r))>-1){}break;case" ":++r;break;default:++r;break;}}return false}function Le(e,r,t,a){var n=[],i="",s=0,l="",o="t",c,f,u;var h="H";while(s<e.length){switch(l=e.charAt(s)){case"G":if(!Y(e,s))throw new Error("unrecognized character "+l+" in "+e);n[n.length]={t:"G",v:"General"};s+=7;break;case'"':for(i="";(u=e.charCodeAt(++s))!==34&&s<e.length;)i+=String.fromCharCode(u);n[n.length]={t:"t",v:i};++s;break;case"\\":var d=e.charAt(++s),p=d==="("||d===")"?d:"t";n[n.length]={t:p,v:d};++s;break;case"_":n[n.length]={t:"t",v:" "};s+=2;break;case"@":n[n.length]={t:"T",v:r};++s;break;case"B":;case"b":if(e.charAt(s+1)==="1"||e.charAt(s+1)==="2"){if(c==null){c=ae(r,t,e.charAt(s+1)==="2");if(c==null)return""}n[n.length]={t:"X",v:e.substr(s,2)};o=l;s+=2;break};case"M":;case"D":;case"Y":;case"H":;case"S":;case"E":l=l.toLowerCase();case"m":;case"d":;case"y":;case"h":;case"s":;case"e":;case"g":if(r<0)return"";if(c==null){c=ae(r,t);if(c==null)return""}i=l;while(++s<e.length&&e.charAt(s).toLowerCase()===l)i+=l;if(l==="m"&&o.toLowerCase()==="h")l="M";if(l==="h")l=h;n[n.length]={t:l,v:i};o=l;break;case"A":;case"a":;case"上":var m={t:l,v:l};if(c==null)c=ae(r,t);if(e.substr(s,3).toUpperCase()==="A/P"){if(c!=null)m.v=c.H>=12?e.charAt(s+2):l;m.t="T";h="h";s+=3}else if(e.substr(s,5).toUpperCase()==="AM/PM"){if(c!=null)m.v=c.H>=12?"PM":"AM";m.t="T";s+=5;h="h"}else if(e.substr(s,5).toUpperCase()==="上午/下午"){if(c!=null)m.v=c.H>=12?"下午":"上午";m.t="T";s+=5;h="h"}else{m.t="t";++s}if(c==null&&m.t==="T")return"";n[n.length]=m;o=l;break;case"[":i=l;while(e.charAt(s++)!=="]"&&s<e.length)i+=e.charAt(s);if(i.slice(-1)!=="]")throw'unterminated "[" block: |'+i+"|";if(i.match(Pe)){if(c==null){c=ae(r,t);if(c==null)return""}n[n.length]={t:"Z",v:i.toLowerCase()};o=i.charAt(1)}else if(i.indexOf("$")>-1){i=(i.match(/\$([^-\[\]]*)/)||[])[1]||"$";if(!Re(e))n[n.length]={t:"t",v:i}}break;case".":if(c!=null){i=l;while(++s<e.length&&(l=e.charAt(s))==="0")i+=l;n[n.length]={t:"s",v:i};break};case"0":;case"#":i=l;while(++s<e.length&&"0#?.,E+-%".indexOf(l=e.charAt(s))>-1)i+=l;n[n.length]={t:"n",v:i};break;case"?":i=l;while(e.charAt(++s)===l)i+=l;n[n.length]={t:l,v:i};o=l;break;case"*":++s;if(e.charAt(s)==" "||e.charAt(s)=="*")++s;break;case"(":;case")":n[n.length]={t:a===1?"t":l,v:l};++s;break;case"1":;case"2":;case"3":;case"4":;case"5":;case"6":;case"7":;case"8":;case"9":i=l;while(s<e.length&&"0123456789".indexOf(e.charAt(++s))>-1)i+=e.charAt(s);n[n.length]={t:"D",v:i};break;case" ":n[n.length]={t:l,v:l};++s;break;case"$":n[n.length]={t:"t",v:"$"};++s;break;default:if(",$-+/():!^&'~{}<>=€acfijklopqrtuvwxzP".indexOf(l)===-1)throw new Error("unrecognized character "+l+" in "+e);n[n.length]={t:"t",v:l};++s;break;}}var v=0,g=0,b;for(s=n.length-1,o="t";s>=0;--s){switch(n[s].t){case"h":;case"H":n[s].t=h;o="h";if(v<1)v=1;break;case"s":if(b=n[s].v.match(/\.0+$/)){g=Math.max(g,b[0].length-1);v=4}if(v<3)v=3;case"d":;case"y":;case"e":o=n[s].t;break;case"M":o=n[s].t;if(v<2)v=2;break;case"m":if(o==="s"){n[s].t="M";if(v<2)v=2}break;case"X":break;case"Z":if(v<1&&n[s].v.match(/[Hh]/))v=1;if(v<2&&n[s].v.match(/[Mm]/))v=2;if(v<3&&n[s].v.match(/[Ss]/))v=3;}}var w;switch(v){case 0:break;case 1:;case 2:;case 3:if(c.u>=.5){c.u=0;++c.S}if(c.S>=60){c.S=0;++c.M}if(c.M>=60){c.M=0;++c.H}if(c.H>=24){c.H=0;++c.D;w=ae(c.D);w.u=c.u;w.S=c.S;w.M=c.M;w.H=c.H;c=w}break;case 4:switch(g){case 1:c.u=Math.round(c.u*10)/10;break;case 2:c.u=Math.round(c.u*100)/100;break;case 3:c.u=Math.round(c.u*1e3)/1e3;break;}if(c.u>=1){c.u=0;++c.S}if(c.S>=60){c.S=0;++c.M}if(c.M>=60){c.M=0;++c.H}if(c.H>=24){c.H=0;++c.D;w=ae(c.D);w.u=c.u;w.S=c.S;w.M=c.M;w.H=c.H;c=w}break;}var k="",y;for(s=0;s<n.length;++s){switch(n[s].t){case"t":;case"T":;case" ":;case"D":break;case"X":n[s].v="";n[s].t=";";break;case"d":;case"m":;case"y":;case"h":;case"H":;case"M":;case"s":;case"e":;case"b":;case"Z":n[s].v=ue(n[s].t.charCodeAt(0),n[s].v,c,g);n[s].t="t";break;case"n":;case"?":y=s+1;while(n[y]!=null&&((l=n[y].t)==="?"||l==="D"||(l===" "||l==="t")&&n[y+1]!=null&&(n[y+1].t==="?"||n[y+1].t==="t"&&n[y+1].v==="/")||n[s].t==="("&&(l===" "||l==="n"||l===")")||l==="t"&&(n[y].v==="/"||n[y].v===" "&&n[y+1]!=null&&n[y+1].t=="?"))){n[s].v+=n[y].v;n[y]={v:"",t:";"};++y}k+=n[s].v;s=y-1;break;case"G":n[s].t="t";n[s].v=ce(r,t);break;}}var x="",C,S;if(k.length>0){if(k.charCodeAt(0)==40){C=r<0&&k.charCodeAt(0)===45?-r:r;S=Me("n",k,C)}else{C=r<0&&a>1?-r:r;S=Me("n",k,C);if(C<0&&n[0]&&n[0].t=="t"){S=S.substr(1);n[0].v="-"+n[0].v}}y=S.length-1;var _=n.length;for(s=0;s<n.length;++s)if(n[s]!=null&&n[s].t!="t"&&n[s].v.indexOf(".")>-1){_=s;break}var A=n.length;if(_===n.length&&S.indexOf("E")===-1){for(s=n.length-1;s>=0;--s){if(n[s]==null||"n?".indexOf(n[s].t)===-1)continue;if(y>=n[s].v.length-1){y-=n[s].v.length;n[s].v=S.substr(y+1,n[s].v.length)}else if(y<0)n[s].v="";else{n[s].v=S.substr(0,y+1);y=-1}n[s].t="t";A=s}if(y>=0&&A<n.length)n[A].v=S.substr(0,y+1)+n[A].v}else if(_!==n.length&&S.indexOf("E")===-1){y=S.indexOf(".")-1;for(s=_;s>=0;--s){if(n[s]==null||"n?".indexOf(n[s].t)===-1)continue;f=n[s].v.indexOf(".")>-1&&s===_?n[s].v.indexOf(".")-1:n[s].v.length-1;x=n[s].v.substr(f+1);for(;f>=0;--f){if(y>=0&&(n[s].v.charAt(f)==="0"||n[s].v.charAt(f)==="#"))x=S.charAt(y--)+x}n[s].v=x;n[s].t="t";A=s}if(y>=0&&A<n.length)n[A].v=S.substr(0,y+1)+n[A].v;y=S.indexOf(".")+1;for(s=_;s<n.length;++s){if(n[s]==null||"n?(".indexOf(n[s].t)===-1&&s!==_)continue;f=n[s].v.indexOf(".")>-1&&s===_?n[s].v.indexOf(".")+1:0;x=n[s].v.substr(0,f);for(;f<n[s].v.length;++f){if(y<S.length)x+=S.charAt(y++)}n[s].v=x;n[s].t="t";A=s}}}for(s=0;s<n.length;++s)if(n[s]!=null&&"n?".indexOf(n[s].t)>-1){C=a>1&&r<0&&s>0&&n[s-1].v==="-"?-r:r;n[s].v=Me(n[s].t,n[s].v,C);n[s].t="t"}var T="";for(s=0;s!==n.length;++s)if(n[s]!=null)T+=n[s].v;return T}var Ue=/\[(=|>[=]?|<[>=]?)(-?\d+(?:\.\d*)?)\]/;function Be(e,r){if(r==null)return false;var t=parseFloat(r[2]);switch(r[1]){case"=":if(e==t)return true;break;case">":if(e>t)return true;break;case"<":if(e<t)return true;break;case"<>":if(e!=t)return true;break;case">=":if(e>=t)return true;break;case"<=":if(e<=t)return true;break;}return false}function ze(e,r){var t=Ie(e);var a=t.length,n=t[a-1].indexOf("@");if(a<4&&n>-1)--a;if(t.length>4)throw new Error("cannot find right format for |"+t.join("|")+"|");if(typeof r!=="number")return[4,t.length===4||n>-1?t[t.length-1]:"@"];if(typeof r==="number"&&!isFinite(r))r=0;switch(t.length){case 1:t=n>-1?["General","General","General",t[0]]:[t[0],t[0],t[0],"@"];break;case 2:t=n>-1?[t[0],t[0],t[0],t[1]]:[t[0],t[1],t[0],"@"];break;case 3:t=n>-1?[t[0],t[1],t[0],t[2]]:[t[0],t[1],t[2],"@"];break;case 4:break;}var i=r>0?t[0]:r<0?t[1]:t[2];if(t[0].indexOf("[")===-1&&t[1].indexOf("[")===-1)return[a,i];if(t[0].match(/\[[=<>]/)!=null||t[1].match(/\[[=<>]/)!=null){var s=t[0].match(Ue);var l=t[1].match(Ue);return Be(r,s)?[a,t[0]]:Be(r,l)?[a,t[1]]:[a,t[s!=null&&l!=null?2:1]]}return[a,i]}function $e(e,r,t){if(t==null)t={};var a="";switch(typeof e){case"string":if(e=="m/d/yy"&&t.dateNF)a=t.dateNF;else a=e;break;case"number":if(e==14&&t.dateNF)a=t.dateNF;else a=(t.table!=null?t.table:q)[e];if(a==null)a=t.table&&t.table[Q[e]]||q[Q[e]];if(a==null)a=ee[e]||"General";break;}if(Y(a,0))return ce(r,t);if(r instanceof Date)r=dr(r,t.date1904);var n=ze(a,r);if(Y(n[1]))return ce(r,t);if(r===true)r="TRUE";else if(r===false)r="FALSE";else if(r===""||r==null)return"";else if(isNaN(r)&&n[1].indexOf("0")>-1)return"#NUM!";else if(!isFinite(r)&&n[1].indexOf("0")>-1)return"#DIV/0!";return Le(n[1],r,t,n[0])}function We(e,r){if(typeof r!="number"){r=+r||-1;for(var t=0;t<392;++t){if(q[t]==undefined){if(r<0)r=t;continue}if(q[t]==e){r=t;break}}if(r<0)r=391}q[r]=e;return r}function je(e){for(var r=0;r!=392;++r)if(e[r]!==undefined)We(e[r],r)}function He(){q=K()}var Ve={format:$e,load:We,_table:q,load_table:je,parse_date_code:ae,is_date:Re,get_table:function Mc(){return Ve._table=q}};var Xe={5:'"$"#,##0_);\\("$"#,##0\\)',6:'"$"#,##0_);[Red]\\("$"#,##0\\)',7:'"$"#,##0.00_);\\("$"#,##0.00\\)',8:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',23:"General",24:"General",25:"General",26:"General",27:"m/d/yy",28:"m/d/yy",29:"m/d/yy",30:"m/d/yy",31:"m/d/yy",32:"h:mm:ss",33:"h:mm:ss",34:"h:mm:ss",35:"h:mm:ss",36:"m/d/yy",41:'_(* #,##0_);_(* (#,##0);_(* "-"_);_(@_)',42:'_("$"* #,##0_);_("$"* (#,##0);_("$"* "-"_);_(@_)',43:'_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)',44:'_("$"* #,##0.00_);_("$"* (#,##0.00);_("$"* "-"??_);_(@_)',50:"m/d/yy",51:"m/d/yy",52:"m/d/yy",53:"m/d/yy",54:"m/d/yy",55:"m/d/yy",56:"m/d/yy",57:"m/d/yy",58:"m/d/yy",59:"0",60:"0.00",61:"#,##0",62:"#,##0.00",63:'"$"#,##0_);\\("$"#,##0\\)',64:'"$"#,##0_);[Red]\\("$"#,##0\\)',65:'"$"#,##0.00_);\\("$"#,##0.00\\)',66:'"$"#,##0.00_);[Red]\\("$"#,##0.00\\)',67:"0%",68:"0.00%",69:"# ?/?",70:"# ??/??",71:"m/d/yy",72:"m/d/yy",73:"d-mmm-yy",74:"d-mmm",75:"mmm-yy",76:"h:mm",77:"h:mm:ss",78:"m/d/yy h:mm",79:"mm:ss",80:"[h]:mm:ss",81:"mmss.0"};var Ge=/[dD]+|[mM]+|[yYeE]+|[Hh]+|[Ss]+/g;function Ye(e){var r=typeof e=="number"?q[e]:e;r=r.replace(Ge,"(\\d+)");Ge.lastIndex=0;return new RegExp("^"+r+"$");
@@ -402,13 +485,12 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 </script>
 </head>
 <body>
-
 <!-- Landing / drop zone -->
 <div id="landing-zone">
     <div class="drop-card" id="drop-card" style="position: relative;">
         <div class="drop-title">&#128200; Gantt Chart Viewer</div>
         <div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>
-        <div class="drop-version">v1.8</div>
+        <div class="drop-version">v2.0</div>
         <div class="drop-text">
             Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
             with a table of tasks in <em>"Current Planning"</em> or <em>"Sheet 1"</em>. <br><br>
@@ -474,6 +556,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     </div>
     <div class="toolbar-right">
       <span id="unsaved-warning" class="unsaved-warning" style="display:none;"><span class="txt-full">!! Unsaved Changes !!</span><span class="txt-short">!!</span></span>
+      <button class="btn" id="darkmode-btn" data-action="toggleDarkMode" style="margin-right:12px; border-color:#64748b; color:#64748b;" data-tooltip="Toggle dark/light mode">&#9789;</button>
       <button class="btn" id="save-btn" data-action="saveSnapshot" style="margin-right:12px; border-color:#16a34a; color:#16a34a;" data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file.">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short"> Save</span></button>
       <button class="btn" id="export-btn" data-action="exportChart" style="margin-right:12px; border-color:#2563eb; color:#2563eb;" data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart.">&#128228;<span class="txt-full"> Export Chart</span><span class="txt-short"> Export</span></button>
       <button class="btn" id="info-btn" data-action="toggleInfoPanel" style="border-color:#d97706; color:#d97706;" data-tooltip="View application info and version">&#10067; Info</button>
@@ -489,7 +572,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
           <button class="fbtn"        id="fb-unfinished" data-action="setFilter" data-value="unfinished" data-tooltip="Show only active (non-completed) items">Active</button>
           <button class="fbtn"        id="fb-overdue"    data-action="setFilter" data-value="overdue" data-tooltip="Show only items past their end date that are not 100% complete">Overdue</button>
         </div>
-        <button class="add-global-btn" onclick="openTaskModal(null, 'add', null, null)" data-tooltip="Add a new task">Add +</button>
+        <button class="add-global-btn" data-action="openTaskModalNew" data-tooltip="Add a new task">Add +</button>
       </div>
       <div id="left-subheader">
         <button class="compact-btn" id="toggle-all-btn" data-action="toggleAll" data-tooltip="Expand / Collapse all">&#9660; Collapse all</button>
@@ -523,47 +606,79 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   </div>
   <div class="info-content">
     <p>Visualise your project planning as an interactive Gantt chart.</p>
-    
+
     <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:10px;">
       <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Managing Tasks</p>
       <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li><strong>Edit:</strong> Click on any task bar in the chart to edit its details, progress, and dependencies.</li>
-        <li><strong>Add:</strong> Use the global "Add +" button, or hover over a Phase/Category row to reveal an inline "+" button.</li>
-        <li><strong>Duplicate/Chain:</strong> Quickly duplicate tasks or create dependent tasks using the buttons in the Edit Task header.</li>
-        <li><strong>Delete:</strong> Easily remove tasks by clicking "Delete" inside the task's edit menu.</li>
+        <li><strong>Edit:</strong> Click any task bar, or hover a bar and click the &#9998; button that appears to its side.</li>
+        <li><strong>Add:</strong> Use the global "Add +" button, or hover a Phase/Category row to reveal an inline "+" button for that group.</li>
+        <li><strong>Duplicate / Chain:</strong> Inside the Edit modal, use <em>Duplicate Task</em> to copy, or <em>Dependent Task</em> to create a follow-on task pre-linked to the current one.</li>
+        <li><strong>Delete:</strong> Click "Delete" inside the task's Edit modal.</li>
+        <li><strong>Rename Phase / Category:</strong> Hover a Phase or Category row to reveal a &#x270F; pencil button, then click to rename. If the new name already exists you will be offered a merge or a numbered duplicate.</li>
+        <li><strong>Unsaved edits:</strong> While an Edit modal is open, any field that differs from its saved value shows an <span style="color:#d97706; font-style:italic;">amber label *</span> and a coloured left border, so you always know what has changed before saving.</li>
       </ul>
 
-      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Navigation & Filters</p>
+      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Comments</p>
       <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li><strong>Scrolling:</strong> Click and drag the chart to pan. Click the glowing pills at the timeline edges to load more past/future time.</li>
+        <li>Hover a task bar and click &#x1F4AC; to open the Comments modal, or use the keyboard shortcut <kbd>c</kbd> while hovering.</li>
+        <li>Each comment is stored with the author name and date. The task tooltip shows the total comment count and a preview of the latest note.</li>
+        <li>Comments can be edited or deleted inline &mdash; hover any comment to reveal ✏ Edit and 🗑 Delete buttons.</li>
+        <li>Author names are remembered for the session and colour-coded consistently across all comments.</li>
+      </ul>
+
+      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Edit &amp; Comments Modal Views</p>
+      <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
+        <li>Every task modal has a <strong>view bar</strong> at the top with three buttons: <strong>&#9999; Edit</strong>, <strong>&#9645;&#9645; Both</strong> (side-by-side), and <strong>&#x1F4AC; Comments</strong>. Switch between them freely &mdash; the current task is preserved.</li>
+        <li>While a modal is open, use keyboard shortcuts to switch views instantly: <kbd>e</kbd> Edit &nbsp;|&nbsp; <kbd>b</kbd> Both &nbsp;|&nbsp; <kbd>c</kbd> Comments.</li>
+        <li>Press <kbd>Esc</kbd> to close any modal. If the edit form has unsaved changes you will be prompted before the modal closes.</li>
+      </ul>
+
+      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Navigation &amp; Filters</p>
+      <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
+        <li><strong>Scrolling:</strong> Click and drag the chart to pan. Release mid-swipe for momentum scrolling. Click the glowing pills at the timeline edges to extend past or future range.</li>
         <li><strong>Views:</strong> Toggle between Week, Month, and Year timelines. Week mode aligns to Mondays.</li>
-        <li><strong>Filters:</strong> Use "All", "Active", and "Overdue" to focus in on specific tasks. Empty categories are automatically hidden.</li>
-        <li><strong>Compact Mode:</strong> Reduces label widths and vertically stacks filters to maximize horizontal space.</li>
-        <li><strong>Reload:</strong> Click the dark green Date Pill in the top-left to efficiently reload data from your external file without creating snapshots.</li>
+        <li><strong>Filters:</strong> Use "All", "Active", and "Overdue" to focus on specific tasks. Empty categories are automatically hidden.</li>
+        <li><strong>Compact Mode:</strong> Narrows the left panel and stacks filters vertically to maximise chart space. Hover any row for a full-detail tooltip.</li>
+        <li><strong>Reload:</strong> Click the Date Pill in the top-left to reload from the source file without creating a new snapshot.</li>
       </ul>
 
-      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Snapshots & Comparison</p>
+      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Keyboard Shortcuts</p>
+      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:12px;">
+        <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Context</th><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Key</th><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Action</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:3px 6px;">Hovering a task bar</td><td style="padding:3px 6px;"><kbd>e</kbd></td><td style="padding:3px 6px;">Open Edit modal</td></tr>
+          <tr><td style="padding:3px 6px;">Hovering a task bar</td><td style="padding:3px 6px;"><kbd>c</kbd></td><td style="padding:3px 6px;">Open Comments modal</td></tr>
+          <tr><td style="padding:3px 6px;">Hovering Phase/Category</td><td style="padding:3px 6px;"><kbd>e</kbd></td><td style="padding:3px 6px;">Open Rename modal</td></tr>
+          <tr><td style="padding:3px 6px;">Any task modal open</td><td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>b</kbd> / <kbd>c</kbd></td><td style="padding:3px 6px;">Switch to Edit / Both / Comments view</td></tr>
+          <tr><td style="padding:3px 6px;">Any modal open</td><td style="padding:3px 6px;"><kbd>Esc</kbd></td><td style="padding:3px 6px;">Close modal (prompts if unsaved)</td></tr>
+        </tbody>
+      </table>
+
+      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Snapshots &amp; Comparison</p>
       <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li>Use the <strong>"Compare"</strong> dropdown to view historical snapshots alongside current tasks. Ghost tasks (light grey text) show prior states.</li>
-        <li>Review high-level changes using the <strong>Stats</strong> flyout panel, which outlines tasks achieved, added, or removed.</li>
-        <li>Use <strong>"Save Excel"</strong> to back up modifications and append a new dated snapshot, or use <strong>"Export Chart"</strong> to save a standalone read-only HTML file.</li>
+        <li>Use the <strong>"Compare"</strong> dropdown to view a historical snapshot alongside current tasks. Ghost rows (muted italic text) show prior states.</li>
+        <li>Review high-level changes in the <strong>Stats</strong> flyout: milestones achieved, tasks completed, progressed, overdue, added, or removed.</li>
+        <li><strong>"Save Excel"</strong> appends a new dated snapshot and downloads the updated workbook. <strong>"Export Chart"</strong> saves a standalone read-only HTML file for sharing.</li>
       </ul>
-      
+
       <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Icon Legend</p>
-      <ul style="margin:0 0 12px 20px; padding:0; list-style-type:none; line-height:1.7;">
+      <ul style="margin:0 0 12px 20px; padding:0; list-style-type:none; line-height:1.9;">
         <li><span style="font-size:0.85rem;">&#x1F6A9;</span> &ensp;Open Phase Milestone</li>
         <li><span style="font-size:0.85rem;">&#x1F3C6;</span> &ensp;Completed Phase Milestone</li>
-        <li><span style="color:#16a34a; font-weight:bold;">&#x2713;</span> &ensp;Done items count</li>
-        <li><span style="color:#dc2626; font-weight:bold;">&#x26A0;&#xFE0F;</span> &ensp;Overdue items count</li>
-        <li><span style="color:#2563eb; font-weight:bold;">&#x25CF;</span> &ensp;Active items count</li>
-        <li><span style="color:#ef4444; font-weight:bold;">&#x2B24;</span> <strong>[!]</strong> &ensp;Hidden task dependencies</li>
-        <li><span style="font-size:0.95rem;">&#x27F3;</span> &ensp;Historical Snapshot (Ghost) Item</li>
+        <li><span style="color:#16a34a; font-weight:bold;">&#x2713;</span> &ensp;Done items count (category row)</li>
+        <li><span style="color:#dc2626; font-weight:bold;">&#x26A0;&#xFE0F;</span> &ensp;Overdue items count (category row)</li>
+        <li><span style="color:#2563eb; font-weight:bold;">&#x25CF;</span> &ensp;Active items count (category row)</li>
+        <li><span style="font-size:0.85rem;">&#x1F4AC;</span> &ensp;Open Comments modal (bar hover)</li>
+        <li><span style="font-size:0.85rem;">&#x270E;</span> &ensp;Open Edit modal (bar hover)</li>
+        <li><span style="font-size:0.85rem;">&#x270F;</span> &ensp;Rename Phase or Category (row hover)</li>
+        <li><span style="color:#ef4444; font-weight:bold;">[!]</span> &ensp;Hidden task dependency (collapsed parent)</li>
+        <li><span style="font-size:0.95rem;">&#x27F3;</span> &ensp;Historical Snapshot (Ghost) item</li>
       </ul>
     </div>
-    
+
     <p style="margin-top:20px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded &mdash; all processing happens locally.</p>
     <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v1.8</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.0</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a href="https://github.com/kolfers/public_excel_to_gantt_standalone" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">GitHub Repository</a>.</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">Created by <a href="https://www.universiteitleiden.nl/en/staffmembers/kerwin-olfers#tab-1" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Kerwin Olfers</a> &middot; Released under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">MIT License</a>.</p>
     </div>
@@ -572,13 +687,21 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 
 <!-- Task Modal -->
 <div id="task-modal-overlay" class="modal-overlay" style="display:none;">
-    <div class="modal">
+    <div class="modal modal-standard">
+        <div class="modal-view-bar" id="edit-view-switcher">
+            <div class="btn-group">
+                <button class="btn active" data-action="modalSwitchEdit" data-tooltip="Edit view">&#9999; Edit</button>
+                <button class="btn" data-action="modalSwitchBoth" data-tooltip="Show Edit &amp; Comments side by side">&#9645;&#9645; Both</button>
+                <button class="btn" data-action="modalSwitchComments" data-tooltip="Switch to Comments view">&#128172; Comments</button>
+            </div>
+            <div id="edit-modal-taskinfo" class="comments-task-info"></div>
+        </div>
         <div class="modal-header" style="display:flex; align-items:center;">
             <h3 id="task-modal-title" style="margin:0;">Edit Task</h3>
             <div style="flex:1;"></div>
-            <button id="modal-btn-dependent" onclick="createDependentTask()" style="display:none;">Dependent Task</button>
-            <button id="modal-btn-duplicate" onclick="duplicateTaskFromModal()" style="display:none;">Duplicate Task</button>
-            <span class="modal-close" onclick="closeTaskModal()">&times;</span>
+            <button id="modal-btn-dependent" data-action="createDependentTask" style="display:none;">Dependent Task</button>
+            <button id="modal-btn-duplicate" data-action="duplicateTaskFromModal" style="display:none;">Duplicate Task</button>
+            <span class="modal-close" data-action="closeTaskModalConfirm">&times;</span>
         </div>
         <div class="modal-body">
             <div class="form-group">
@@ -635,20 +758,97 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
                     <input type="text" id="modal-task-id">
                 </div>
             </div>
+            <div class="form-group" id="modal-comment-info" style="display:none; flex-direction:column; gap:2px;">
+                <label>Comments</label>
+                <div>
+                  <span id="modal-comment-count" data-action="openCommentsFromEdit" style="cursor:pointer; color:var(--accent); font-weight:600;">0 comments</span>
+                  <span id="modal-comment-latest" style="color:var(--text-mu); font-size:0.8rem;"></span>
+                </div>
+            </div>
             <div class="form-group" style="margin-bottom:0px;">
                 <label>Description</label>
-                <input type="text" id="modal-task-desc">
+                <textarea id="modal-task-desc" rows="4" style="resize:vertical;"></textarea>
             </div>
         </div>
         <div class="modal-footer">
-            <button id="modal-btn-delete" class="btn btn-delete" onclick="deleteTaskFromModal()" style="display:none;">Delete</button>
+            <button id="modal-btn-delete" class="btn btn-delete" data-action="deleteTaskFromModal" style="display:none;">Delete</button>
             <div style="flex:1"></div>
-            <button class="btn" onclick="closeTaskModal()">Cancel</button>
-            <button id="modal-btn-save" class="btn btn-primary" onclick="saveTaskModal()">Save</button>
+            <button class="btn" data-action="closeTaskModalConfirm">Cancel</button>
+            <button id="modal-btn-save" class="btn btn-primary" data-action="saveTaskModal">Save</button>
         </div>
     </div>
 </div>
 
+<!-- Comments Modal -->
+<div id="comments-modal-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal modal-standard comments-modal" id="comments-modal">
+        <div class="modal-view-bar" id="comments-view-switcher">
+            <div class="btn-group">
+                <button class="btn" data-action="modalSwitchEdit" data-tooltip="Switch to Edit view">&#9999; Edit</button>
+                <button class="btn" data-action="modalSwitchBoth" data-tooltip="Show Edit &amp; Comments side by side">&#9645;&#9645; Both</button>
+                <button class="btn active" data-action="modalSwitchComments" data-tooltip="Comments view (current)">&#128172; Comments</button>
+            </div>
+            <div id="comments-modal-taskinfo" class="comments-task-info"></div>
+        </div>
+        <div class="modal-header">
+            <h3 id="comments-modal-title" style="margin:0; font-size:1rem;">Comments</h3>
+            <span class="modal-close" data-action="closeCommentsModalConfirm">&times;</span>
+        </div>
+        <div class="modal-body comments-modal-body">
+            <div class="form-group">
+                <label>Your name</label>
+                <input type="text" id="comments-name-input" list="comments-name-list" placeholder="Enter or select name...">
+                <datalist id="comments-name-list"></datalist>
+            </div>
+            <div class="form-group">
+                <label>Comment</label>
+                <textarea id="comments-text-input" rows="4" placeholder="Write a comment..." style="resize:vertical;"></textarea>
+            </div>
+            <button class="btn btn-primary" data-action="saveComment">Save Comment</button>
+            <div id="comments-list" class="comments-list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Dual modal (side-by-side Edit + Comments) -->
+<div id="dual-modal-overlay" style="display:none;">
+    <div id="dual-modal">
+        <div class="modal-view-bar" id="dual-view-switcher">
+            <div class="btn-group">
+                <button class="btn" data-action="modalSwitchEdit" data-tooltip="Edit view only">&#9999; Edit</button>
+                <button class="btn active" data-action="modalSwitchBoth" data-tooltip="Side-by-side (current)">&#9645;&#9645; Both</button>
+                <button class="btn" data-action="modalSwitchComments" data-tooltip="Comments view only">&#128172; Comments</button>
+            </div>
+            <div id="dual-modal-taskinfo" class="comments-task-info"></div>
+        </div>
+        <div id="dual-modal-panels">
+            <div id="dual-modal-edit"></div>
+            <div id="dual-modal-comments"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Rename Modal -->
+<div id="rename-modal-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal" style="width:340px;">
+        <div class="modal-header" style="display:flex; align-items:center;">
+            <h3 id="rename-modal-title" style="margin:0;">Rename</h3>
+            <div style="flex:1;"></div>
+            <span class="modal-close" data-action="closeRenameModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label id="rename-modal-label">Name</label>
+                <input type="text" id="rename-modal-input">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div style="flex:1"></div>
+            <button class="btn" data-action="closeRenameModal">Cancel</button>
+            <button class="btn btn-primary" data-action="saveRename">Save</button>
+        </div>
+    </div>
+</div>
 <script>
 
 window.IS_EXPORTED = false;
@@ -656,8 +856,6 @@ window.IS_EXPORTED = false;
 let DATA = { tasks: [], snapshots: {}, meta: { source_file: 'None' } };
 const STATUS_COLORS = {"done": "#22c55e", "on track": "#3b82f6", "behind": "#ef4444", "waiting": "#eab308"};
 const CAT_COLORS    = ["#0d9488", "#d97706", "#0284c7", "#e11d48", "#65a30d", "#ea580c", "#0891b2", "#db2777", "#059669", "#4338ca"];
-
-
 
 function getExampleData() {
     const today = new Date();
@@ -734,10 +932,6 @@ function downloadExampleExcel() {
     const exampleData = getExampleData();
     downloadDataAsExcel(exampleData, "Example_Gantt_Data.xlsx");
 }
-
-
-
-
 // ── Constants ────────────────────────────────────────────────────────
 const ROW_H  = 34;
 const HEAD_H = 44;
@@ -752,7 +946,12 @@ const AppState = {
   viewPadLeft: 0, viewPadRight: 0,
   collapsed: {}, currentTasks: [],
   changesOnly: false, compactMode: false, unsavedChanges: false,
-  _highlightId: null, _highlightTimer: null
+  _highlightId: null, _highlightTimer: null,
+  _hoveredTask: null,      // task object currently hovered in chart (for keyboard shortcuts)
+  _hoveredPhase: null,     // phase name currently hovered in left panel
+  _hoveredCatInfo: null,   // {phase, cat} currently hovered in left panel
+  _commenterName: '',      // last used commenter name (session only)
+  _modalLayout: 'single',  // 'single' | 'both'
 };
 
 // ── Title trimmer & snapshot formatter ───────────────────────────────
@@ -795,6 +994,9 @@ function getISOWeek(d) {
 // ── Colour helpers ────────────────────────────────────────────────────
 const _catMap = {}; let _catIdx = 0;
 function catColor(cat) { if(!_catMap[cat]) _catMap[cat]=CAT_COLORS[_catIdx++%CAT_COLORS.length]; return _catMap[cat]; }
+
+const _commenterMap = {}; let _commenterIdx = 0;
+function commenterColor(name) { if(!_commenterMap[name]) _commenterMap[name]=CAT_COLORS[_commenterIdx++%CAT_COLORS.length]; return _commenterMap[name]; }
 
 // ── Column width ──────────────────────────────────────────────────────
 function getColWidth() {
@@ -876,7 +1078,15 @@ function setUnsavedChanges(val) {
   }
 }
 
-
+// ── Unsaved-changes tab-close guard ──────────────────────────────────
+// Shows the browser's native "Leave site? Changes you made may not be saved."
+// dialog when the user tries to close or refresh the tab with unsaved changes.
+window.addEventListener('beforeunload', (e) => {
+  if (AppState.unsavedChanges) {
+    e.preventDefault();
+    e.returnValue = ''; // Required for Chrome/Edge to trigger the dialog
+  }
+});
 let _currentFile = null;
 let _currentArrayBuffer = null;
 
@@ -996,6 +1206,26 @@ function formatNum(v) {
     return String(v);
 }
 
+// ── Comments helpers ──────────────────────────────────────────────────
+function parseComments(raw) {
+    if (!raw || typeof raw !== 'string') return [];
+    const results = [];
+    const re = /\[([^\]:]+):([^\]]+)\]\s*([\s\S]*?)(?=\[|$)/g;
+    let m;
+    while ((m = re.exec(raw)) !== null) {
+        const dateStr = formatDateStr(m[1].trim()) || sanitizeInput(m[1].trim());
+        const name = sanitizeInput(m[2].trim());
+        const text = sanitizeInput(m[3].trim());
+        if (name && text) results.push({ date: dateStr, name, text });
+    }
+    return results;
+}
+
+function serializeComments(arr) {
+    if (!arr || !arr.length) return '';
+    return arr.map(c => `[${c.date}:${c.name}] ${c.text}`).join(' ');
+}
+
 function processTasksList(rawArray) {
     let mapped = [];
     let idCounts = {};
@@ -1035,7 +1265,8 @@ function processTasksList(rawArray) {
             'End Date': formatDateStr(r['End Date']),
             'Progress': progress,
             'Dependency': sanitizeInput(r['Dependency']) || '',
-            'Description': sanitizeInput(r['Description']) || ''
+            'Description': sanitizeInput(r['Description']) || '',
+            'Comments': parseComments(sanitizeInput(r['Comments']) || '')
         });
     });
     return mapped;
@@ -1117,34 +1348,39 @@ function downloadDataAsExcel(data, fileName) {
     const wb = XLSX.utils.book_new();
     
     // 1. Build Current Planning sheet
-    const cpData = [['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description']];
+    const cpData = [['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments']];
     data.tasks.forEach(t => {
         cpData.push([
             t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||''
+            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+            serializeComments(t.Comments||[])
         ]);
     });
     const wsCurrent = XLSX.utils.aoa_to_sheet(cpData);
     XLSX.utils.book_append_sheet(wb, wsCurrent, "Current Planning");
-    
-    // 2. Build Log sheet
-    const logData = [['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Saved On Date']];
+
+    // 2. Build Log sheet (Saved On Date is first column)
+    const logData = [['Saved On Date', 'ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments']];
     // Insert existing snapshots if any
     Object.keys(data.snapshots).sort((a,b) => new Date(a) - new Date(b)).forEach(dateKey => {
         data.snapshots[dateKey].forEach(t => {
             logData.push([
+                dateKey,
                 t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-                t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'', dateKey
+                t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+                serializeComments(t.Comments||[])
             ]);
         });
     });
-    
+
     // Append the brand new snapshot representing "Right Now"
     const nowStr = formatDateTimeStr(new Date());
     data.tasks.forEach(t => {
         logData.push([
+            nowStr,
             t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'', nowStr
+            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+            serializeComments(t.Comments||[])
         ]);
     });
     
@@ -1170,14 +1406,26 @@ function downloadDataAsExcel(data, fileName) {
     return nowStr;
 }
 
+// Build filename in format: {source}_gantt_{d}-{month}-{yyyy}.xlsx
+// Strips any existing _gantt_{date} suffix before appending the new one.
+function buildGanttFileName(sourceName, date) {
+    const FULL_MONTHS = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+    const d = date || new Date();
+    const dateStr = `${d.getDate()}-${FULL_MONTHS[d.getMonth()]}-${d.getFullYear()}`;
+    // Strip extension
+    let base = String(sourceName || 'Plan').replace(/\.xls[xm]?$/i, '');
+    // Strip existing _gantt_{date} suffix (case-insensitive)
+    base = base.replace(/_gantt_\d{1,2}-[a-z]+-\d{4}$/i, '');
+    // Strip trailing separators
+    base = base.replace(/[-_\s]+$/, '');
+    return `${base}_gantt_${dateStr}.xlsx`;
+}
+
 function saveSnapshot() {
     if (!_currentArrayBuffer || !_currentFile) {
         // If we have no original file (e.g. Example Data), build a new one from DATA
-        const d = new Date();
-        const dateSuffix = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         let originalName = DATA.meta.source_file || 'New_Plan';
-        let baseName = originalName.lastIndexOf('.') > 0 ? originalName.substring(0, originalName.lastIndexOf('.')) : originalName;
-        const fileName = baseName + "_" + dateSuffix + ".xlsx";
+        const fileName = buildGanttFileName(originalName);
 
         const nowStr = downloadDataAsExcel(DATA, fileName);
         
@@ -1207,35 +1455,73 @@ function saveSnapshot() {
         s2Name = "Log";
         wb.SheetNames.push(s2Name);
         wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet([
-            ['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Saved On Date']
+            ['Saved On Date', 'ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments']
         ]);
     }
-    
+
     // Copy current planning to log with current timestamp
+    // IMPORTANT: Use DATA.tasks (in-memory state) — NOT the raw sheet buffer —
+    // so that tasks added/edited via the UI are included.
     const nowStr = formatDateTimeStr(new Date());
-    const sheet1 = wb.Sheets[s1Name];
-    // Re-read with cell formats to preserve everything as best as we can when rewriting
-    let rawTasks = XLSX.utils.sheet_to_json(sheet1, {raw: false, header: 1});
-    
-    if (rawTasks.length > 1) {
-        const headers = rawTasks[0];
-        const dataRows = rawTasks.slice(1).filter(row => row.length > 0 && row.some(cell => cell !== null && cell !== ''));
-        
-        // If the Log sheet was just created, ensure it has headers
+    const CP_HEADERS = ['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments'];
+    const LOG_HEADERS = ['Saved On Date', ...CP_HEADERS];
+
+    // Rewrite the Current Planning sheet from in-memory DATA.tasks
+    const cpRows = [CP_HEADERS];
+    DATA.tasks.forEach(t => {
+        cpRows.push([
+            t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
+            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+            serializeComments(t.Comments||[])
+        ]);
+    });
+    wb.Sheets[s1Name] = XLSX.utils.aoa_to_sheet(cpRows);
+
+    {
+        // Read existing log
         let logData = XLSX.utils.sheet_to_json(wb.Sheets[s2Name], {raw: false, header: 1});
         if (logData.length === 0) {
-            logData = [headers.concat(['Saved On Date'])];
+            logData = [LOG_HEADERS];
+        } else {
+            // Migrate existing log rows to canonical column order (Saved On Date first, Comments present)
+            const headerRow = logData[0];
+            const savedOnIdx = headerRow.indexOf('Saved On Date');
+            const hasComments = headerRow.includes('Comments');
+            const needsMigration = savedOnIdx !== 0 || !hasComments;
+
+            if (needsMigration) {
+                // Build canonical column list from existing header
+                let cols = [...headerRow];
+                // Add Comments if missing (insert before Saved On Date or at end if no Saved On Date)
+                if (!hasComments) {
+                    const soIdx = cols.indexOf('Saved On Date');
+                    if (soIdx >= 0) cols.splice(soIdx, 0, 'Comments');
+                    else cols.push('Comments');
+                }
+                // Move Saved On Date to front if not already
+                const soIdx2 = cols.indexOf('Saved On Date');
+                if (soIdx2 > 0) { cols.splice(soIdx2, 1); cols.unshift('Saved On Date'); }
+
+                // Remap all rows using the old header positions to the new order
+                const oldHeader = headerRow;
+                logData = logData.map((row, rIdx) => {
+                    if (rIdx === 0) return cols;
+                    return cols.map(col => {
+                        const oldIdx = oldHeader.indexOf(col);
+                        return oldIdx >= 0 ? (row[oldIdx] || '') : '';
+                    });
+                });
+            }
         }
-        
-        // Append rows
-        const newRows = dataRows.map(row => {
-            let newRow = [...row];
-            // Ensure array is long enough to match headers
-            while(newRow.length < headers.length) newRow.push('');
-            newRow.push(nowStr);
-            return newRow;
-        });
-        
+
+        // Append current tasks as new snapshot rows (Saved On Date first)
+        const newRows = DATA.tasks.map(t => [
+            nowStr,
+            t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
+            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+            serializeComments(t.Comments||[])
+        ]);
+
         logData = logData.concat(newRows);
         wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet(logData);
     }
@@ -1251,46 +1537,28 @@ function saveSnapshot() {
     a.href = url;
     
     let originalName = _currentFile.name;
-    let baseName = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
-    const d = new Date();
-    const dateSuffix = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    a.download = baseName + "_" + dateSuffix + ".xlsx";
+    a.download = buildGanttFileName(originalName);
     
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    // Since we appended a snapshot, let's artificially add it to the state to avoid requiring a reload of the downloaded file
+    // Since we appended a snapshot, artificially add it to state to avoid requiring a reload
     setTimeout(() => {
-        // Convert the appended rawTasks to the format parseWorkbook expects and update DATA
-        let logHeader = rawTasks[0] || [];
-        let rawObjs = [];
-        
-        rawTasks.slice(1).forEach(row => {
-            if (!row.length || !row.some(cell => cell !== null && cell !== '')) return;
-            let obj = {};
-            logHeader.forEach((h, i) => obj[h] = row[i] || '');
-            rawObjs.push(obj);
-        });
-        
-        let newSnapTasks = processTasksList(rawObjs);
-        
-        // Add to our dictionary
-        if(newSnapTasks.length) {
-            DATA.snapshots[nowStr] = newSnapTasks;
-            setUnsavedChanges(false);
-            // Re-populate compare UI
-            const currentCmp = AppState.compareLabel;
-            populateCompare();
-            if (currentCmp) {
-                const sel = document.getElementById('compare-sel');
-                sel.value = currentCmp;
-            }
+        // DATA.tasks is already up-to-date (synced before save). Use it directly as the snapshot.
+        DATA.snapshots[nowStr] = DATA.tasks.map(t => ({...t}));
+        setUnsavedChanges(false);
+        // Re-populate compare UI
+        const currentCmp = AppState.compareLabel;
+        populateCompare();
+        if (currentCmp) {
+            const sel = document.getElementById('compare-sel');
+            sel.value = currentCmp;
         }
 
         if (originalName.endsWith(".xlsm")) {
-            alert(`Snapshot saved as ${baseName}.xlsx\n(macros not preserved in standalone version)`);
+            alert(`Snapshot saved as .xlsx\n(macros not preserved in standalone version)`);
         }
     }, 200);
 }
@@ -1384,6 +1652,9 @@ function buildAllRows(current, compareTasks, snapLabel) {
   const catOrder = {}; // phase -> [categories]
   const tasksByCat = {}; // phase||cat -> [tasks]
 
+  const _today = new Date(); _today.setHours(0,0,0,0);
+  const PRIORITY_ORDER = {high:0, medium:1, low:2, '':3};
+
   current.forEach(t => {
       const ph = t.Phase || '(No Phase)';
       const ca = t.Category || '(No Category)';
@@ -1398,7 +1669,25 @@ function buildAllRows(current, compareTasks, snapLabel) {
       if (!tasksByCat[key]) tasksByCat[key] = [];
       tasksByCat[key].push(t);
   });
-  
+
+  // Sort categories alphabetically within each phase
+  phaseOrder.forEach(ph => { catOrder[ph].sort((a, b) => a.localeCompare(b)); });
+
+  // Sort tasks: priority (High→Low), then overdue days descending, then start date ascending
+  Object.keys(tasksByCat).forEach(key => {
+      tasksByCat[key].sort((a, b) => {
+          const pa = PRIORITY_ORDER[(a.Priority||'').toLowerCase()] ?? 3;
+          const pb = PRIORITY_ORDER[(b.Priority||'').toLowerCase()] ?? 3;
+          if (pa !== pb) return pa - pb;
+          const oa = overdueInfo(a, _today); const ob = overdueInfo(b, _today);
+          const da = oa ? oa.days : -1; const db = ob ? ob.days : -1;
+          if (da !== db) return db - da;
+          const sa = parseDate(a['Start Date']); const sb = parseDate(b['Start Date']);
+          if (sa && sb) return sa - sb;
+          return sa ? -1 : sb ? 1 : 0;
+      });
+  });
+
   phaseOrder.forEach(ph => {
       rows.push({type:'phase', phase:ph, ghost:false});
       catOrder[ph].forEach(ca => {
@@ -1449,10 +1738,6 @@ function buildStatsMap(tasks, today) {
   });
   return m;
 }
-
-
-
-
 function populateCompare() {
   const sel = document.getElementById('compare-sel');
   sel.innerHTML = '<option value=""><strong>\u2014 Compare \u2014</strong></option>';
@@ -1466,6 +1751,38 @@ function populateCompare() {
   });
   _setCompareUI('');
 }
+
+// Dark mode toggle
+function toggleDarkMode() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const next = isDark ? '' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('gantt-theme', next);
+  _updateDarkmodeBtn(next === 'dark');
+  render();
+}
+
+function _updateDarkmodeBtn(isDark) {
+  const btn = document.getElementById('darkmode-btn');
+  if (btn) {
+    btn.textContent = isDark ? '\u2600' : '\u263D'; // ☀ or ☽
+    btn.title = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+  }
+}
+
+function initTheme() {
+  const stored = localStorage.getItem('gantt-theme');
+  let theme = '';
+  if (stored !== null) {
+    theme = stored;
+  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    theme = 'dark';
+  }
+  document.documentElement.setAttribute('data-theme', theme);
+  _updateDarkmodeBtn(theme === 'dark');
+}
+
+initTheme();
 
 // Compact mode toggle
 function toggleCompact() {
@@ -1680,6 +1997,7 @@ function svgEl(tag, attrs={}, text='') {
 
 // ── Render left panel ─────────────────────────────────────────────────
 function renderLeft(visible, today, statsMap) {
+  const _leftDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const c = document.getElementById('left-rows'); c.innerHTML = '';
   // Empty state when filter gives no results
   let taskCount = 0;
@@ -1730,6 +2048,11 @@ function renderLeft(visible, today, statsMap) {
         }
       }
     if (!r.ghost) {
+      div.addEventListener('mouseenter', () => { AppState._hoveredPhase = r.phase; AppState._hoveredCatInfo = null; });
+      div.addEventListener('mouseleave', () => { AppState._hoveredPhase = null; });
+      const editP = document.createElement('span'); editP.className='rename-btn'; editP.dataset.tooltip='Rename Phase'; editP.textContent='\u270F';
+      editP.onclick = (e) => { e.stopPropagation(); openRenameModal('phase', r.phase); };
+      div.appendChild(editP);
       const addP = document.createElement('span'); addP.className='add-task-btn'; addP.dataset.tooltip='Add Task'; addP.textContent='+';
       addP.onclick = (e) => { e.stopPropagation(); openTaskModal(null, 'add', r.phase, null); };
       div.appendChild(addP);
@@ -1771,6 +2094,11 @@ function renderLeft(visible, today, statsMap) {
     }
     div.appendChild(lbl);
     if (!r.ghost) {
+      div.addEventListener('mouseenter', () => { AppState._hoveredCatInfo = {phase: r.phase, cat: r.cat}; AppState._hoveredPhase = null; });
+      div.addEventListener('mouseleave', () => { AppState._hoveredCatInfo = null; });
+      const editC = document.createElement('span'); editC.className='rename-btn'; editC.dataset.tooltip='Rename Category'; editC.textContent='\u270F';
+      editC.onclick = (e) => { e.stopPropagation(); openRenameModal('category', r.cat, r.phase); };
+      div.appendChild(editC);
       const addC = document.createElement('span'); addC.className='add-task-btn'; addC.dataset.tooltip='Add Task'; addC.textContent='+';
       addC.onclick = (e) => { e.stopPropagation(); openTaskModal(null, 'add', r.phase, r.cat); };
       div.appendChild(addC);
@@ -1800,8 +2128,8 @@ function renderLeft(visible, today, statsMap) {
       const dispTaskTitle = rawTaskTitle.replace(/\(milestone\)/gi,'').trim();
       titleSpan.textContent = (r.ghost?'\u27f3 ':'')+trimTitle(dispTaskTitle, AppState.compactMode, 7);
       titleSpan.dataset.tooltip = rawTaskTitle;
-      titleSpan.style.background = '#fff';
-      titleSpan.style.color = '#000';
+      titleSpan.style.background = _leftDark ? '#000' : '#fff';
+      titleSpan.style.color = _leftDark ? '#f1f5f9' : '#000';
       titleSpan.style.border = '1px solid ' + taskColorStr;
       titleSpan.style.borderRadius = '8px';
       titleSpan.style.padding = '1px 7px';
@@ -1844,6 +2172,85 @@ function renderLeft(visible, today, statsMap) {
   });
 }
 
+// ── Bar hover overlay helpers ─────────────────────────────────────────
+let _hoverOverlayTimer = null;
+
+function _removeBarHoverOverlay() {
+  clearTimeout(_hoverOverlayTimer); _hoverOverlayTimer = null;
+  const ov = document.getElementById('bar-hover-overlay');
+  if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+  AppState._hoveredTask = null;
+}
+
+function _scheduleHideBarHover() {
+  clearTimeout(_hoverOverlayTimer);
+  _hoverOverlayTimer = setTimeout(_removeBarHoverOverlay, 500);
+}
+
+function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
+  clearTimeout(_hoverOverlayTimer); _hoverOverlayTimer = null;
+
+  // If already showing for the same task, just keep it — don't move the buttons
+  if (AppState._hoveredTask === task && document.getElementById('bar-hover-overlay')) return;
+
+  AppState._hoveredTask = task;
+  const chartArea = document.getElementById('chart-area');
+  if (!chartArea) return;
+  const caRect = chartArea.getBoundingClientRect();
+  const relLeft = hitClientRect.left - caRect.left + chartArea.scrollLeft;
+  const relTop  = hitClientRect.top  - caRect.top  + chartArea.scrollTop;
+
+  let ov = document.getElementById('bar-hover-overlay');
+  if (!ov) {
+    ov = document.createElement('div'); ov.id = 'bar-hover-overlay';
+    ov.className = 'bar-hover-overlay';
+    chartArea.appendChild(ov);
+  }
+  ov.style.left   = relLeft + 'px';
+  ov.style.top    = relTop  + 'px';
+  ov.style.width  = hitClientRect.width  + 'px';
+  ov.style.height = hitClientRect.height + 'px';
+
+  // Place buttons to whichever side of the cursor has more room.
+  // The clear zone equals one button width so the tooltip is visible first.
+  // If neither side fits inside the bar, float the group just outside the right edge.
+  const cursorInBar = cursorClientX - hitClientRect.left;
+  const btnGroupW   = 68;   // approx total width: 2 buttons + 4px gap
+  const cursorGap   = 32;   // clear zone ≈ one button width
+
+  const roomRight = hitClientRect.width - cursorInBar - cursorGap;
+  const roomLeft  = cursorInBar - cursorGap;
+
+  let btnLeft;
+  if (roomLeft < btnGroupW && roomRight < btnGroupW) {
+    // Bar too short to fit on either side — float just past the right edge
+    btnLeft = hitClientRect.width + 4;
+  } else if (roomRight >= roomLeft) {
+    btnLeft = cursorInBar + cursorGap;
+  } else {
+    btnLeft = cursorInBar - cursorGap - btnGroupW;
+  }
+  const btnTop = (hitClientRect.height - 26) / 2;
+
+  ov.innerHTML = '';
+  const actions = document.createElement('div'); actions.className = 'bar-hover-actions';
+  actions.style.left = btnLeft + 'px';
+  actions.style.top  = btnTop  + 'px';
+
+  const btnC = document.createElement('button'); btnC.textContent = '\uD83D\uDCAC'; btnC.dataset.tooltip = 'Comments (c)';
+  btnC.addEventListener('mouseenter', () => clearTimeout(_hoverOverlayTimer));
+  btnC.addEventListener('mouseleave', _scheduleHideBarHover);
+  btnC.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openCommentsModal(task); };
+
+  const btnE = document.createElement('button'); btnE.textContent = '\u270E'; btnE.dataset.tooltip = 'Edit task (e)';
+  btnE.addEventListener('mouseenter', () => clearTimeout(_hoverOverlayTimer));
+  btnE.addEventListener('mouseleave', _scheduleHideBarHover);
+  btnE.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openTaskModal(task, 'edit'); };
+
+  actions.appendChild(btnC); actions.appendChild(btnE);
+  ov.appendChild(actions);
+}
+
 // ── Render SVG chart ──────────────────────────────────────────────────
 function renderChart(visible, today) {
   const cw    = getColWidth(); const cols  = getColumns();
@@ -1856,6 +2263,19 @@ function renderChart(visible, today) {
 
   svg.setAttribute('width', totalW); svg.setAttribute('height', totalH);
   while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  // Dark mode color palette for SVG elements
+  const _dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const _barBg      = _dark ? '#000000' : '#ffffff';
+  const _ghostBg    = _dark ? '#0a0a0a' : '#f8fafc';
+  const _ghostProg  = _dark ? '#2a2a2a' : '#cbd5e1';
+  const _normProg   = _dark ? '#134e2a' : '#bbf7d0';
+  const _barText    = _dark ? '#f1f5f9' : '#1e293b';
+  const _gridMajor  = _dark ? '#1c1c1c' : '#e2e8f0';
+  const _gridMinor  = _dark ? '#0d0d0d' : '#f1f5f9';
+  const _gridWeek   = _dark ? '#181818' : '#cbd5e1';
+  const _rowSep     = _dark ? '#181818' : '#cbd5e1';
+  const _headMinor  = _dark ? '#1a1a1a' : '#f1f5f9';
 
   const defs = svgEl('defs');
   const mk = svgEl('marker',{id:'arr',markerWidth:6,markerHeight:6,refX:6,refY:3,orient:'auto'});
@@ -1871,17 +2291,17 @@ function renderChart(visible, today) {
     if (r.ghost) ghostById[id] = r.task; else currById[id] = r.task;
   });
 
+  // Pre-compute highlight row index (rect drawn after grid lines so it covers them)
+  const _highlightRi = AppState._highlightId
+    ? visible.findIndex(r => r.type==='task' && !r.ghost && getTaskId(r.task) === AppState._highlightId)
+    : -1;
+
   // Row backgrounds
   visible.forEach((r,ri) => {
-    if (r.type==='task' && !r.ghost && AppState._highlightId) {
-      const tid = getTaskId(r.task);
-      if (tid === AppState._highlightId)
-        svg.appendChild(svgEl('rect',{x:0,y:ri*ROW_H,width:totalW,height:ROW_H,fill:'rgba(239,68,68,0.10)'}));
-    }
     if (r.ghost && r.type==='task')
-      svg.appendChild(svgEl('rect',{x:0,y:ri*ROW_H,width:totalW,height:ROW_H,fill:'#f8fafc'}));
+      svg.appendChild(svgEl('rect',{x:0,y:ri*ROW_H,width:totalW,height:ROW_H,fill:_ghostBg}));
     if (r.type==='phase' && ri>0)
-      svg.appendChild(svgEl('line',{x1:0,y1:ri*ROW_H,x2:totalW,y2:ri*ROW_H,stroke:'#cbd5e1','stroke-width':1.5}));
+      svg.appendChild(svgEl('line',{x1:0,y1:ri*ROW_H,x2:totalW,y2:ri*ROW_H,stroke:_rowSep,'stroke-width':1.5}));
   });
 
   // ── Timeline header ──
@@ -1904,18 +2324,18 @@ function renderChart(visible, today) {
       hSvg.appendChild(svgEl('text',{x:x+7*cw/2,y:13,'text-anchor':'middle',fill:'#0284c7','font-size':11,'font-weight':'700'},`${monName} ${wkStart.getFullYear()} \u00b7 W${isoW}`));
       // Week separator line
       if(wk>0){
-        svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:'#cbd5e1','stroke-width':2}));
-        hSvg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:HEAD_H,stroke:'#cbd5e1','stroke-width':2}));
+        svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridWeek,'stroke-width':2}));
+        hSvg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:HEAD_H,stroke:_gridWeek,'stroke-width':2}));
       }
       // Row 2: day abbr, Row 3: day number
       const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
       for(let d=0;d<7;d++){
         const dd=addDays(AppState.renderStart,wk*7+d);
         const dx=x+d*cw;
-        hSvg.appendChild(svgEl('line',{x1:dx,y1:16,x2:dx,y2:HEAD_H,stroke:'#f1f5f9','stroke-width':1}));
+        hSvg.appendChild(svgEl('line',{x1:dx,y1:16,x2:dx,y2:HEAD_H,stroke:_headMinor,'stroke-width':1}));
         hSvg.appendChild(svgEl('text',{x:dx+cw/2,y:27,'text-anchor':'middle',fill:'#94a3b8','font-size':9},dayNames[dd.getDay()]));
         hSvg.appendChild(svgEl('text',{x:dx+cw/2,y:40,'text-anchor':'middle',fill:'#475569','font-size':10},String(dd.getDate())));
-        svg.appendChild(svgEl('line',{x1:dx,y1:0,x2:dx,y2:totalH,stroke:'#f8fafc','stroke-width':1}));
+        svg.appendChild(svgEl('line',{x1:dx,y1:0,x2:dx,y2:totalH,stroke:_gridMinor,'stroke-width':1}));
       }
     }
   } else if (AppState.view==='year') {
@@ -1927,20 +2347,20 @@ function renderChart(visible, today) {
         const dd=new Date(mon.getFullYear(),mon.getMonth(),d);
         if(dd.getDay()===1){
           const wx=x+(d-1)/dim*cw;
-          svg.appendChild(svgEl('line',{x1:wx,y1:0,x2:wx,y2:totalH,stroke:'#f1f5f9','stroke-width':1}));
+          svg.appendChild(svgEl('line',{x1:wx,y1:0,x2:wx,y2:totalH,stroke:_gridMinor,'stroke-width':1}));
           hSvg.appendChild(svgEl('text',{x:wx+1,y:40,fill:'#94a3b8','font-size':8},`W${getISOWeek(dd)}`));
         }
       }
       if(ci>0){
-        svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:'#e2e8f0','stroke-width':1.5}));
-        hSvg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:HEAD_H,stroke:'#e2e8f0','stroke-width':1}));
+        svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridMajor,'stroke-width':1.5}));
+        hSvg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:HEAD_H,stroke:_gridMajor,'stroke-width':1}));
       }
     });
   } else {
     let prevMonth='';
     cols.forEach((col,ci) => {
       const x=ci*cw;
-      svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:'#f1f5f9','stroke-width':1}));
+      svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridMinor,'stroke-width':1}));
       if(AppState.view==='week'){
         const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         hSvg.appendChild(svgEl('text',{x:x+cw/2,y:15,'text-anchor':'middle',fill:'#94a3b8','font-size':9},days[col.date.getDay()]));
@@ -1951,14 +2371,20 @@ function renderChart(visible, today) {
           prevMonth=ml;
           hSvg.appendChild(svgEl('text',{x:x+2,y:16,fill:'#0284c7','font-size':11,'font-weight':'700'},ml));
           if(ci>0){
-            svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:'#e2e8f0','stroke-width':1.5}));
-            hSvg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:HEAD_H,stroke:'#e2e8f0','stroke-width':1.5}));
+            svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridMajor,'stroke-width':1.5}));
+            hSvg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:HEAD_H,stroke:_gridMajor,'stroke-width':1.5}));
           }
         }
         if(col.date.getDate()%5===0||col.date.getDate()===1)
           hSvg.appendChild(svgEl('text',{x:x+1,y:34,fill:'#94a3b8','font-size':9},String(col.date.getDate())));
       }
     });
+  }
+
+  // ── Row highlight (drawn after grid lines so it covers minor lines) ──
+  if (_highlightRi >= 0) {
+    svg.appendChild(svgEl('rect',{x:0,y:_highlightRi*ROW_H,width:totalW,height:ROW_H,fill:_barBg}));
+    svg.appendChild(svgEl('rect',{x:0,y:_highlightRi*ROW_H,width:totalW,height:ROW_H,fill:_dark?'rgba(251,191,36,0.18)':'rgba(239,68,68,0.10)'}));
   }
 
   // ── Today line ──
@@ -2033,8 +2459,8 @@ function renderChart(visible, today) {
 
     if(ghost){
       const gg=svgEl('g',{opacity:'0.7'});
-      gg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:'#f8fafc',stroke:'#94a3b8','stroke-width':1.5,'stroke-dasharray':'4,3'}));
-      if(pct>0)gg.appendChild(svgEl('rect',{x:x+1.5,y:y+1.5,width:Math.max((drawW-3)*pct/100,0),height:h-3,fill:'#cbd5e1','clip-path':`url(#${clipId})`}));
+      gg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:_ghostBg,stroke:'#94a3b8','stroke-width':1.5,'stroke-dasharray':'4,3'}));
+      if(pct>0)gg.appendChild(svgEl('rect',{x:x+1.5,y:y+1.5,width:Math.max((drawW-3)*pct/100,0),height:h-3,fill:_ghostProg,'clip-path':`url(#${clipId})`}));
       if(drawW>12){
         const gt=svgEl('text',{x:x+5,y:y+h/2+4,fill:'#94a3b8','font-size':12,'font-weight':'500',
           'font-family':'Segoe UI,system-ui,sans-serif','clip-path':`url(#${clipId})`,style:'pointer-events:none'});
@@ -2043,8 +2469,8 @@ function renderChart(visible, today) {
       svg.appendChild(gg);
     } else {
       if(isOverdue)svg.appendChild(svgEl('rect',{x:x-3,y:y-3,width:drawW+6,height:h+6,rx:rx+2,fill:'none',stroke:'#f59e0b','stroke-width':2,opacity:'0.5'}));
-      svg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:'#fff'}));
-      if(pct>0)svg.appendChild(svgEl('rect',{x:x+1.5,y:y+1.5,width:Math.max((drawW-3)*pct/100,0),height:h-3,fill:'#bbf7d0','clip-path':`url(#${clipId})`}));
+      svg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:_barBg}));
+      if(pct>0)svg.appendChild(svgEl('rect',{x:x+1.5,y:y+1.5,width:Math.max((drawW-3)*pct/100,0),height:h-3,fill:_normProg,'clip-path':`url(#${clipId})`}));
       svg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:'none',stroke:color,'stroke-width':2}));
       // Status circle (always shown since MIN_BAR_W guarantees space)
       const sc=STATUS_COLORS[(t.Status||'').toLowerCase()]||'#94a3b8';
@@ -2057,14 +2483,19 @@ function renderChart(visible, today) {
       const dispTitle=rawTitle.replace(/\(milestone\)/gi,'').trim();
       const maxChars=Math.max(3,Math.floor(availW/CHAR_W));
       const displayTitle=dispTitle.length>maxChars?dispTitle.slice(0,maxChars-1)+'\u2026':dispTitle;
-      const tx=svgEl('text',{x:x+5,y:y+h/2+4,fill:'#1e293b','font-size':12,'font-weight':'600',
+      const tx=svgEl('text',{x:x+5,y:y+h/2+4,fill:_barText,'font-size':12,'font-weight':'600',
         'font-family':'Segoe UI,system-ui,sans-serif','clip-path':`url(#${clipId})`,style:'pointer-events:none'});
       tx.textContent=displayTitle; svg.appendChild(tx);
-      // Milestone marker: gold circle (bar height) with white M, to the right of the bar
+      // Milestone marker: gold diamond with white M, to the right of the bar
       if(/\(milestone\)/i.test(rawTitle)){
-        const mr=h/2;  // radius = half bar height = full bar height in diameter
-        const mx=x+drawW+mr+4, my=y+h/2;
-        svg.appendChild(svgEl('circle',{cx:mx,cy:my,r:mr,fill:'#b45309'}));
+        const ms=h/2;  // half-size of diamond = half bar height
+        const mx=x+drawW+ms+4, my=y+h/2;
+        // Diamond = rotated square: top, right, bottom, left vertices
+        const pts=`${mx},${my-ms} ${mx+ms},${my} ${mx},${my+ms} ${mx-ms},${my}`;
+        const diamond=svgEl('polygon',{points:pts,fill:'#d97706',stroke:'#92400e','stroke-width':1.5,style:'cursor:default'});
+        diamond.addEventListener('mousemove', e=>showSimpleTooltip(e,'Milestone Task'));
+        diamond.addEventListener('mouseleave', hideTooltip);
+        svg.appendChild(diamond);
         const mt=svgEl('text',{x:mx,y:my+4,'text-anchor':'middle',fill:'#fff','font-size':12,'font-weight':'700',
           'font-family':'Segoe UI,system-ui,sans-serif',style:'pointer-events:none'},'M');
         svg.appendChild(mt);
@@ -2107,6 +2538,8 @@ function renderChart(visible, today) {
     hit.addEventListener('mouseleave', hideTooltip);
     if (!ghost) {
         hit.addEventListener('click', (e) => { e.stopPropagation(); hideTooltip(); openTaskModal(t, 'edit'); });
+        hit.addEventListener('mouseenter', (e) => { _showBarHoverOverlay(t, e.clientX, hit.getBoundingClientRect()); });
+        hit.addEventListener('mouseleave', _scheduleHideBarHover);
     }
     svg.appendChild(hit);
   });
@@ -2153,15 +2586,15 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
   const cColor = catColor(myCat);
   const phaseCatHtml = `<div style="font-size:0.7rem; color:#64748b; margin-top:-2px; margin-bottom:6px;">${escHtml(myPhase)} \xBB <span style="color:${cColor}; font-weight:600">${escHtml(myCat)}</span></div>`;
 
-  // Fields to render in the tooltip
+  // Fields to render in the tooltip (Description moved to top)
   const fields = [
+    {label:'Description',key:'Description', skip_diff:true},
     {label:'Status',     key:'Status', is_status:true},
     {label:'Start',      key:'Start Date'},
     {label:'End',        key:'End Date'},
     {label:'Progress',   key:'Progress'},
     {label:'Priority',   key:'Priority'},
     {label:'Dependency', key:'Dependency'},
-    {label:'Description',key:'Description'},
   ];
 
   const currentList = AppState.currentTasks || [];
@@ -2185,6 +2618,17 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
       rows += `<div class="tt-row"><span class="tt-label">${label}</span>${escHtml(myVal)}${diffHtml}</div>`;
     }
   });
+
+  // Append note count and latest note at bottom
+  const ttComments = t.Comments || [];
+  const noteCountLabel = ttComments.length === 0 ? 'No notes yet' : `${ttComments.length} note${ttComments.length !== 1 ? 's' : ''}`;
+  rows += `<div class="tt-row" style="margin-top:4px;border-top:1px solid var(--border);padding-top:4px;"><span class="tt-label">Notes</span>${escHtml(noteCountLabel)}</div>`;
+  if (ttComments.length > 0) {
+    const latest = ttComments[ttComments.length - 1];
+    const cColor = commenterColor(latest.name);
+    const shortText = latest.text.length > 55 ? latest.text.slice(0, 55) + '\u2026' : latest.text;
+    rows += `<div class="tt-row"><span class="tt-label">Latest note</span><span style="color:${cColor};font-weight:700">${escHtml(latest.name)}</span> <span style="color:var(--text-mu);font-size:0.75em;">${escHtml(latest.date)}</span>: ${escHtml(shortText)}</div>`;
+  }
 
   tt.innerHTML = `${snap}<div class="tt-title">${escHtml(t.Title||'')}</div>${phaseCatHtml}${rows}`;
   tt.style.display='block'; moveTooltip(e);
@@ -2620,6 +3064,401 @@ function initDragScroll() {
   _dragScrollInit = true;
 }
 
+// ── Shared modal task-info helper ─────────────────────────────────────
+function _setModalTaskInfo(elId, task) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!task) { el.innerHTML = ''; return; }
+  const catCol = catColor(task.Category||'');
+  el.innerHTML =
+    `<span class="comments-task-phase">${escHtml(task.Phase||'')}</span>` +
+    `<span style="color:var(--text-mu);">\u203A</span>` +
+    `<span class="comments-task-cat" style="background:${catCol};">${escHtml(task.Category||'')}</span>` +
+    `<span style="color:var(--text-mu);">\u203A</span>` +
+    `<span class="comments-task-title" data-tooltip="${escHtml(task.Title||'')}">${escHtml(task.Title||'')}</span>`;
+}
+
+// ── Comments Modal ────────────────────────────────────────────────────
+let _commentsTask = null;
+
+function openCommentsModal(task) {
+    if (!task) return;
+    _commentsTask = task;
+    if (!_commentsTask.Comments) _commentsTask.Comments = [];
+    // Populate name datalist
+    const nameSet = new Set();
+    AppState.currentTasks.forEach(t => (t.Comments||[]).forEach(c => { if(c.name) nameSet.add(c.name); }));
+    const dl = document.getElementById('comments-name-list');
+    if (dl) { dl.innerHTML = ''; nameSet.forEach(n => { const o = document.createElement('option'); o.value = n; dl.appendChild(o); }); }
+    // Pre-fill name
+    const nameInput = document.getElementById('comments-name-input');
+    if (nameInput && AppState._commenterName) nameInput.value = AppState._commenterName;
+    // Clear textarea
+    const textInput = document.getElementById('comments-text-input');
+    if (textInput) textInput.value = '';
+    // Update title and task info bar
+    const title = document.getElementById('comments-modal-title');
+    if (title) title.textContent = 'Comments';
+    _setModalTaskInfo('comments-modal-taskinfo', task);
+    // Render list
+    renderCommentList();
+    document.getElementById('comments-modal-overlay').style.display = 'flex';
+    AppState._modalLayout = 'comments';
+}
+
+function closeCommentsModal() {
+    document.getElementById('comments-modal-overlay').style.display = 'none';
+    _commentsTask = null;
+}
+
+function renderCommentList() {
+    const list = document.getElementById('comments-list');
+    if (!list || !_commentsTask) return;
+    list.innerHTML = '';
+    const comments = (_commentsTask.Comments || []).slice().reverse(); // newest first
+    if (comments.length === 0) {
+        const empty = document.createElement('div');
+        empty.style.cssText = 'text-align:center;color:var(--text-lt);font-size:0.8rem;padding:16px 0;';
+        empty.textContent = 'No comments yet.';
+        list.appendChild(empty); return;
+    }
+    comments.forEach((c, revIdx) => {
+        const realIdx = (_commentsTask.Comments.length - 1) - revIdx; // index in original array
+        const item = document.createElement('div'); item.className = 'comment-item';
+        const color = commenterColor(c.name);
+        item.innerHTML = `
+          <div class="comment-actions">
+            <button class="comment-edit-btn" data-tooltip="Edit this comment">&#9999;</button>
+            <button class="comment-delete-btn" style="color:#dc2626;" data-tooltip="Delete this comment">&#128465;</button>
+          </div>
+          <div class="comment-header"><span style="font-weight:700;color:${color}">${escHtml(c.name)}</span> &middot; ${escHtml(c.date)}</div>
+          <div class="comment-text">${escHtml(c.text)}</div>`;
+        // Edit button
+        item.querySelector('.comment-edit-btn').addEventListener('click', () => {
+            const textDiv = item.querySelector('.comment-text');
+            if (item.querySelector('.comment-edit-area')) return; // already editing
+            const ta = document.createElement('textarea'); ta.className = 'comment-edit-area';
+            ta.value = c.text; ta.rows = 3;
+            textDiv.style.display = 'none'; item.appendChild(ta);
+            const acts = document.createElement('div'); acts.className = 'comment-edit-actions';
+            const saveBtn = document.createElement('button'); saveBtn.textContent = 'Save';
+            saveBtn.className = 'btn btn-primary'; saveBtn.style.fontSize = '0.72rem'; saveBtn.style.padding = '2px 10px';
+            const cancelBtn = document.createElement('button'); cancelBtn.textContent = 'Cancel';
+            cancelBtn.style.fontSize = '0.72rem'; cancelBtn.style.padding = '2px 8px';
+            acts.appendChild(saveBtn); acts.appendChild(cancelBtn); item.appendChild(acts);
+            saveBtn.addEventListener('click', () => {
+                const newText = sanitizeInput(ta.value);
+                if (!newText) return;
+                _commentsTask.Comments[realIdx].text = newText;
+                syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
+            });
+            cancelBtn.addEventListener('click', () => renderCommentList());
+        });
+        // Delete button
+        item.querySelector('.comment-delete-btn').addEventListener('click', () => {
+            if (confirm('Delete this comment?')) {
+                _commentsTask.Comments.splice(realIdx, 1);
+                syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
+            }
+        });
+        list.appendChild(item);
+    });
+}
+
+function saveComment() {
+    if (!_commentsTask) return;
+    const name = sanitizeInput(document.getElementById('comments-name-input').value);
+    const text = sanitizeInput(document.getElementById('comments-text-input').value);
+    if (!name || !text) { alert('Please enter both your name and a comment.'); return; }
+    AppState._commenterName = name;
+    if (!_commentsTask.Comments) _commentsTask.Comments = [];
+    _commentsTask.Comments.push({ date: formatDateStr(new Date()), name, text });
+    syncCurrentTasksToData(); setUnsavedChanges(true);
+    document.getElementById('comments-text-input').value = '';
+    // Update datalist
+    const dl = document.getElementById('comments-name-list');
+    if (dl && !Array.from(dl.options).some(o => o.value === name)) {
+        const o = document.createElement('option'); o.value = name; dl.appendChild(o);
+    }
+    renderCommentList();
+}
+
+function openCommentsFromEdit() {
+    const task = _modalTask;
+    closeTaskModal();
+    openCommentsModal(task);
+}
+
+// ── Modal view switching ───────────────────────────────────────────────
+function modalSwitchEdit() {
+    if (!_checkDirtyBeforeSwitch()) return;
+    const task = _commentsTask || _modalTask;
+    closeDualModal(); closeCommentsModal();
+    if (task) openTaskModal(task, 'edit');
+}
+
+function modalSwitchComments() {
+    if (!_checkDirtyBeforeSwitch()) return;
+    const task = _modalTask || _commentsTask;
+    closeDualModal(); closeTaskModal();
+    if (task) openCommentsModal(task);
+}
+
+function modalSwitchBoth() {
+    if (!_checkDirtyBeforeSwitch()) return;
+    const task = _modalTask || _commentsTask;
+    if (!task) return;
+    closeTaskModal(); closeCommentsModal();
+    openDualModal(task);
+}
+
+function openDualModal(task) {
+    if (!task) return;
+    _commentsTask = task;
+    _modalTask = task;
+    _modalMode = 'edit';
+    AppState._modalLayout = 'both';
+    const overlay = document.getElementById('dual-modal-overlay');
+    if (!overlay) return;
+
+    // Populate task info in dual modal view bar
+    _setModalTaskInfo('dual-modal-taskinfo', task);
+
+    // Build edit panel content by cloning the modal body/header/footer structure
+    const editDiv = document.getElementById('dual-modal-edit');
+    const commentsDiv = document.getElementById('dual-modal-comments');
+    editDiv.innerHTML = ''; commentsDiv.innerHTML = '';
+
+    // ── Edit panel header ──
+    const eh = document.createElement('div'); eh.className = 'modal-header';
+    eh.innerHTML = `<h3 style="margin:0;">Edit Task</h3>`;
+    editDiv.appendChild(eh);
+
+    // Clone the task modal body form fields
+    const origBody = document.querySelector('#task-modal-overlay .modal-body');
+    if (origBody) {
+        const bodyClone = origBody.cloneNode(true);
+        bodyClone.id = 'dual-edit-body';
+        editDiv.appendChild(bodyClone);
+        // Populate the cloned fields by opening modal (it writes to IDs directly),
+        // then copy values across
+        openTaskModal(task, 'edit');
+        // Transfer values from original IDs to cloned fields
+        const fields = ['modal-task-title','modal-task-phase','modal-task-cat','modal-task-desc',
+                        'modal-task-id','modal-task-start','modal-task-end',
+                        'modal-task-progress-range','modal-task-progress-num','modal-task-dependency'];
+        fields.forEach(id => {
+            const orig = document.getElementById(id);
+            const clone = bodyClone.querySelector('#'+id);
+            if (orig && clone) { clone.value = orig.value; clone.id = 'dual-'+id; }
+        });
+        // Re-hide the original modal (we just used it for population)
+        document.getElementById('task-modal-overlay').style.display = 'none';
+    }
+    // Attach dirty tracking to dual edit panel
+    const dualEditBody = document.getElementById('dual-edit-body');
+    if (dualEditBody) {
+        dualEditBody.addEventListener('input', _updateDualDirtyHighlights);
+        dualEditBody.addEventListener('change', _updateDualDirtyHighlights);
+    }
+
+    // Edit panel footer
+    const ef = document.createElement('div'); ef.className = 'modal-footer';
+    ef.innerHTML = `<button class="btn btn-delete" data-action="deleteTaskFromModal" style="${task?'':'display:none'}">Delete</button><div style="flex:1"></div><button class="btn" data-action="closeDualModalConfirm">Cancel</button><button class="btn btn-primary" data-action="saveDualEdit">Save</button>`;
+    editDiv.appendChild(ef);
+
+    // ── Comments panel ──
+    const ch = document.createElement('div'); ch.className = 'modal-header';
+    ch.innerHTML = `<h3 style="margin:0;">Comments</h3>`;
+    commentsDiv.appendChild(ch);
+
+    // Clone comments body
+    const origCBody = document.querySelector('#comments-modal-overlay .modal-body');
+    if (origCBody) {
+        const cBodyClone = origCBody.cloneNode(true);
+        cBodyClone.id = 'dual-comments-body';
+        // Update IDs to avoid conflicts
+        ['comments-name-input','comments-text-input','comments-list'].forEach(id => {
+            const el = cBodyClone.querySelector('#'+id);
+            if (el) el.id = 'dual-'+id;
+        });
+        const dl = cBodyClone.querySelector('#comments-name-list');
+        if (dl) dl.id = 'dual-comments-name-list';
+        commentsDiv.appendChild(cBodyClone);
+        // Populate comments panel
+        const nameSet = new Set();
+        AppState.currentTasks.forEach(t => (t.Comments||[]).forEach(c => { if(c.name) nameSet.add(c.name); }));
+        const dualDl = cBodyClone.querySelector('#dual-comments-name-list');
+        if (dualDl) { dualDl.innerHTML=''; nameSet.forEach(n=>{const o=document.createElement('option');o.value=n;dualDl.appendChild(o);}); }
+        const nameInput = cBodyClone.querySelector('#dual-comments-name-input');
+        if (nameInput && AppState._commenterName) nameInput.value = AppState._commenterName;
+        // Render comments list in dual panel
+        _renderCommentListInEl(cBodyClone.querySelector('#dual-comments-list'), task);
+        // Save comment button in dual panel
+        const saveCommentBtn = cBodyClone.querySelector('[data-action="saveComment"]');
+        if (saveCommentBtn) {
+            saveCommentBtn.removeAttribute('data-action');
+            saveCommentBtn.addEventListener('click', () => {
+                const n = sanitizeInput(nameInput ? nameInput.value : '');
+                const t2 = sanitizeInput(cBodyClone.querySelector('#dual-comments-text-input') ? cBodyClone.querySelector('#dual-comments-text-input').value : '');
+                if (!n || !t2) { alert('Please enter both your name and a comment.'); return; }
+                AppState._commenterName = n;
+                if (!task.Comments) task.Comments = [];
+                task.Comments.push({date:formatDateStr(new Date()), name:n, text:t2});
+                syncCurrentTasksToData(); setUnsavedChanges(true);
+                if (cBodyClone.querySelector('#dual-comments-text-input')) cBodyClone.querySelector('#dual-comments-text-input').value='';
+                _renderCommentListInEl(cBodyClone.querySelector('#dual-comments-list'), task);
+            });
+        }
+    }
+
+    // View switcher for dual modal
+    const vs = document.getElementById('dual-view-switcher');
+    if (vs) { vs.querySelectorAll('button').forEach(b=>b.classList.remove('active')); const bb=vs.querySelector('[data-action="modalSwitchBoth"]'); if(bb) bb.classList.add('active'); }
+
+    overlay.style.display = 'flex';
+}
+
+function _renderCommentListInEl(listEl, task) {
+    if (!listEl || !task) return;
+    listEl.innerHTML = '';
+    const comments = (task.Comments || []).slice().reverse();
+    if (comments.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center;color:var(--text-lt);font-size:0.8rem;padding:16px 0;">No comments yet.</div>';
+        return;
+    }
+    comments.forEach((c, revIdx) => {
+        const realIdx = (task.Comments.length - 1) - revIdx;
+        const item = document.createElement('div'); item.className = 'comment-item';
+        const color = commenterColor(c.name);
+        item.innerHTML = `<div class="comment-header"><span style="font-weight:700;color:${color}">${escHtml(c.name)}</span> &middot; ${escHtml(c.date)}</div><div class="comment-text">${escHtml(c.text)}</div>`;
+        listEl.appendChild(item);
+    });
+}
+
+function saveDualEdit() {
+    // Read values from dual-edit-body cloned fields
+    const get = id => { const el = document.getElementById('dual-'+id); return el ? el.value : ''; };
+    if (!_modalTask) return;
+    const t = _modalTask;
+    t.Title = sanitizeInput(get('modal-task-title')) || 'New Task';
+    t.Phase = sanitizeInput(get('modal-task-phase')) || 'Phase 1';
+    t.Category = sanitizeInput(get('modal-task-cat')) || 'Category 1';
+    t.Description = sanitizeInput(get('modal-task-desc'));
+    const sd = get('modal-task-start'); if(sd) t['Start Date'] = sd;
+    const ed = get('modal-task-end'); if(ed) t['End Date'] = ed;
+    t.Progress = get('modal-task-progress-range');
+    t.Dependency = get('modal-task-dependency');
+    const idVal = sanitizeInput(get('modal-task-id'));
+    t.ID = idVal || t.Title.replace(/[^a-zA-Z0-9 ]/g,'');
+    syncCurrentTasksToData(); setUnsavedChanges(true);
+    closeDualModal(); render();
+}
+
+function closeDualModal() {
+    _modalOriginal = null;
+    const overlay = document.getElementById('dual-modal-overlay');
+    if (overlay) overlay.style.display = 'none';
+    AppState._modalLayout = 'single';
+}
+
+// ── Confirm-close helpers ──────────────────────────────────────────────
+function closeTaskModalConfirm() {
+    if (_isEditDirty() && !confirm('Discard unsaved changes?')) return;
+    closeTaskModal();
+}
+function closeDualModalConfirm() {
+    if (_isDualDirty() && !confirm('Discard unsaved changes?')) return;
+    closeDualModal();
+}
+function closeCommentsModalConfirm() {
+    const txt = document.getElementById('comments-text-input');
+    if (txt && txt.value.trim() && !confirm('You have an unsaved comment. Discard it?')) return;
+    closeCommentsModal();
+}
+
+// ── Rename Modal ───────────────────────────────────────────────────────
+let _renameType = null, _renameOldValue = null, _renamePhase = null;
+
+function openRenameModal(type, oldName, phase) {
+    _renameType = type; _renameOldValue = oldName; _renamePhase = phase || null;
+    document.getElementById('rename-modal-title').textContent = type === 'phase' ? 'Rename Phase' : 'Rename Category';
+    document.getElementById('rename-modal-label').textContent = type === 'phase' ? 'Phase name' : 'Category name';
+    document.getElementById('rename-modal-input').value = oldName;
+    document.getElementById('rename-modal-overlay').style.display = 'flex';
+    setTimeout(() => { const inp = document.getElementById('rename-modal-input'); if(inp){inp.focus();inp.select();} }, 50);
+}
+
+function closeRenameModal() {
+    document.getElementById('rename-modal-overlay').style.display = 'none';
+}
+
+function saveRename() {
+    const newName = sanitizeInput(document.getElementById('rename-modal-input').value);
+    if (!newName) return;
+    if (newName === _renameOldValue) { closeRenameModal(); return; }
+
+    if (_renameType === 'phase') {
+        const existingPhase = AppState.currentTasks.some(t => t.Phase === newName);
+        if (existingPhase) {
+            const choice = window.confirm(
+                `A Phase named "${newName}" already exists.\n\n` +
+                `Click OK to merge "${_renameOldValue}" into "${newName}" (all tasks will be moved).\n` +
+                `Click Cancel to keep both phases (a number will be added to avoid duplicates).`
+            );
+            if (choice === true) {
+                // Merge: move all tasks from old phase to new phase
+                AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = newName; });
+            } else if (choice === false) {
+                // Duplicate: add incremented suffix
+                let suffix = 2; let safeName = `${newName} ${suffix}`;
+                while (AppState.currentTasks.some(t => t.Phase === safeName)) { suffix++; safeName = `${newName} ${suffix}`; }
+                AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = safeName; });
+            }
+            // null = Cancel (dialog was dismissed) — do nothing
+        } else {
+            AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = newName; });
+        }
+    } else {
+        // Category rename
+        const samePhaseCatExists = AppState.currentTasks.some(t => t.Phase === _renamePhase && t.Category === newName);
+        const otherPhaseCatExists = !samePhaseCatExists && AppState.currentTasks.some(t => t.Phase !== _renamePhase && t.Category === newName);
+
+        if (samePhaseCatExists) {
+            const choice = window.confirm(
+                `A Category named "${newName}" already exists in phase "${_renamePhase}".\n\n` +
+                `Click OK to merge "${_renameOldValue}" into "${newName}" (all tasks will be moved).\n` +
+                `Click Cancel to keep both categories (a number will be added to avoid duplicates).`
+            );
+            if (choice === true) {
+                AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
+            } else if (choice === false) {
+                let suffix = 2; let safeName = `${newName} ${suffix}`;
+                while (AppState.currentTasks.some(t => t.Phase === _renamePhase && t.Category === safeName)) { suffix++; safeName = `${newName} ${suffix}`; }
+                AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = safeName; });
+            }
+        } else if (otherPhaseCatExists) {
+            const choice = window.confirm(
+                `A Category named "${newName}" exists in a different Phase.\n\n` +
+                `Click OK to merge and move all tasks from "${_renamePhase} \u203A ${_renameOldValue}" into that other category.\n` +
+                `Click Cancel to proceed with a simple rename (tasks stay in "${_renamePhase}").`
+            );
+            if (choice === true) {
+                // Find the phase of the matching category
+                const targetTask = AppState.currentTasks.find(t => t.Phase !== _renamePhase && t.Category === newName);
+                const targetPhase = targetTask ? targetTask.Phase : _renamePhase;
+                AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) { t.Category = newName; t.Phase = targetPhase; } });
+            } else if (choice === false) {
+                AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
+            }
+        } else {
+            AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
+        }
+    }
+    syncCurrentTasksToData(); setUnsavedChanges(true);
+    closeRenameModal(); render();
+}
+
 // ── Init Events ───────────────────────────────────────────────────────
 let _eventsInit = false;
 function initEvents() {
@@ -2647,9 +3486,75 @@ function initEvents() {
                 case 'setFilter': setFilter(val); break;
                 case 'toggleAll': toggleAll(); break;
                 case 'toggleCompact': toggleCompact(); break;
+                case 'toggleDarkMode': toggleDarkMode(); break;
                 case 'browseFile': document.getElementById('file-input').click(); break;
+                // Task modal actions
+                case 'openTaskModalNew': openTaskModal(null, 'add'); break;
+                case 'closeTaskModal': closeTaskModal(); break;
+                case 'closeTaskModalConfirm': closeTaskModalConfirm(); break;
+                case 'saveTaskModal': saveTaskModal(); break;
+                case 'deleteTaskFromModal': deleteTaskFromModal(); break;
+                case 'duplicateTaskFromModal': duplicateTaskFromModal(); break;
+                case 'createDependentTask': createDependentTask(); break;
+                // Comments modal actions
+                case 'openCommentsFromEdit': openCommentsFromEdit(); break;
+                case 'closeCommentsModal': closeCommentsModal(); break;
+                case 'closeCommentsModalConfirm': closeCommentsModalConfirm(); break;
+                case 'saveComment': saveComment(); break;
+                // Modal layout switch actions
+                case 'modalSwitchEdit': modalSwitchEdit(); break;
+                case 'modalSwitchBoth': modalSwitchBoth(); break;
+                case 'modalSwitchComments': modalSwitchComments(); break;
+                // Dual modal actions
+                case 'closeDualModal': closeDualModal(); break;
+                case 'closeDualModalConfirm': closeDualModalConfirm(); break;
+                case 'saveDualEdit': saveDualEdit(); break;
+                // Rename modal actions
+                case 'closeRenameModal': closeRenameModal(); break;
+                case 'saveRename': saveRename(); break;
             }
         }
+    });
+
+    // Delegated dirty-state tracking for Edit modal form
+    const _taskOverlay = document.getElementById('task-modal-overlay');
+    if (_taskOverlay) {
+        _taskOverlay.addEventListener('input', _updateEditDirtyHighlights);
+        _taskOverlay.addEventListener('change', _updateEditDirtyHighlights);
+        _taskOverlay.addEventListener('click', (e) => {
+            if (e.target.classList.contains('select-pill')) setTimeout(_updateEditDirtyHighlights, 0);
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
+      const taskModalOpen = document.getElementById('task-modal-overlay') && document.getElementById('task-modal-overlay').style.display !== 'none';
+      const commentsModalOpen = document.getElementById('comments-modal-overlay') && document.getElementById('comments-modal-overlay').style.display !== 'none';
+      const renameModalOpen = document.getElementById('rename-modal-overlay') && document.getElementById('rename-modal-overlay').style.display !== 'none';
+      const dualModalOpen = document.getElementById('dual-modal-overlay') && document.getElementById('dual-modal-overlay').style.display !== 'none';
+      const anyModalOpen = taskModalOpen || commentsModalOpen || renameModalOpen || dualModalOpen;
+      // Escape closes whichever modal is open (with unsaved-change prompt where relevant)
+      if (e.key === 'Escape') {
+        if (taskModalOpen)     { e.preventDefault(); closeTaskModalConfirm(); }
+        else if (dualModalOpen)     { e.preventDefault(); closeDualModalConfirm(); }
+        else if (commentsModalOpen) { e.preventDefault(); closeCommentsModalConfirm(); }
+        else if (renameModalOpen)   { e.preventDefault(); closeRenameModal(); }
+        return;
+      }
+      if (taskModalOpen || commentsModalOpen || dualModalOpen) {
+        if (e.key === 'e') { e.preventDefault(); modalSwitchEdit(); }
+        if (e.key === 'c') { e.preventDefault(); modalSwitchComments(); }
+        if (e.key === 'b') { e.preventDefault(); modalSwitchBoth(); }
+      } else if (!anyModalOpen) {
+        if (AppState._hoveredTask) {
+          if (e.key === 'c') { e.preventDefault(); openCommentsModal(AppState._hoveredTask); }
+          if (e.key === 'e') { e.preventDefault(); openTaskModal(AppState._hoveredTask, 'edit'); }
+        }
+        if (e.key === 'e' && !AppState._hoveredTask) {
+          if (AppState._hoveredPhase) { e.preventDefault(); openRenameModal('phase', AppState._hoveredPhase); }
+          else if (AppState._hoveredCatInfo) { e.preventDefault(); openRenameModal('category', AppState._hoveredCatInfo.cat, AppState._hoveredCatInfo.phase); }
+        }
+      }
     });
 
     document.body.addEventListener('change', (e) => {
@@ -2708,10 +3613,14 @@ function init(){
   const meta=DATA.meta||{};
   let src=String(meta.source_file||'Gantt Chart');
   src = src.replace(/\.xls[xm]?$/i, '');
-  const trimmed=src.length>30?src.slice(0,30):src;
+  const trimmed=src.length>20?src.slice(0,20)+'..':src;
   const narrowed=src.length>5?src.slice(0,5)+'..':src;
   const titleEl=document.getElementById('app-title');
-  if(titleEl) titleEl.innerHTML=`<span class="txt-full">${escHtml(trimmed)}</span><span class="txt-short">${escHtml(narrowed)}</span>`;
+  if(titleEl) {
+    titleEl.innerHTML=`<span class="txt-full">${escHtml(trimmed)}</span><span class="txt-short">${escHtml(narrowed)}</span>`;
+    if(src.length>20) titleEl.dataset.tooltip = src;
+    else delete titleEl.dataset.tooltip;
+  }
   const pillEl=document.getElementById('date-pill');
   if(pillEl){
       if (meta.generated_at) {
@@ -2750,8 +3659,79 @@ window.addEventListener('load',init);
 // ── Modal Logic ───────────────────────────────────────────────────────
 let _modalTask = null;
 let _modalMode = 'edit';
+let _modalOriginal = null;
 const PREDEFINED_STATUSES = ['done', 'on track', 'behind', 'waiting', 'none'];
 const PREDEFINED_PRIORITIES = ['high', 'medium', 'low', 'none'];
+
+// ── Edit / Dual modal dirty-state helpers ─────────────────────────────
+function _getEditFieldValues() {
+    return {
+        title:    document.getElementById('modal-task-title')?.value    ?? '',
+        phase:    document.getElementById('modal-task-phase')?.value    ?? '',
+        cat:      document.getElementById('modal-task-cat')?.value      ?? '',
+        desc:     document.getElementById('modal-task-desc')?.value     ?? '',
+        start:    document.getElementById('modal-task-start')?.value    ?? '',
+        end:      document.getElementById('modal-task-end')?.value      ?? '',
+        progress: document.getElementById('modal-task-progress-range')?.value ?? '0',
+        dep:      document.getElementById('modal-task-dependency')?.value    ?? '',
+        id:       document.getElementById('modal-task-id')?.value       ?? '',
+        priority: document.getElementById('modal-priority-container')?.dataset.value ?? 'medium',
+        status:   document.getElementById('modal-status-container')?.dataset.value   ?? 'none',
+    };
+}
+function _captureEditSnapshot() {
+    _modalOriginal = (_modalMode === 'edit') ? _getEditFieldValues() : null;
+}
+function _isEditDirty() {
+    if (!_modalOriginal) return false;
+    const cur = _getEditFieldValues();
+    return Object.keys(_modalOriginal).some(k => cur[k] !== _modalOriginal[k]);
+}
+function _updateEditDirtyHighlights() {
+    if (!_modalOriginal) return;
+    const cur = _getEditFieldValues();
+    [['title','modal-task-title'],['phase','modal-task-phase'],['cat','modal-task-cat'],
+     ['desc','modal-task-desc'],['start','modal-task-start'],['end','modal-task-end'],
+     ['progress','modal-task-progress-range'],['dep','modal-task-dependency'],
+     ['id','modal-task-id'],['priority','modal-priority-container'],['status','modal-status-container']
+    ].forEach(([key, elId]) => {
+        const el = document.getElementById(elId); if (!el) return;
+        const fg = el.closest('.form-group'); if (!fg) return;
+        fg.classList.toggle('form-group--dirty', cur[key] !== _modalOriginal[key]);
+    });
+}
+function _getDualFieldValues() {
+    const g = id => document.getElementById('dual-modal-task-'+id)?.value ?? '';
+    return {
+        title: g('title'), phase: g('phase'), cat: g('cat'), desc: g('desc'),
+        start: g('start'), end: g('end'), progress: g('progress-range') || '0',
+        dep: g('dependency'), id: g('id'),
+    };
+}
+function _isDualDirty() {
+    if (!_modalOriginal) return false;
+    const cur = _getDualFieldValues();
+    return Object.keys(cur).some(k => _modalOriginal[k] !== undefined && cur[k] !== _modalOriginal[k]);
+}
+function _updateDualDirtyHighlights() {
+    if (!_modalOriginal) return;
+    const cur = _getDualFieldValues();
+    [['title','dual-modal-task-title'],['phase','dual-modal-task-phase'],
+     ['cat','dual-modal-task-cat'],['desc','dual-modal-task-desc'],
+     ['start','dual-modal-task-start'],['end','dual-modal-task-end'],
+     ['progress','dual-modal-task-progress-range'],['dep','dual-modal-task-dependency'],
+     ['id','dual-modal-task-id']
+    ].forEach(([key, elId]) => {
+        const el = document.getElementById(elId); if (!el) return;
+        const fg = el.closest('.form-group'); if (!fg) return;
+        fg.classList.toggle('form-group--dirty', cur[key] !== _modalOriginal[key]);
+    });
+}
+function _checkDirtyBeforeSwitch() {
+    if (_isEditDirty() || _isDualDirty())
+        return confirm('Switching views will discard unsaved edits. Continue?');
+    return true;
+}
 
 function openTaskModal(task, mode, defaultPhase, defaultCat) {
     _modalTask = task;
@@ -2820,6 +3800,28 @@ function openTaskModal(task, mode, defaultPhase, defaultCat) {
     if (dupBtn) dupBtn.style.display = isEdit ? 'inline-block' : 'none';
     const depBtn = document.getElementById('modal-btn-dependent');
     if (depBtn) depBtn.style.display = isEdit ? 'inline-block' : 'none';
+
+    // Comment info section
+    const comments = (isEdit && task && task.Comments) ? task.Comments : [];
+    const infoEl = document.getElementById('modal-comment-info');
+    if (infoEl) {
+      infoEl.style.display = comments.length > 0 ? 'block' : 'none';
+      const countEl = document.getElementById('modal-comment-count');
+      if (countEl) countEl.textContent = `${comments.length} comment${comments.length !== 1 ? 's' : ''}`;
+      const latestEl = document.getElementById('modal-comment-latest');
+      if (latestEl && comments.length > 0) {
+        const latest = comments[comments.length - 1];
+        latestEl.textContent = ` \xB7 last: ${latest.date} by ${latest.name}`;
+      }
+    }
+
+    // Populate task info in edit modal view bar
+    _setModalTaskInfo('edit-modal-taskinfo', isEdit ? task : null);
+
+    // Reset then capture dirty-state snapshot
+    document.querySelectorAll('#task-modal-overlay .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
+    _captureEditSnapshot();
+
     document.getElementById('task-modal-overlay').style.display = 'flex';
 }
 
@@ -2868,6 +3870,8 @@ function ensureModalIdHandler() {
 }
 
 function closeTaskModal() {
+    _modalOriginal = null;
+    document.querySelectorAll('#task-modal-overlay .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
     document.getElementById('task-modal-overlay').style.display = 'none';
 }
 
@@ -2962,7 +3966,18 @@ function createDependentTask() {
         depSel.appendChild(op);
     });
     depSel.value = parentId;
-    
+
+    // Prefill Start Date with parent's End Date
+    const parentTask = AppState.currentTasks.find(t => getTaskId(t) === parentId);
+    if (parentTask && parentTask['End Date']) {
+        const parentEnd = parseDate(parentTask['End Date']);
+        if (parentEnd && !isNaN(parentEnd)) {
+            document.getElementById('modal-task-start').value = parentEnd.toISOString().split('T')[0];
+            const newEnd = addDays(parentEnd, 7);
+            document.getElementById('modal-task-end').value = newEnd.toISOString().split('T')[0];
+        }
+    }
+
     _modalMode = 'add';
     document.getElementById('task-modal-title').textContent = 'Add Task';
     document.getElementById('modal-btn-delete').style.display = 'none';
@@ -2971,7 +3986,6 @@ function createDependentTask() {
     const depBtn = document.getElementById('modal-btn-dependent');
     if (depBtn) depBtn.style.display = 'none';
 }
-
 
 </script>
 </body>
