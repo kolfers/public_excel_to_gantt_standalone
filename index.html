@@ -187,8 +187,8 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
   white-space:nowrap;flex-shrink:0;transition:background .1s,color .1s,border-color .1s}
 .filter-btn:hover{background:var(--surface2);color:var(--text)}
 .filter-btn.active{background:#d97706;color:#fff;border-color:#d97706;font-weight:600}
-.toolbar-add-task{flex:1;display:flex;align-items:center;justify-content:center}
-.add-task-toolbar-btn{background:var(--header-bg);color:#fff;border-color:var(--header-bg)}
+.toolbar-add-task{flex:1;display:none;align-items:center;justify-content:center}
+.add-task-toolbar-btn{background:var(--header-bg);color:#fff;border-color:var(--header-bg);font-size:1rem;font-weight:700}
 .add-task-toolbar-btn:hover{filter:brightness(1.15);background:var(--header-bg);color:#fff}
 #filter-panel{position:fixed;z-index:9998;background:var(--bg);border:1px solid var(--border-md);
   border-radius:6px;box-shadow:0 4px 18px rgba(0,0,0,.15);padding:8px 10px;min-width:340px}
@@ -366,6 +366,15 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
 .info-title{font-size:.9rem;font-weight:700;color:var(--text)}
 .info-content{font-size:.85rem;color:var(--text);line-height:1.6}
 .info-content p{margin-bottom:12px}
+.info-sections{margin-top:16px;border-top:1px solid var(--border)}
+.info-section{border-bottom:1px solid var(--border)}
+.info-section-heading{display:flex;align-items:center;justify-content:space-between;padding:8px 4px;font-weight:700;color:var(--accent);cursor:pointer;list-style:none;user-select:none}
+.info-section-heading::-webkit-details-marker{display:none}
+.info-section-heading::after{content:'›';font-size:1rem;color:var(--text-mu);transition:transform .2s;display:inline-block}
+details.info-section[open] .info-section-heading::after{transform:rotate(90deg)}
+.info-section-heading:hover{opacity:.8}
+.info-section ul{margin:0 0 10px 20px;padding:0;list-style:circle}
+.info-section li{margin-bottom:4px}
 
 .flyout-header{margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .flyout-title{font-size:.72rem;font-weight:700;text-transform:uppercase;
@@ -422,7 +431,8 @@ select#compare-sel{background:var(--bg);border:1px solid var(--border-md);color:
     border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem;
 }
 .browse-btn:hover { background: #0369a1; }
-[data-theme='dark'] .browse-btn:hover { background: #0284c7; }
+[data-theme='dark'] .browse-btn { background: #0c4a6e; border-color: #38bdf8; color: #e0f2fe; }
+[data-theme='dark'] .browse-btn:hover { background: #0e5a82; }
 [data-theme='dark'] .template-download-btn { background: #052e16 !important; border-color: #166534 !important; color: #86efac !important; }
 [data-theme='dark'] .template-download-btn:hover { background: #064e3b !important; border-color: #16a34a !important; }
 #file-input { display: none; }
@@ -647,7 +657,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <button class="btn icon-btn" data-action="navigate" data-value="1" data-tooltip="Next time period">&#8594;</button>
     </div>
     <div class="toolbar-add-task">
-      <button class="btn add-task-toolbar-btn" data-action="openTaskModalNew" data-tooltip="Add a new task"><span class="txt-full">Add Task</span><span class="txt-short">+</span></button>
+      <button class="btn add-task-toolbar-btn" data-action="openTaskModalNew" data-tooltip="Add a new task"><span class="txt-full">+ Add Task</span><span class="txt-short">+</span></button>
     </div>
     <div class="toolbar-right">
       <span id="unsaved-warning" class="unsaved-warning" style="display:none;"><span class="txt-full">Unsaved Changes</span><span class="txt-short">Unsaved</span></span>
@@ -702,83 +712,97 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="info-content">
     <p>Visualise your project planning as an interactive Gantt chart.</p>
 
-    <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Managing Tasks</p>
-      <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li><strong>Edit:</strong> Click any task bar, or hover a bar and click the &#9998; button that appears to its side. Hovering a task row in the left panel also reveals the same shortcuts.</li>
-        <li><strong>Add:</strong> Use the global "Add +" button, hover a Phase/Category row to reveal an inline "+" button, or press <kbd>n</kbd> while hovering a Phase or Category row.</li>
-        <li><strong>Duplicate / Chain:</strong> Inside the Edit modal, use <em>Duplicate Task</em> to copy (comments are copied too), or <em>Dependent Task</em> to create a follow-on task pre-linked to the current one (comments are <em>not</em> copied). The main view scrolls to the new task after creation.</li>
-        <li><strong>Delete:</strong> Click "Delete" inside the task's Edit modal.</li>
-        <li><strong>Rename Phase / Category:</strong> Hover a Phase or Category row to reveal a &#x270F; pencil button, then click to rename (or press <kbd>r</kbd>). If the new name already exists you will be offered a merge or a numbered duplicate.</li>
-        <li><strong>Unsaved edits:</strong> While an Edit modal is open, any field that differs from its saved value shows an <span style="color:#d97706; font-style:italic;">amber label *</span> and a coloured left border, so you always know what has changed before saving.</li>
-        <li><strong>Save &amp; Close:</strong> Pressing <em>Save &amp; Close</em> in the Edit modal automatically flushes any pending unsaved comment before saving.</li>
-      </ul>
+    <div class="info-sections">
+      <details class="info-section">
+        <summary class="info-section-heading">Managing Tasks</summary>
+        <ul>
+          <li><strong>Edit:</strong> Click any task bar, or hover a bar and click the &#9998; button that appears to its side. Hovering a task row in the left panel also reveals the same shortcuts.</li>
+          <li><strong>Add:</strong> Use the global "Add Task" button in the toolbar, hover a Phase/Category row to reveal an inline "+" button, or press <kbd>n</kbd> while hovering a Phase or Category row.</li>
+          <li><strong>Duplicate / Chain:</strong> Inside the Edit modal, use <em>Duplicate Task</em> to copy (comments are copied too), or <em>Dependent Task</em> to create a follow-on task pre-linked to the current one (comments are <em>not</em> copied). The main view scrolls to the new task after creation.</li>
+          <li><strong>Delete:</strong> Click "Delete" inside the task's Edit modal.</li>
+          <li><strong>Rename Phase / Category:</strong> Hover a Phase or Category row to reveal a &#x270F; pencil button, then click to rename (or press <kbd>e</kbd> / <kbd>r</kbd>). If the new name already exists you will be offered a merge or a numbered duplicate.</li>
+          <li><strong>Unsaved edits:</strong> While an Edit modal is open, any field that differs from its saved value shows an <span style="color:#d97706; font-style:italic;">amber label *</span> and a coloured left border, so you always know what has changed before saving.</li>
+          <li><strong>Save &amp; Close:</strong> Pressing <em>Save &amp; Close</em> in the Edit modal automatically flushes any pending unsaved comment before saving.</li>
+        </ul>
+      </details>
 
-      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Comments</p>
-      <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li>Hover a task bar (or a task row in the left panel) and click &#x1F4AC; to open the Comments modal, or use the keyboard shortcut <kbd>c</kbd> while hovering.</li>
-        <li>Each comment is stored with the author name and date+time. The task tooltip shows the total comment count and a preview of the latest note.</li>
-        <li>Comments can be edited or deleted inline &mdash; hover any comment to reveal ✏ Edit and 🗑 Delete buttons.</li>
-        <li>Author names are remembered for the session and colour-coded consistently across all comments.</li>
-      </ul>
+      <details class="info-section">
+        <summary class="info-section-heading">Comments</summary>
+        <ul>
+          <li>Hover a task bar (or a task row in the left panel) and click &#x1F4AC; to open the Comments modal, or use the keyboard shortcut <kbd>c</kbd> while hovering.</li>
+          <li>Each comment is stored with the author name and date+time. The task tooltip shows the total comment count and a preview of the latest note.</li>
+          <li>Comments can be edited or deleted inline &mdash; hover any comment to reveal ✏ Edit and 🗑 Delete buttons.</li>
+          <li>Author names are remembered for the session and colour-coded consistently across all comments.</li>
+        </ul>
+      </details>
 
-      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Edit &amp; Comments Modal Views</p>
-      <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li>Every task modal has a <strong>view bar</strong> at the top with three buttons: <strong>&#9999; Edit</strong>, <strong>&#9645;&#9645; Both</strong> (side-by-side), and <strong>&#x1F4AC; Comments</strong>. Switch between them freely &mdash; the current task is preserved.</li>
-        <li>While a modal is open, use keyboard shortcuts to switch views instantly: <kbd>e</kbd> Edit &nbsp;|&nbsp; <kbd>b</kbd> Both &nbsp;|&nbsp; <kbd>c</kbd> Comments.</li>
-        <li>Press <kbd>Esc</kbd> to close any modal. If the edit form has unsaved changes you will be prompted before the modal closes.</li>
-      </ul>
+      <details class="info-section">
+        <summary class="info-section-heading">Edit &amp; Comments Modal Views</summary>
+        <ul>
+          <li>Every task modal has a <strong>view bar</strong> at the top with three buttons: <strong>&#9999; Edit</strong>, <strong>&#9645;&#9645; Both</strong> (side-by-side), and <strong>&#x1F4AC; Comments</strong>. Switch between them freely &mdash; the current task is preserved.</li>
+          <li>While a modal is open, use keyboard shortcuts to switch views instantly: <kbd>e</kbd> Edit &nbsp;|&nbsp; <kbd>b</kbd> Both &nbsp;|&nbsp; <kbd>c</kbd> Comments.</li>
+          <li>Press <kbd>Esc</kbd> to close any modal. If the edit form has unsaved changes you will be prompted before the modal closes.</li>
+        </ul>
+      </details>
 
-      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Navigation &amp; Filters</p>
-      <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li><strong>Scrolling:</strong> Click and drag the chart to pan. Release mid-swipe for momentum scrolling. Click the glowing pills at the timeline edges to extend past or future range.</li>
-        <li><strong>Views:</strong> Toggle between Week, Month, and Year timelines. Week mode aligns to Mondays.</li>
-        <li><strong>Filters:</strong> Use "All", "Active" (excludes On Hold), and "Overdue" to focus on specific tasks. Empty categories are automatically hidden.</li>
-        <li><strong>Compact Mode:</strong> Narrows the left panel and stacks filters vertically to maximise chart space. Hover any row for a full-detail tooltip.</li>
-        <li><strong>Reload:</strong> Click the Date Pill in the top-left to reload from the source file without creating a new snapshot.</li>
-        <li><strong>Dependency arrows:</strong> Hovering a task bar with a dependency highlights its incoming arrow in amber.</li>
-      </ul>
+      <details class="info-section">
+        <summary class="info-section-heading">Navigation &amp; Filters</summary>
+        <ul>
+          <li><strong>Scrolling:</strong> Click and drag the chart to pan. Release mid-swipe for momentum scrolling. Click the glowing pills at the timeline edges to extend past or future range.</li>
+          <li><strong>Views:</strong> Toggle between Week, Month, and Year timelines. Week mode aligns to Mondays.</li>
+          <li><strong>Filters:</strong> Use "All", "Active" (excludes On Hold), and "Overdue" to focus on specific tasks. Empty categories are automatically hidden. The <strong>Filter</strong> button opens a panel with toggleable chips to filter by Status, Priority, Comments, Dependency, and Overdue state &mdash; active filter values appear in a summary bar below the timeline header.</li>
+          <li><strong>Compact Mode:</strong> Narrows the left panel and stacks filters vertically to maximise chart space. Hover any row for a full-detail tooltip.</li>
+          <li><strong>Reload:</strong> Click the Date Pill in the top-left to reload from the source file without creating a new snapshot.</li>
+          <li><strong>Dependency arrows:</strong> Hovering a task bar with a dependency highlights its incoming arrow in amber.</li>
+        </ul>
+      </details>
 
-      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Keyboard Shortcuts</p>
-      <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:12px;">
-        <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Context</th><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Key</th><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Action</th></tr></thead>
-        <tbody>
-          <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>e</kbd></td><td style="padding:3px 6px;">Open Edit modal</td></tr>
-          <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>c</kbd></td><td style="padding:3px 6px;">Open Comments modal</td></tr>
-          <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>d</kbd></td><td style="padding:3px 6px;">Create a Dependent Task</td></tr>
-          <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>n</kbd></td><td style="padding:3px 6px;">Duplicate the task</td></tr>
-          <tr><td style="padding:3px 6px;">Hovering Phase/Category row</td><td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>r</kbd></td><td style="padding:3px 6px;">Open Rename modal</td></tr>
-          <tr><td style="padding:3px 6px;">Hovering Phase/Category row</td><td style="padding:3px 6px;"><kbd>n</kbd></td><td style="padding:3px 6px;">Add a new task to that group</td></tr>
-          <tr><td style="padding:3px 6px;">Main view (no modal open)</td><td style="padding:3px 6px;"><kbd>s</kbd></td><td style="padding:3px 6px;">Save Excel</td></tr>
-          <tr><td style="padding:3px 6px;">Any task modal open</td><td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>b</kbd> / <kbd>c</kbd></td><td style="padding:3px 6px;">Switch to Edit / Both / Comments view</td></tr>
-          <tr><td style="padding:3px 6px;">Any modal open</td><td style="padding:3px 6px;"><kbd>Esc</kbd></td><td style="padding:3px 6px;">Close modal (prompts if unsaved)</td></tr>
-        </tbody>
-      </table>
+      <details class="info-section">
+        <summary class="info-section-heading">Keyboard Shortcuts</summary>
+        <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin:8px 0 4px;">
+          <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Context</th><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Key</th><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Action</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>e</kbd></td><td style="padding:3px 6px;">Open Edit modal</td></tr>
+            <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>c</kbd></td><td style="padding:3px 6px;">Open Comments modal</td></tr>
+            <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>d</kbd></td><td style="padding:3px 6px;">Create a Dependent Task</td></tr>
+            <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>n</kbd></td><td style="padding:3px 6px;">Duplicate the task</td></tr>
+            <tr><td style="padding:3px 6px;">Hovering Phase/Category row</td><td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>r</kbd></td><td style="padding:3px 6px;">Open Rename modal</td></tr>
+            <tr><td style="padding:3px 6px;">Hovering Phase/Category row</td><td style="padding:3px 6px;"><kbd>n</kbd></td><td style="padding:3px 6px;">Add a new task to that group</td></tr>
+            <tr><td style="padding:3px 6px;">Main view (no modal open)</td><td style="padding:3px 6px;"><kbd>s</kbd></td><td style="padding:3px 6px;">Save Excel</td></tr>
+            <tr><td style="padding:3px 6px;">Any task modal open</td><td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>b</kbd> / <kbd>c</kbd></td><td style="padding:3px 6px;">Switch to Edit / Both / Comments view</td></tr>
+            <tr><td style="padding:3px 6px;">Any modal open</td><td style="padding:3px 6px;"><kbd>Esc</kbd></td><td style="padding:3px 6px;">Close modal (prompts if unsaved)</td></tr>
+          </tbody>
+        </table>
+      </details>
 
-      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Snapshots &amp; Comparison</p>
-      <ul style="margin:0 0 12px 20px; padding:0; list-style:circle;">
-        <li>Use the <strong>"Compare"</strong> dropdown to view a historical snapshot alongside current tasks. Ghost rows (muted italic text) show prior states; the timeline header glows red.</li>
-        <li>Review high-level changes in the <strong>Stats</strong> flyout: milestones achieved, tasks completed, progressed, overdue, added, put on hold, or removed.</li>
-        <li><strong>"Save Excel"</strong> appends a new dated snapshot and downloads the updated workbook. <strong>"Export Chart"</strong> saves a standalone read-only HTML file for sharing.</li>
-      </ul>
+      <details class="info-section">
+        <summary class="info-section-heading">Snapshots &amp; Comparison</summary>
+        <ul>
+          <li>Use the <strong>"Compare"</strong> dropdown to view a historical snapshot alongside current tasks. Ghost rows (muted italic text) show prior states; the timeline header glows red.</li>
+          <li>Review high-level changes in the <strong>Stats</strong> flyout: milestones achieved, tasks completed, progressed, overdue, added, put on hold, or removed.</li>
+          <li><strong>"Save Excel"</strong> appends a new dated snapshot and downloads the updated workbook. <strong>"Export Chart"</strong> saves a standalone read-only HTML file for sharing.</li>
+        </ul>
+      </details>
 
-      <p style="margin-bottom:8px; font-weight:700; color:var(--accent);">Icon Legend</p>
-      <ul style="margin:0 0 12px 20px; padding:0; list-style-type:none; line-height:1.9;">
-        <li><span style="font-size:0.85rem;">&#x1F6A9;</span> &ensp;Open Phase Milestone</li>
-        <li><span style="font-size:0.85rem;">&#x1F3C6;</span> &ensp;Completed Phase Milestone</li>
-        <li><span style="color:#16a34a; font-weight:bold;">&#x2713;</span> &ensp;Done items count (category row)</li>
-        <li><span style="color:#dc2626; font-weight:bold;">&#x26A0;&#xFE0F;</span> &ensp;Overdue items count (category row)</li>
-        <li><span style="color:#2563eb; font-weight:bold;">&#x25CF;</span> &ensp;Active items count (category row)</li>
-        <li><span style="font-size:0.85rem;">&#x1F4AC;</span> &ensp;Open Comments modal (bar hover)</li>
-        <li><span style="font-size:0.85rem;">&#x270E;</span> &ensp;Open Edit modal (bar hover)</li>
-        <li><span style="font-size:0.85rem;">&#x270F;</span> &ensp;Rename Phase or Category (row hover)</li>
-        <li><span style="color:#ef4444; font-weight:bold;">[!]</span> &ensp;Hidden task dependency (collapsed parent)</li>
-        <li><span style="font-size:0.95rem;">&#x27F3;</span> &ensp;Historical Snapshot (Ghost) item</li>
-      </ul>
+      <details class="info-section">
+        <summary class="info-section-heading">Icon Legend</summary>
+        <ul style="list-style-type:none; padding-left:0; line-height:1.9;">
+          <li><span style="font-size:0.85rem;">&#x1F6A9;</span> &ensp;Open Phase Milestone</li>
+          <li><span style="font-size:0.85rem;">&#x1F3C6;</span> &ensp;Completed Phase Milestone</li>
+          <li><span style="color:#16a34a; font-weight:bold;">&#x2713;</span> &ensp;Done items count (category row)</li>
+          <li><span style="color:#dc2626; font-weight:bold;">&#x26A0;&#xFE0F;</span> &ensp;Overdue items count (category row)</li>
+          <li><span style="color:#2563eb; font-weight:bold;">&#x25CF;</span> &ensp;Active items count (category row)</li>
+          <li><span style="font-size:0.85rem;">&#x1F4AC;</span> &ensp;Open Comments modal (bar hover)</li>
+          <li><span style="font-size:0.85rem;">&#x270E;</span> &ensp;Open Edit modal (bar hover)</li>
+          <li><span style="font-size:0.85rem;">&#x270F;</span> &ensp;Rename Phase or Category (row hover)</li>
+          <li><span style="color:#ef4444; font-weight:bold;">[!]</span> &ensp;Hidden task dependency (collapsed parent)</li>
+          <li><span style="font-size:0.95rem;">&#x27F3;</span> &ensp;Historical Snapshot (Ghost) item</li>
+        </ul>
+      </details>
     </div>
 
-    <p style="margin-top:20px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded &mdash; all processing happens locally.</p>
-    <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:10px;">
+    <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded &mdash; all processing happens locally.</p>
+    <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
       <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.3</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a href="https://github.com/kolfers/public_excel_to_gantt_standalone" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">GitHub Repository</a>.</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">Created by <a href="https://www.universiteitleiden.nl/en/staffmembers/kerwin-olfers#tab-1" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Kerwin Olfers</a> &middot; Released under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">MIT License</a>.</p>
@@ -2428,6 +2452,7 @@ function _clearDepArrowHighlight() {
   if (_highlightedDepArrow) {
     _highlightedDepArrow.setAttribute('stroke', '#94a3b8');
     _highlightedDepArrow.setAttribute('stroke-width', '1.5');
+    _highlightedDepArrow.setAttribute('marker-end', 'url(#arr)');
     _highlightedDepArrow = null;
   }
 }
@@ -2462,6 +2487,7 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
         if (a.getAttribute('data-dep-child-id') === childId) {
           a.setAttribute('stroke', '#f59e0b');
           a.setAttribute('stroke-width', '2.5');
+          a.setAttribute('marker-end', 'url(#arr-hi)');
           _highlightedDepArrow = a;
         }
       });
@@ -2550,7 +2576,11 @@ function renderChart(visible, today) {
   const defs = svgEl('defs');
   const mk = svgEl('marker',{id:'arr',markerWidth:6,markerHeight:6,refX:6,refY:3,orient:'auto'});
   mk.appendChild(svgEl('path',{d:'M0,0 L6,3 L0,6 Z',fill:'#94a3b8'}));
-  defs.appendChild(mk); svg.appendChild(defs);
+  defs.appendChild(mk);
+  const mkHi = svgEl('marker',{id:'arr-hi',markerWidth:6,markerHeight:6,refX:6,refY:3,orient:'auto'});
+  mkHi.appendChild(svgEl('path',{d:'M0,0 L6,3 L0,6 Z',fill:'#f59e0b'}));
+  defs.appendChild(mkHi);
+  svg.appendChild(defs);
 
   // Build partner lookup for tooltip diff highlight
   const currById = {}, ghostById = {};
