@@ -616,9 +616,9 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <div class="drop-version">v2.4</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
+      Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
       <a href="#" data-action="downloadExampleExcel"
-        style="color: var(--accent); font-weight: 600; text-decoration: none;">Download example Excel here</a> <br>
-      Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br><br>
+        style="color: var(--accent); font-weight: 600; text-decoration: none;">Download example Excel here</a> <br><br>
       Import, create and edit Gantt charts. Save to Excel or standalone html file.
     </div>
     <div class="drop-privacy">
@@ -634,7 +634,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         In this browser, saving will download new files.
       </div>
       <div id="in-place-tip">
-        <span style="color: var(--accent); font-weight: 600;">&#10024; Tip:</span> Click <strong>Browse</strong> below to
+        <span style="color: var(--accent); font-weight: 600;">&#10024; Tip:</span> Click <strong>Browse</strong> below
+        to
         open an <strong>.xlsx</strong> file and save changes directly back to it! <span
           style="font-size: 0.85em; color: var(--text-mu);"><br>(Drag and drop, or using .xlsm files, will result in
           downloading a new file on save)</span>
@@ -726,13 +727,16 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <button class="btn" id="darkmode-btn" data-action="toggleDarkMode"
         style="margin-right:12px; border-color:#64748b; color:#64748b;"
         data-tooltip="Toggle dark/light mode">&#9789;</button>
-      <label id="autosave-wrapper" style="display:none; align-items:center; gap:6px; margin-right:12px; font-size:0.8rem; color:var(--text-mu); cursor:pointer;" data-tooltip="Automatically save changes to Excel">
+      <label id="autosave-wrapper"
+        style="display:none; align-items:center; gap:6px; margin-right:12px; font-size:0.8rem; color:var(--text-mu); cursor:pointer;"
+        data-tooltip="Automatically save changes to Excel">
         <input type="checkbox" id="autosave-toggle" data-action="toggleAutoSave"> Auto-save
       </label>
       <button class="btn" id="save-btn" data-action="saveSnapshot"
         style="margin-right:12px; border-color:#16a34a; color:#16a34a;"
-        data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file." data-shortcut="s: save">&#128190;<span
-          class="txt-full"> Save Excel</span><span class="txt-short"> Save</span></button>
+        data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file."
+        data-shortcut="s: save">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short">
+          Save</span></button>
       <button class="btn" id="export-btn" data-action="exportChart"
         style="margin-right:12px; border-color:#2563eb; color:#2563eb;"
         data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart.">&#128228;<span
@@ -928,10 +932,13 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             rows (muted italic text) show prior states; the timeline header glows red.</li>
           <li>Review high-level changes in the <strong>Stats</strong> flyout: milestones achieved, tasks completed,
             progressed, overdue, added, put on hold, or removed.</li>
-          <li><strong>"Save Excel"</strong> appends a new dated snapshot and downloads the updated workbook.
-            <strong>"Export Chart"</strong> saves a standalone read-only HTML file for sharing.
+          <li><strong>"Save Excel"</strong> appends a new dated snapshot. On supported browsers (Chrome/Edge) with a
+            file opened via "Browse", it saves directly back to the original file in-place; otherwise it downloads the
+            updated workbook. <strong>"Export Chart"</strong> saves a standalone read-only HTML file for sharing.
           </li>
-          <li><strong>"Auto-Save"</strong> appears in the toolbar when your browser supports save-in-place and an `.xlsx` file is opened via "Browse". When enabled, it automatically triggers Save Excel upon any confirmed edits.</li>
+          <li><strong>"Auto-Save"</strong> appears in the toolbar when your browser supports save-in-place and an
+            `.xlsx` file is opened via "Browse". When enabled, it automatically triggers Save Excel upon any confirmed
+            edits.</li>
         </ul>
       </details>
 
@@ -1022,12 +1029,15 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div id="modal-container" class="modal view-both">
     <div class="modal-view-bar" id="modal-view-switcher">
       <div class="btn-group">
-        <button class="btn" data-action="modalSwitchEdit" data-tooltip="Edit view" data-shortcut="e: edit">&#9999; Edit</button>
-        <button class="btn active" data-action="modalSwitchBoth"
-          data-tooltip="Show Edit &amp; Comments side by side" data-shortcut="b: both">&#9645;&#9645; Both</button>
-        <button class="btn" data-action="modalSwitchComments" data-tooltip="Comments view" data-shortcut="c: comments">&#128172; Comments</button>
+        <button class="btn" data-action="modalSwitchEdit" data-tooltip="Edit view" data-shortcut="e: edit">&#9999;
+          Edit</button>
+        <button class="btn active" data-action="modalSwitchBoth" data-tooltip="Show Edit &amp; Comments side by side"
+          data-shortcut="b: both">&#9645;&#9645; Both</button>
+        <button class="btn" data-action="modalSwitchComments" data-tooltip="Comments view"
+          data-shortcut="c: comments">&#128172; Comments</button>
       </div>
-      <button class="modal-view-close" data-action="closeModalConfirm" data-tooltip="Close" data-shortcut="Esc: close">&times;</button>
+      <button class="modal-view-close" data-action="closeModalConfirm" data-tooltip="Close"
+        data-shortcut="Esc: close">&times;</button>
       <div id="modal-taskinfo" class="comments-task-info"></div>
     </div>
     <div id="modal-panels">
