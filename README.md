@@ -56,10 +56,12 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 - The **Filter** button opens a panel for fine-grained filtering by Status, Priority, Comments, Dependency, and Overdue state. Filters within a property are OR'd; filters across properties are AND'd. Active filters are shown as a summary bar beneath the timeline.
 - **Compact** mode compresses the left panel to save horizontal space.
 
-### Snapshots & Export
-- Once the Log sheet contains snapshots, the **Compare** dropdown overlays an older snapshot as ghost tracks on the chart. Changed items are highlighted and the timeline header turns red. A stats panel summarises milestones, completions, holds, and overruns relative to the chosen baseline.
-- **Export Chart** packages the entire UI and current data into a single self-contained `.html` file that can be opened on any computer without the original Excel file.
-- **Auto-Save**: In supported browsers (Edge, Chrome), loading an `.xlsx` file via the "Browse" button unlocks an **Auto-save** toggle. When enabled, confirmed edits are seamlessly saved directly back to the original Excel file.
+### Saving & Snapshots
+- **Save Excel** writes the current tasks back to the *Current Planning* sheet and appends a timestamped snapshot to the *Log* sheet. On supported browsers (Chrome/Edge) when the file was opened via "Browse", it overwrites the original file directly; otherwise it downloads an updated `.xlsx`. Each saved snapshot becomes a selectable entry in the **Compare** dropdown.
+- **Auto-Save** (Chrome/Edge only, `.xlsx` files opened via "Browse") silently rewrites only the *Current Planning* sheet after each confirmed edit, keeping your work safe if the browser closes unexpectedly. It does **not** create a Log entry or add a Compare snapshot — it is a safety net, not a versioned checkpoint.
+- **On-open snapshot (automatic):** Every time you open a file, the app compares *Current Planning* against the most recent Log entry. If they differ — because Auto-Save ran since the last manual save, or the file was edited externally — a snapshot is silently appended to the Log, timestamped with the file's last-modified date. Your history stays complete with no extra steps.
+- Use the **Compare** dropdown to overlay any past snapshot as ghost tracks on the chart. Changed items are highlighted and the timeline header glows red. The **Stats** flyout summarises milestones, completions, holds, and overruns relative to the chosen baseline.
+- **Export Chart** packages the current view into a single self-contained `.html` file that can be opened on any computer without the original Excel file.
 
 ---
 *Released under the MIT License.*

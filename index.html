@@ -1330,9 +1330,12 @@ function trimTitle(s, compact, maxLen = 6) {
   return s.length > max ? s.slice(0, max) + '..' : s;
 }
 function formatSnapKey(key) {
-  const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})/.exec(key);
-  if (m) return `${parseInt(m[1],10)} ${m[2]} ${m[3]}`;
-  return key.replace(/\s\d{2}:\d{2}.*$/, ''); // strip time
+  const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})(?:\s+(\d{2}):(\d{2}))?/.exec(key);
+  if (m) {
+    const base = `${parseInt(m[1],10)} ${m[2]} ${m[3]}`;
+    return m[4] ? `${base} ${m[4]}:${m[5]}` : base;
+  }
+  return key;
 }
 
 // ── Date helpers ─────────────────────────────────────────────────────
@@ -1488,7 +1491,7 @@ function setUnsavedChanges(val) {
           if (AppState.autoSave && typeof window.isSaveInPlaceSupported === 'function' && window.isSaveInPlaceSupported()) {
               setTimeout(() => {
                   if (typeof window.saveSnapshot === 'function' && AppState.unsavedChanges) {
-                      window.saveSnapshot();
+                      window.saveSnapshot(false);
                   }
               }, 100);
           }
@@ -1585,24 +1588,30 @@ function showToast(message) {
     }, 4000);
 }
 
-function loadFile(file) {
+function loadFile(file, isReload = false) {
     if (window.IS_EXPORTED) return;
     _currentFile = file;
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         _currentArrayBuffer = e.target.result;
         const wb = XLSX.read(_currentArrayBuffer, {type: 'array', cellDates: true});
         parseWorkbook(wb);
-        
+
+        // On initial load (not a reload), snapshot the previous session's auto-save
+        // state if Current Planning differs from the last Log snapshot.
+        if (!isReload) {
+            await _maybeCreateOnOpenSnapshot(file);
+        }
+
         document.getElementById('landing-zone').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
-        
+
         const asw = document.getElementById('autosave-wrapper');
         if (asw) asw.style.display = (_currentFileHandle && !file.name.toLowerCase().endsWith('.xlsm')) ? 'flex' : 'none';
 
         // Ensure comparison is reset on load
         clearCompare();
-        
+
         init();
     };
     reader.readAsArrayBuffer(file);
@@ -1786,33 +1795,21 @@ function parseWorkbook(wb) {
             return newRow;
         });
         
-        const logsByDate = {};
-        rawLog.forEach(r => {
-            const savedRaw = r['Saved On Date'];
-            if (!savedRaw) return;
-            const savedStr = formatDateTimeStr(savedRaw);
-            // Deduplicate per day
-            const dayKey = savedStr.substring(0, 11); // DD-Mon-YYYY
-            if (!logsByDate[dayKey] || logsByDate[dayKey] < savedStr) {
-                logsByDate[dayKey] = savedStr;
-            }
-        });
-        
-        // Group by the latest timestamp per day
+        // Group by full timestamp (no per-day deduplication — each snapshot is intentional)
         const logGroups = {};
         rawLog.forEach(r => {
             const savedRaw = r['Saved On Date'];
             if (!savedRaw) return;
             const savedStr = formatDateTimeStr(savedRaw);
-            const dayKey = savedStr.substring(0, 11);
-            if (logsByDate[dayKey] === savedStr) {
-                if (!logGroups[savedStr]) logGroups[savedStr] = [];
-                logGroups[savedStr].push(r);
-            }
+            if (!logGroups[savedStr]) logGroups[savedStr] = [];
+            logGroups[savedStr].push(r);
         });
-        
-        // Sort descending
-        const sortedKeys = Object.keys(logGroups).sort((a,b) => new Date(b) - new Date(a));
+
+        // Sort descending by full datetime
+        const sortedKeys = Object.keys(logGroups).sort((a, b) => {
+            const pa = parseDate(a), pb = parseDate(b);
+            return (pb ? pb.getTime() : 0) - (pa ? pa.getTime() : 0);
+        });
         sortedKeys.forEach(k => { snapshotsDict[k] = processTasksList(logGroups[k]); });
     }
     
@@ -1837,7 +1834,7 @@ function reloadFile() {
             return;
         }
     }
-    loadFile(_currentFile);
+    loadFile(_currentFile, true);
 }
 
 function downloadDataAsExcel(data, fileName) {
@@ -1943,15 +1940,169 @@ function buildGanttFileName(sourceName, date) {
     return `${base}_gantt_${dateStr}_${hh}-${mm}.xlsx`;
 }
 
-async function saveSnapshot() {
+// ── Snapshot helpers ──────────────────────────────────────────────────
+
+// Returns true if the two task arrays differ in any meaningful field.
+function _tasksDiffer(tasks, snapTasks) {
+    if (tasks.length !== snapTasks.length) return true;
+    const FIELDS = ['Title','Phase','Category','Start Date','End Date','Status','Priority','Progress','Description','Dependency'];
+    const byId = {};
+    snapTasks.forEach(t => { byId[t.ID || t.Title] = t; });
+    for (const t of tasks) {
+        const s = byId[t.ID || t.Title];
+        if (!s) return true;
+        for (const f of FIELDS) {
+            if (String(t[f]||'') !== String(s[f]||'')) return true;
+        }
+        if (serializeComments(t.Comments||[]) !== serializeComments(s.Comments||[])) return true;
+    }
+    return false;
+}
+
+// Ensures the Log sheet header has Saved On Date as first column and Comments present.
+function _migrateLogHeaders(logData) {
+    if (logData.length === 0) return logData;
+    const headerRow = logData[0];
+    const savedOnIdx = headerRow.indexOf('Saved On Date');
+    const hasComments = headerRow.includes('Comments');
+    if (savedOnIdx === 0 && hasComments) return logData;
+
+    let cols = [...headerRow];
+    if (!hasComments) {
+        const soIdx = cols.indexOf('Saved On Date');
+        if (soIdx >= 0) cols.splice(soIdx, 0, 'Comments');
+        else cols.push('Comments');
+    }
+    const soIdx2 = cols.indexOf('Saved On Date');
+    if (soIdx2 > 0) { cols.splice(soIdx2, 1); cols.unshift('Saved On Date'); }
+
+    const oldHeader = headerRow;
+    return logData.map((row, rIdx) => {
+        if (rIdx === 0) return cols;
+        return cols.map(col => {
+            const oldIdx = oldHeader.indexOf(col);
+            return oldIdx >= 0 ? (row[oldIdx] || '') : '';
+        });
+    });
+}
+
+// Appends a snapshot row-set to the Log sheet and writes the file in-place.
+// Updates _currentArrayBuffer on success so subsequent saves accumulate correctly.
+async function _appendSnapshotToLog(timestamp, tasks) {
+    if (!_currentArrayBuffer) return;
+    const LOG_HEADER = ['Saved On Date', 'ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments'];
+    const wb = XLSX.read(_currentArrayBuffer, {type: 'array', cellDates: true});
+    let s2Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g,'') === 'log' || n.toLowerCase().replace(/\s/g,'') === 'sheet2');
+
+    if (!s2Name) {
+        s2Name = "Log";
+        wb.SheetNames.push(s2Name);
+        wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet([LOG_HEADER]);
+    }
+
+    let logData = XLSX.utils.sheet_to_json(wb.Sheets[s2Name], {raw: false, header: 1});
+    if (logData.length === 0) logData = [LOG_HEADER];
+    else logData = _migrateLogHeaders(logData);
+
+    const newRows = tasks.map(t => [
+        timestamp,
+        t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
+        t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+        serializeComments(t.Comments||[])
+    ]);
+    logData = logData.concat(newRows);
+    wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet(logData);
+
+    const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+    if (_currentFileHandle) {
+        try {
+            const writable = await _currentFileHandle.createWritable();
+            await writable.write(wbout);
+            await writable.close();
+            _currentArrayBuffer = wbout;
+        } catch(e) {
+            console.error("Failed to persist on-open snapshot", e);
+        }
+    }
+    // If no fileHandle (drag-drop), snapshot stays in DATA.snapshots in memory only;
+    // it will be included in any subsequent manual-save download via downloadDataAsExcel.
+}
+
+// Called on initial file load (not reload). If Current Planning differs from the
+// last Log snapshot, appends a snapshot timestamped with file.lastModified so that
+// external edits and prior auto-save sessions are captured in the history.
+async function _maybeCreateOnOpenSnapshot(file) {
+    if (!file || !file.lastModified) return;
+
+    const snapKeys = Object.keys(DATA.snapshots).sort((a, b) => {
+        const pa = parseDate(a), pb = parseDate(b);
+        return (pb ? pb.getTime() : 0) - (pa ? pa.getTime() : 0);
+    });
+    const latestSnap = snapKeys.length > 0 ? DATA.snapshots[snapKeys[0]] : null;
+
+    // Genuinely empty file with no history — nothing to capture.
+    if (DATA.tasks.length === 0 && latestSnap === null) return;
+
+    // Tasks are identical to the last snapshot — nothing changed since the last save.
+    if (latestSnap !== null && !_tasksDiffer(DATA.tasks, latestSnap)) return;
+
+    const snapTimestamp = formatDateTimeStr(new Date(file.lastModified));
+
+    // Guard: don't overwrite an existing snapshot with the same timestamp.
+    if (DATA.snapshots[snapTimestamp]) return;
+
+    DATA.snapshots[snapTimestamp] = DATA.tasks.map(t => ({...t}));
+
+    if (_currentFileHandle && !file.name.toLowerCase().endsWith('.xlsm')) {
+        await _appendSnapshotToLog(snapTimestamp, DATA.tasks);
+    }
+}
+
+async function saveSnapshot(manual = true) {
+    if (!manual) {
+        // ── AUTO-SAVE: rewrite Current Planning only, no Log entry ──────
+        if (!_currentArrayBuffer || !_currentFile) {
+            // No backing file (e.g. Example Data) — auto-save not possible.
+            setUnsavedChanges(false);
+            return;
+        }
+        const wb = XLSX.read(_currentArrayBuffer, {type: 'array', cellDates: true});
+        const s1Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g,'') === 'currentplanning' || n.toLowerCase().replace(/\s/g,'') === 'sheet1') || wb.SheetNames[0];
+        const CP_HEADERS_EXPORT = ['ID (Optional)', 'Phase (Optional)', 'Category (Optional)', 'Title (Required)', 'Priority (Optional)', 'Status (Optional)', 'Start Date (Optional)', 'End Date (Optional)', 'Progress (Optional)', 'Dependency (Optional)', 'Description (Optional)', 'Comments (Optional)'];
+        const cpRows = [CP_HEADERS_EXPORT];
+        DATA.tasks.forEach(t => {
+            cpRows.push([
+                t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
+                t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+                serializeComments(t.Comments||[])
+            ]);
+        });
+        wb.Sheets[s1Name] = XLSX.utils.aoa_to_sheet(cpRows);
+        const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+
+        if (_currentFileHandle && !_currentFile.name.toLowerCase().endsWith('.xlsm')) {
+            try {
+                const writable = await _currentFileHandle.createWritable();
+                await writable.write(wbout);
+                await writable.close();
+                _currentArrayBuffer = wbout;
+                const now = new Date();
+                const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+                showToast(`✅ Auto-saved at ${timeStr}`);
+            } catch(e) {
+                console.error("Auto-save failed", e);
+            }
+        }
+        setUnsavedChanges(false);
+        return;
+    }
+
+    // ── MANUAL SAVE: rewrite Current Planning + append Log snapshot ──────
     if (!_currentArrayBuffer || !_currentFile) {
-        // If we have no original file (e.g. Example Data), build a new one from DATA
+        // No backing file (e.g. Example Data) — download a fresh workbook.
         let originalName = DATA.meta.source_file || 'New_Plan';
         const fileName = buildGanttFileName(originalName);
-
         const nowStr = downloadDataAsExcel(DATA, fileName);
-        
-        // Soft update state
         setTimeout(() => {
             DATA.snapshots[nowStr] = DATA.tasks.map(t => ({...t}));
             setUnsavedChanges(false);
@@ -1962,17 +2113,14 @@ async function saveSnapshot() {
                 sel.value = currentCmp;
             }
         }, 200);
-        
         return;
     }
-    
-    
-    // Read the original workbook
+
+    // Read and update the workbook
     const wb = XLSX.read(_currentArrayBuffer, {type: 'array', cellDates: true});
-    
-    const s1Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g, '') === 'currentplanning' || n.toLowerCase().replace(/\s/g, '') === 'sheet1') || wb.SheetNames[0];
-    let s2Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g, '') === 'log' || n.toLowerCase().replace(/\s/g, '') === 'sheet2');
-    
+    const s1Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g,'') === 'currentplanning' || n.toLowerCase().replace(/\s/g,'') === 'sheet1') || wb.SheetNames[0];
+    let s2Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g,'') === 'log' || n.toLowerCase().replace(/\s/g,'') === 'sheet2');
+
     if (!s2Name) {
         s2Name = "Log";
         wb.SheetNames.push(s2Name);
@@ -1981,15 +2129,12 @@ async function saveSnapshot() {
         ]);
     }
 
-    // Copy current planning to log with current timestamp
     // IMPORTANT: Use DATA.tasks (in-memory state) — NOT the raw sheet buffer —
     // so that tasks added/edited via the UI are included.
     const nowStr = formatDateTimeStr(new Date());
-    const CP_HEADERS = ['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments'];
     const CP_HEADERS_EXPORT = ['ID (Optional)', 'Phase (Optional)', 'Category (Optional)', 'Title (Required)', 'Priority (Optional)', 'Status (Optional)', 'Start Date (Optional)', 'End Date (Optional)', 'Progress (Optional)', 'Dependency (Optional)', 'Description (Optional)', 'Comments (Optional)'];
-    const LOG_HEADERS = ['Saved On Date', ...CP_HEADERS];
 
-    // Rewrite the Current Planning sheet from in-memory DATA.tasks
+    // Rewrite Current Planning sheet from in-memory DATA.tasks
     const cpRows = [CP_HEADERS_EXPORT];
     DATA.tasks.forEach(t => {
         cpRows.push([
@@ -2000,107 +2145,67 @@ async function saveSnapshot() {
     });
     wb.Sheets[s1Name] = XLSX.utils.aoa_to_sheet(cpRows);
 
-    {
-        // Read existing log
-        let logData = XLSX.utils.sheet_to_json(wb.Sheets[s2Name], {raw: false, header: 1});
-        if (logData.length === 0) {
-            logData = [LOG_HEADERS];
-        } else {
-            // Migrate existing log rows to canonical column order (Saved On Date first, Comments present)
-            const headerRow = logData[0];
-            const savedOnIdx = headerRow.indexOf('Saved On Date');
-            const hasComments = headerRow.includes('Comments');
-            const needsMigration = savedOnIdx !== 0 || !hasComments;
-
-            if (needsMigration) {
-                // Build canonical column list from existing header
-                let cols = [...headerRow];
-                // Add Comments if missing (insert before Saved On Date or at end if no Saved On Date)
-                if (!hasComments) {
-                    const soIdx = cols.indexOf('Saved On Date');
-                    if (soIdx >= 0) cols.splice(soIdx, 0, 'Comments');
-                    else cols.push('Comments');
-                }
-                // Move Saved On Date to front if not already
-                const soIdx2 = cols.indexOf('Saved On Date');
-                if (soIdx2 > 0) { cols.splice(soIdx2, 1); cols.unshift('Saved On Date'); }
-
-                // Remap all rows using the old header positions to the new order
-                const oldHeader = headerRow;
-                logData = logData.map((row, rIdx) => {
-                    if (rIdx === 0) return cols;
-                    return cols.map(col => {
-                        const oldIdx = oldHeader.indexOf(col);
-                        return oldIdx >= 0 ? (row[oldIdx] || '') : '';
-                    });
-                });
-            }
-        }
-
-        // Append current tasks as new snapshot rows (Saved On Date first)
-        const newRows = DATA.tasks.map(t => [
-            nowStr,
-            t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
-            serializeComments(t.Comments||[])
-        ]);
-
-        logData = logData.concat(newRows);
-        wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet(logData);
+    // Append snapshot to Log sheet
+    let logData = XLSX.utils.sheet_to_json(wb.Sheets[s2Name], {raw: false, header: 1});
+    if (logData.length === 0) {
+        logData = [['Saved On Date', 'ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments']];
+    } else {
+        logData = _migrateLogHeaders(logData);
     }
-    
-    // Write out the modified workbook as XLSX
+    const newRows = DATA.tasks.map(t => [
+        nowStr,
+        t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
+        t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+        serializeComments(t.Comments||[])
+    ]);
+    logData = logData.concat(newRows);
+    wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet(logData);
+
     const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
     const blob = new Blob([wbout], {type: "application/octet-stream"});
-    
+
     let originalName = _currentFile.name;
     let savedInPlace = false;
-    
+
     if (_currentFileHandle && !originalName.toLowerCase().endsWith('.xlsm')) {
         try {
             const writable = await _currentFileHandle.createWritable();
             await writable.write(wbout);
             await writable.close();
+            _currentArrayBuffer = wbout; // keep buffer in sync for subsequent saves
             savedInPlace = true;
-            
             const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
             showToast(`✅ Saved successfully to ${originalName} at ${timeStr}`);
-        } catch (e) {
+        } catch(e) {
             console.error("In-place save failed", e);
         }
     } else if (_currentFileHandle && originalName.toLowerCase().endsWith('.xlsm')) {
         alert("In-place saving is disabled for .xlsm files to avoid losing macros. Downloading a new .xlsx file instead.");
     }
-    
+
     if (!savedInPlace) {
-        // Trigger download
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.style.display = 'none';
         a.href = url;
-        
         a.download = buildGanttFileName(originalName);
-        
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
-    
-    // Since we appended a snapshot, artificially add it to state to avoid requiring a reload
+
+    // Update in-memory snapshot state so the dropdown reflects the new save immediately.
     setTimeout(() => {
-        // DATA.tasks is already up-to-date (synced before save). Use it directly as the snapshot.
         DATA.snapshots[nowStr] = DATA.tasks.map(t => ({...t}));
         setUnsavedChanges(false);
-        // Re-populate compare UI
         const currentCmp = AppState.compareLabel;
         populateCompare();
         if (currentCmp) {
             const sel = document.getElementById('compare-sel');
             sel.value = currentCmp;
         }
-
         if (originalName.endsWith(".xlsm")) {
             alert(`Snapshot saved as .xlsx\n(macros not preserved in standalone version)`);
         }
@@ -2286,13 +2391,8 @@ function populateCompare() {
   const sel = document.getElementById('compare-sel');
   sel.innerHTML = '<option value=""><strong>\u2014 Compare \u2014</strong></option>';
   const sortedSnapKeys = Object.keys(DATA.snapshots).sort((a, b) => {
-    const parseSnapDate = k => {
-      const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})/.exec(k);
-      if (!m) return 0;
-      const mo = MONTH_ABBR.indexOf(m[2]);
-      return new Date(+m[3], mo, +m[1]).getTime();
-    };
-    return parseSnapDate(b) - parseSnapDate(a); // latest first
+    const pa = parseDate(a), pb = parseDate(b);
+    return (pb ? pb.getTime() : 0) - (pa ? pa.getTime() : 0); // latest first
   });
   sortedSnapKeys.forEach(l => {
     const n = countDiffs(DATA.snapshots[l]);
@@ -2491,7 +2591,8 @@ function getVisibleRows(rows, today) {
       else         taskMap[id].current = r.task;
     });
     Object.entries(taskMap).forEach(([id,p]) => {
-      if (p.current && p.ghost && hasDifferences(p.current, p.ghost)) changedIds.add(id);
+      // Show: changed tasks (both exist, fields differ), added tasks (current only), removed tasks (ghost only)
+      if (!p.current || !p.ghost || hasDifferences(p.current, p.ghost)) changedIds.add(id);
     });
   }
 
@@ -2821,6 +2922,7 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
           a.setAttribute('stroke', '#f59e0b');
           a.setAttribute('stroke-width', '2.5');
           a.setAttribute('marker-end', 'url(#arr-hi)');
+          a.parentNode.appendChild(a); // bring to front
           _highlightedDepArrow = a;
         }
       });
@@ -4182,7 +4284,7 @@ function toggleAutoSave(checkbox) {
     if (!checkbox) return;
     AppState.autoSave = checkbox.checked;
     if (AppState.autoSave && AppState.unsavedChanges && typeof window.isSaveInPlaceSupported === 'function' && window.isSaveInPlaceSupported()) {
-        window.saveSnapshot();
+        window.saveSnapshot(false);
     }
 }
 
