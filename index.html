@@ -435,6 +435,27 @@ details.info-section[open] .info-section-heading::after{transform:rotate(90deg)}
 [data-theme='dark'] .browse-btn:hover { background: #0e5a82; }
 [data-theme='dark'] .template-download-btn { background: #052e16 !important; border-color: #166534 !important; color: #86efac !important; }
 [data-theme='dark'] .template-download-btn:hover { background: #064e3b !important; border-color: #16a34a !important; }
+
+.browser-warning {
+    background: #fef3c7; color: #b45309;
+    border: 1px solid #fcd34d; border-radius: 6px;
+    padding: 10px 14px; margin-bottom: 20px;
+    font-size: 0.85rem; font-weight: 500; text-align: left;
+}
+[data-theme='dark'] .browser-warning { background: #451a03; color: #fde68a; border-color: #78350f; }
+
+.toast-container {
+    position: fixed; top: 70px; right: 20px; z-index: 10000;
+    display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+}
+.toast {
+    background: rgba(16, 185, 129, 0.9); color: white; padding: 10px 16px; border-radius: 6px;
+    font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    backdrop-filter: blur(2px);
+    opacity: 0; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.toast-show { opacity: 1; transform: translateY(0); }
+
 #file-input { display: none; }
 .landing-footer {
     position: absolute; bottom: 18px; left: 0; right: 0;
@@ -589,41 +610,68 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 <body>
 <!-- Landing / drop zone -->
 <div id="landing-zone">
-    <div class="drop-card" id="drop-card" style="position: relative;">
-        <div class="drop-title">&#128200; Gantt Chart Viewer</div>
-        <div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>
-        <div class="drop-version">v2.3</div>
-        <div class="drop-text">
-            Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
-            with a table of tasks in <em>"Current Planning"</em> or <em>"Sheet 1"</em>. <br><br>
-            Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
-            <em>Optional: ID, Phase, Category, Status, Progress, Priority, Dependency, Description.</em> <a href="#" data-action="downloadExampleExcel" style="color: var(--accent); font-weight: 600; text-decoration: none;">Download example Excel here</a> <br><br>
-            <strong>Create and edit</strong> tasks, dependencies, and milestones. <br>
-            <strong>Save and compare</strong> snapshots of tasks stored in a <em>Log</em> sheet. <br>
-            <strong>Export changes</strong> to Excel or prefilled Gantt chart.
-        </div>
-        <div class="drop-privacy">
-            <span class="drop-privacy-icon">&#128274;</span>
-            <span class="drop-privacy-text"><strong>Runs entirely in your browser.</strong>
-            Your file is never uploaded &mdash; all processing happens locally on your device. <strong> Download </strong> offline app below.</span>
-        </div>
-        <div class="drop-instruct"><strong>Drop your file</strong> in this window, or click Browse</div>
-        <div style="display: flex; justify-content: center;">
-            <button class="browse-btn" data-action="browseFile" data-tooltip="Select an Excel file from your computer">&#128193; Browse&hellip;</button>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-top: 25px; gap: 8px;">
-            <button class="btn template-download-btn" data-action="downloadTemplate" data-tooltip="Download full app as-is for offline use" style="padding: 6px 12px; font-size: 0.85em; border: 1px solid #16a34a; background: #f0fdf4; color: #16a34a; font-weight: 600; cursor: pointer; border-radius: 4px; flex: 1;">&#128229; Download</button>
-            <button class="browse-btn" data-action="startEmptyChart" data-tooltip="Start a new project from scratch" style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md); flex: 1;">&#128196; Empty Chart</button>
-            <button class="browse-btn" data-action="loadExampleData" data-tooltip="Explore features with a sample dataset" style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md); flex: 1;">&#128202; Load Example</button>
-        </div>
-        <input type="file" id="file-input" accept=".xlsx,.xlsm" style="display: none;">
+  <div class="drop-card" id="drop-card" style="position: relative;">
+    <div class="drop-title">&#128200; Gantt Chart Builder</div>
+    <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
+    <div class="drop-version">v2.4</div>
+    <div class="drop-text">
+      Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
+      <a href="#" data-action="downloadExampleExcel"
+        style="color: var(--accent); font-weight: 600; text-decoration: none;">Download example Excel here</a> <br>
+      Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br><br>
+      Import, create and edit Gantt charts. Save to Excel or standalone html file.
     </div>
-    <footer class="landing-footer">
-        <p style="margin-bottom: 5px;">
-            The latest version can always be found on the <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener">Live App</a> or at the <a href="https://github.com/kolfers/public_excel_to_gantt_standalone" target="_blank" rel="noopener">GitHub Repository</a>.
-        </p>
-        Created by <a href="https://www.universiteitleiden.nl/en/staffmembers/kerwin-olfers#tab-1" target="_blank" rel="noopener">Kerwin Olfers</a> &middot; <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener" style="color: inherit;">MIT License</a>
-    </footer>
+    <div class="drop-privacy">
+      <span class="drop-privacy-icon">&#128274;</span>
+      <span class="drop-privacy-text"><strong>Runs entirely in your browser.</strong>
+        Your file is never uploaded &mdash; all processing happens locally on your device. <strong> Download </strong>
+        offline app below.</span>
+    </div>
+    <div class="drop-instruct">
+      <div id="browser-warning" class="browser-warning" style="display: none;">
+        &#9888;&#65039; <strong>Your browser does not support in-place saving.</strong> Please use Edge or Chrome to
+        unlock this feature.
+        In this browser, saving will download new files.
+      </div>
+      <div id="in-place-tip">
+        <span style="color: var(--accent); font-weight: 600;">&#10024; Tip:</span> Click <strong>Browse</strong> below to
+        open an <strong>.xlsx</strong> file and save changes directly back to it! <span
+          style="font-size: 0.85em; color: var(--text-mu);"><br>(Drag and drop, or using .xlsm files, will result in
+          downloading a new file on save)</span>
+      </div>
+      <div id="fallback-tip" style="display: none;">
+        <strong>Drop your file</strong> in this window, or click Browse to begin.
+      </div>
+    </div>
+    <div style="display: flex; justify-content: center;">
+      <button class="browse-btn" data-action="browseFile"
+        data-tooltip="Select an Excel file from your computer">&#128193; Browse&hellip;</button>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-top: 25px; gap: 8px;">
+      <button class="btn template-download-btn" data-action="downloadTemplate"
+        data-tooltip="Download full app as-is for offline use"
+        style="padding: 6px 12px; font-size: 0.85em; border: 1px solid #16a34a; background: #f0fdf4; color: #16a34a; font-weight: 600; cursor: pointer; border-radius: 4px; flex: 1;">&#128229;
+        Download</button>
+      <button class="browse-btn" data-action="startEmptyChart" data-tooltip="Start a new project from scratch"
+        style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md); flex: 1;">&#128196;
+        Empty Chart</button>
+      <button class="browse-btn" data-action="loadExampleData" data-tooltip="Explore features with a sample dataset"
+        style="padding: 6px 12px; font-size: 0.85em; background: var(--surface2); color: var(--text-mu); border: 1px solid var(--border-md); flex: 1;">&#128202;
+        Load Example</button>
+    </div>
+    <input type="file" id="file-input" accept=".xlsx,.xlsm" style="display: none;">
+  </div>
+  <footer class="landing-footer">
+    <p style="margin-bottom: 5px;">
+      The latest version can always be found on the <a
+        href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener">Live App</a>
+      or at the <a href="https://github.com/kolfers/public_excel_to_gantt_standalone" target="_blank"
+        rel="noopener">GitHub Repository</a>.
+    </p>
+    Created by <a href="https://www.universiteitleiden.nl/en/staffmembers/kerwin-olfers#tab-1" target="_blank"
+      rel="noopener">Kerwin Olfers</a> &middot; <a href="https://opensource.org/licenses/MIT" target="_blank"
+      rel="noopener" style="color: inherit;">MIT License</a>
+  </footer>
 </div>
 
 <div id="app" style="display:none;">
@@ -631,40 +679,66 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <div class="toolbar-left">
       <span class="app-title" id="app-title">Gantt Chart</span>
       <div class="toolbar-pills">
-          <span class="date-pill" id="date-pill" style="display:none; text-align:center; width:100%; box-sizing:border-box;" data-action="reloadFile" data-tooltip="Current plan generation date. Click to reload the loaded file and pick up external changes."></span>
-          <select id="compare-sel" style="width:100%; box-sizing:border-box;">
-            <option value="">&#8212; Compare &#8212;</option>
-          </select>
-          <span class="snap-pill" id="snap-pill" style="display:none; text-align:center; width:100%; box-sizing:border-box; justify-content:center;" data-action="clearCompare" data-tooltip="Clear comparison">
-            <span id="snap-pill-text"></span>&thinsp;&#10005;
-          </span>
+        <span class="date-pill" id="date-pill"
+          style="display:none; text-align:center; width:100%; box-sizing:border-box;" data-action="reloadFile"
+          data-tooltip="Current plan generation date. Click to reload the loaded file and pick up external changes."></span>
+        <select id="compare-sel" style="width:100%; box-sizing:border-box;">
+          <option value="">&#8212; Compare &#8212;</option>
+        </select>
+        <span class="snap-pill" id="snap-pill"
+          style="display:none; text-align:center; width:100%; box-sizing:border-box; justify-content:center;"
+          data-action="clearCompare" data-tooltip="Clear comparison">
+          <span id="snap-pill-text"></span>&thinsp;&#10005;
+        </span>
       </div>
       <div style="display:flex; flex-direction:column; gap:3px; align-items:stretch; margin-left:7px;">
         <button class="cbtn" id="stats-btn" data-action="toggleFlyout"
-                style="display:none; width:100%; justify-content:center;" data-tooltip="Toggle comparison stats panel">&#9783;&thinsp;<span class="txt-full">Stats</span></button>
+          style="display:none; width:100%; justify-content:center;"
+          data-tooltip="Toggle comparison stats panel">&#9783;&thinsp;<span class="txt-full">Stats</span></button>
         <button class="cbtn" id="changes-only-btn" data-action="toggleChangesOnly"
-                style="display:none; width:100%; justify-content:center;" data-tooltip="Show only changed items">&#8800;&thinsp;<span class="txt-full">Changes</span></button>
+          style="display:none; width:100%; justify-content:center;"
+          data-tooltip="Show only changed items">&#8800;&thinsp;<span class="txt-full">Changes</span></button>
       </div>
     </div>
     <div class="toolbar-center">
       <div class="btn-group" id="view-btns">
-        <button class="btn" id="btn-week"  data-action="setView" data-value="week" data-tooltip="Week view"><span class="txt-full">Week</span><span class="txt-short">W</span></button>
-        <button class="btn active" id="btn-month" data-action="setView" data-value="month" data-tooltip="Month view"><span class="txt-full">Month</span><span class="txt-short">M</span></button>
-        <button class="btn" id="btn-year"  data-action="setView" data-value="year" data-tooltip="Year view"><span class="txt-full">Year</span><span class="txt-short">Y</span></button>
+        <button class="btn" id="btn-week" data-action="setView" data-value="week" data-tooltip="Week view"><span
+            class="txt-full">Week</span><span class="txt-short">W</span></button>
+        <button class="btn active" id="btn-month" data-action="setView" data-value="month"
+          data-tooltip="Month view"><span class="txt-full">Month</span><span class="txt-short">M</span></button>
+        <button class="btn" id="btn-year" data-action="setView" data-value="year" data-tooltip="Year view"><span
+            class="txt-full">Year</span><span class="txt-short">Y</span></button>
       </div>
-      <button class="btn icon-btn" data-action="navigate" data-value="-1" data-tooltip="Previous time period">&#8592;</button>
-      <button class="btn today-btn" data-action="goToday" data-tooltip="Jump to today"><span class="txt-full">Today</span><span class="txt-short">T</span></button>
-      <button class="btn icon-btn" data-action="navigate" data-value="1" data-tooltip="Next time period">&#8594;</button>
+      <button class="btn icon-btn" data-action="navigate" data-value="-1"
+        data-tooltip="Previous time period">&#8592;</button>
+      <button class="btn today-btn" data-action="goToday" data-tooltip="Jump to today"><span
+          class="txt-full">Today</span><span class="txt-short">T</span></button>
+      <button class="btn icon-btn" data-action="navigate" data-value="1"
+        data-tooltip="Next time period">&#8594;</button>
     </div>
     <div class="toolbar-add-task">
-      <button class="btn add-task-toolbar-btn" data-action="openTaskModalNew" data-tooltip="Add a new task"><span class="txt-full">+ Add Task</span><span class="txt-short">+</span></button>
+      <button class="btn add-task-toolbar-btn" data-action="openTaskModalNew" data-tooltip="Add a new task"><span
+          class="txt-full">+ Add Task</span><span class="txt-short">+</span></button>
     </div>
     <div class="toolbar-right">
-      <span id="unsaved-warning" class="unsaved-warning" style="display:none;"><span class="txt-full">Unsaved Changes</span><span class="txt-short">Unsaved</span></span>
-      <button class="btn" id="darkmode-btn" data-action="toggleDarkMode" style="margin-right:12px; border-color:#64748b; color:#64748b;" data-tooltip="Toggle dark/light mode">&#9789;</button>
-      <button class="btn" id="save-btn" data-action="saveSnapshot" style="margin-right:12px; border-color:#16a34a; color:#16a34a;" data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file.">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short"> Save</span></button>
-      <button class="btn" id="export-btn" data-action="exportChart" style="margin-right:12px; border-color:#2563eb; color:#2563eb;" data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart.">&#128228;<span class="txt-full"> Export Chart</span><span class="txt-short"> Export</span></button>
-      <button class="btn" id="info-btn" data-action="toggleInfoPanel" style="border-color:#d97706; color:#d97706;" data-tooltip="View application info and version">&#10067; Info</button>
+      <span id="unsaved-warning" class="unsaved-warning" style="display:none;"><span class="txt-full">Unsaved
+          Changes</span><span class="txt-short">Unsaved</span></span>
+      <button class="btn" id="darkmode-btn" data-action="toggleDarkMode"
+        style="margin-right:12px; border-color:#64748b; color:#64748b;"
+        data-tooltip="Toggle dark/light mode">&#9789;</button>
+      <label id="autosave-wrapper" style="display:none; align-items:center; gap:6px; margin-right:12px; font-size:0.8rem; color:var(--text-mu); cursor:pointer;" data-tooltip="Automatically save changes to Excel">
+        <input type="checkbox" id="autosave-toggle" data-action="toggleAutoSave"> Auto-save
+      </label>
+      <button class="btn" id="save-btn" data-action="saveSnapshot"
+        style="margin-right:12px; border-color:#16a34a; color:#16a34a;"
+        data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file." data-shortcut="s: save">&#128190;<span
+          class="txt-full"> Save Excel</span><span class="txt-short"> Save</span></button>
+      <button class="btn" id="export-btn" data-action="exportChart"
+        style="margin-right:12px; border-color:#2563eb; color:#2563eb;"
+        data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart.">&#128228;<span
+          class="txt-full"> Export Chart</span><span class="txt-short"> Export</span></button>
+      <button class="btn" id="info-btn" data-action="toggleInfoPanel" style="border-color:#d97706; color:#d97706;"
+        data-tooltip="View application info and version">&#10067; Info</button>
     </div>
   </header>
 
@@ -673,16 +747,21 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <div id="left-header">
         <span class="tasks-label">Tasks</span>
         <div class="filter-btns">
-          <button class="fbtn active" id="fb-all"        data-action="setFilter" data-value="all" data-tooltip="Show all items">All</button>
-          <button class="fbtn"        id="fb-unfinished" data-action="setFilter" data-value="unfinished" data-tooltip="Show only active (non-completed) items">Active</button>
-          <button class="fbtn"        id="fb-overdue"    data-action="setFilter" data-value="overdue" data-tooltip="Show only items past their end date that are not 100% complete">Overdue</button>
+          <button class="fbtn active" id="fb-all" data-action="setFilter" data-value="all"
+            data-tooltip="Show all items">All</button>
+          <button class="fbtn" id="fb-unfinished" data-action="setFilter" data-value="unfinished"
+            data-tooltip="Show only active (non-completed) items">Active</button>
+          <button class="fbtn" id="fb-overdue" data-action="setFilter" data-value="overdue"
+            data-tooltip="Show only items past their end date that are not 100% complete">Overdue</button>
         </div>
         <button class="filter-btn" id="filter-btn" data-tooltip="Filter tasks">Filter</button>
       </div>
       <div id="left-subheader">
-        <button class="compact-btn" id="toggle-all-btn" data-action="toggleAll" data-tooltip="Expand / Collapse all">&#9660; Collapse all</button>
+        <button class="compact-btn" id="toggle-all-btn" data-action="toggleAll"
+          data-tooltip="Expand / Collapse all">&#9660; Collapse all</button>
         <span style="flex:1"></span>
-        <button class="compact-btn" id="compact-btn" data-action="toggleCompact" data-tooltip="Toggle compact view">&#9665; Compact</button>
+        <button class="compact-btn" id="compact-btn" data-action="toggleCompact"
+          data-tooltip="Toggle compact view">&#9665; Compact</button>
       </div>
       <div id="left-rows"></div>
     </div>
@@ -701,7 +780,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   </div>
   <div id="flyout-stats"></div>
   <div id="flyout-actions" style="margin-top:20px; text-align:center; display:none;">
-    <button class="cbtn" id="flyout-changes-btn" data-action="toggleChangesOnly" style="display:inline-flex; width:100%; justify-content:center; padding:6px 12px; font-size:0.8rem;">&#8800;&thinsp;Changes</button>
+    <button class="cbtn" id="flyout-changes-btn" data-action="toggleChangesOnly"
+      style="display:inline-flex; width:100%; justify-content:center; padding:6px 12px; font-size:0.8rem;">&#8800;&thinsp;Changes</button>
   </div>
 </div>
 <div id="info-panel">
@@ -716,22 +796,34 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <details class="info-section">
         <summary class="info-section-heading">Managing Tasks</summary>
         <ul>
-          <li><strong>Edit:</strong> Click any task bar, or hover a bar and click the &#9998; button that appears to its side. Hovering a task row in the left panel also reveals the same shortcuts.</li>
-          <li><strong>Add:</strong> Use the global "Add Task" button in the toolbar, hover a Phase/Category row to reveal an inline "+" button, or press <kbd>n</kbd> while hovering a Phase or Category row.</li>
-          <li><strong>Duplicate / Chain:</strong> Inside the Edit modal, use <em>Duplicate Task</em> to copy (comments are copied too), or <em>Dependent Task</em> to create a follow-on task pre-linked to the current one (comments are <em>not</em> copied). The main view scrolls to the new task after creation.</li>
+          <li><strong>Edit:</strong> Click any task bar, or hover a bar and click the &#9998; button that appears to its
+            side. Hovering a task row in the left panel also reveals the same shortcuts.</li>
+          <li><strong>Add:</strong> Use the global "Add Task" button in the toolbar, hover a Phase/Category row to
+            reveal an inline "+" button, or press <kbd>n</kbd> while hovering a Phase or Category row.</li>
+          <li><strong>Duplicate / Chain:</strong> Inside the Edit modal, use <em>Duplicate Task</em> to copy (comments
+            are copied too), or <em>Dependent Task</em> to create a follow-on task pre-linked to the current one
+            (comments are <em>not</em> copied). The main view scrolls to the new task after creation.</li>
           <li><strong>Delete:</strong> Click "Delete" inside the task's Edit modal.</li>
-          <li><strong>Rename Phase / Category:</strong> Hover a Phase or Category row to reveal a &#x270F; pencil button, then click to rename (or press <kbd>e</kbd> / <kbd>r</kbd>). If the new name already exists you will be offered a merge or a numbered duplicate.</li>
-          <li><strong>Unsaved edits:</strong> While an Edit modal is open, any field that differs from its saved value shows an <span style="color:#d97706; font-style:italic;">amber label *</span> and a coloured left border, so you always know what has changed before saving.</li>
-          <li><strong>Save &amp; Close:</strong> Pressing <em>Save &amp; Close</em> in the Edit modal automatically flushes any pending unsaved comment before saving.</li>
+          <li><strong>Rename Phase / Category:</strong> Hover a Phase or Category row to reveal a &#x270F; pencil
+            button, then click to rename (or press <kbd>e</kbd> / <kbd>r</kbd>). If the new name already exists you will
+            be offered a merge or a numbered duplicate.</li>
+          <li><strong>Unsaved edits:</strong> While an Edit modal is open, any field that differs from its saved value
+            shows an <span style="color:#d97706; font-style:italic;">amber label *</span> and a coloured left border, so
+            you always know what has changed before saving.</li>
+          <li><strong>Save &amp; Close:</strong> Pressing <em>Save &amp; Close</em> in the Edit modal automatically
+            flushes any pending unsaved comment before saving.</li>
         </ul>
       </details>
 
       <details class="info-section">
         <summary class="info-section-heading">Comments</summary>
         <ul>
-          <li>Hover a task bar (or a task row in the left panel) and click &#x1F4AC; to open the Comments modal, or use the keyboard shortcut <kbd>c</kbd> while hovering.</li>
-          <li>Each comment is stored with the author name and date+time. The task tooltip shows the total comment count and a preview of the latest note.</li>
-          <li>Comments can be edited or deleted inline &mdash; hover any comment to reveal ✏ Edit and 🗑 Delete buttons.</li>
+          <li>Hover a task bar (or a task row in the left panel) and click &#x1F4AC; to open the Comments modal, or use
+            the keyboard shortcut <kbd>c</kbd> while hovering.</li>
+          <li>Each comment is stored with the author name and date+time. The task tooltip shows the total comment count
+            and a preview of the latest note.</li>
+          <li>Comments can be edited or deleted inline &mdash; hover any comment to reveal ✏ Edit and 🗑 Delete buttons.
+          </li>
           <li>Author names are remembered for the session and colour-coded consistently across all comments.</li>
         </ul>
       </details>
@@ -739,38 +831,92 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <details class="info-section">
         <summary class="info-section-heading">Edit &amp; Comments Modal Views</summary>
         <ul>
-          <li>Every task modal has a <strong>view bar</strong> at the top with three buttons: <strong>&#9999; Edit</strong>, <strong>&#9645;&#9645; Both</strong> (side-by-side), and <strong>&#x1F4AC; Comments</strong>. Switch between them freely &mdash; the current task is preserved.</li>
-          <li>While a modal is open, use keyboard shortcuts to switch views instantly: <kbd>e</kbd> Edit &nbsp;|&nbsp; <kbd>b</kbd> Both &nbsp;|&nbsp; <kbd>c</kbd> Comments.</li>
-          <li>Press <kbd>Esc</kbd> to close any modal. If the edit form has unsaved changes you will be prompted before the modal closes.</li>
+          <li>Every task modal has a <strong>view bar</strong> at the top with three buttons: <strong>&#9999;
+              Edit</strong>, <strong>&#9645;&#9645; Both</strong> (side-by-side), and <strong>&#x1F4AC;
+              Comments</strong>. Switch between them freely &mdash; the current task is preserved.</li>
+          <li>While a modal is open, use keyboard shortcuts to switch views instantly: <kbd>e</kbd> Edit &nbsp;|&nbsp;
+            <kbd>b</kbd> Both &nbsp;|&nbsp; <kbd>c</kbd> Comments.
+          </li>
+          <li>Press <kbd>Esc</kbd> to close any modal. If the edit form has unsaved changes you will be prompted before
+            the modal closes.</li>
         </ul>
       </details>
 
       <details class="info-section">
         <summary class="info-section-heading">Navigation &amp; Filters</summary>
         <ul>
-          <li><strong>Scrolling:</strong> Click and drag the chart to pan. Release mid-swipe for momentum scrolling. Click the glowing pills at the timeline edges to extend past or future range.</li>
+          <li><strong>Scrolling:</strong> Click and drag the chart to pan. Release mid-swipe for momentum scrolling.
+            Click the glowing pills at the timeline edges to extend past or future range.</li>
           <li><strong>Views:</strong> Toggle between Week, Month, and Year timelines. Week mode aligns to Mondays.</li>
-          <li><strong>Filters:</strong> Use "All", "Active" (excludes On Hold), and "Overdue" to focus on specific tasks. Empty categories are automatically hidden. The <strong>Filter</strong> button opens a panel with toggleable chips to filter by Status, Priority, Comments, Dependency, and Overdue state &mdash; active filter values appear in a summary bar below the timeline header.</li>
-          <li><strong>Compact Mode:</strong> Narrows the left panel and stacks filters vertically to maximise chart space. Hover any row for a full-detail tooltip.</li>
-          <li><strong>Reload:</strong> Click the Date Pill in the top-left to reload from the source file without creating a new snapshot.</li>
-          <li><strong>Dependency arrows:</strong> Hovering a task bar with a dependency highlights its incoming arrow in amber.</li>
+          <li><strong>Filters:</strong> Use "All", "Active" (excludes On Hold), and "Overdue" to focus on specific
+            tasks. Empty categories are automatically hidden. The <strong>Filter</strong> button opens a panel with
+            toggleable chips to filter by Status, Priority, Comments, Dependency, and Overdue state &mdash; active
+            filter values appear in a summary bar below the timeline header.</li>
+          <li><strong>Compact Mode:</strong> Narrows the left panel and stacks filters vertically to maximise chart
+            space. Hover any row for a full-detail tooltip.</li>
+          <li><strong>Reload:</strong> Click the Date Pill in the top-left to reload from the source file without
+            creating a new snapshot.</li>
+          <li><strong>Dependency arrows:</strong> Hovering a task bar with a dependency highlights its incoming arrow in
+            amber.</li>
         </ul>
       </details>
 
       <details class="info-section">
         <summary class="info-section-heading">Keyboard Shortcuts</summary>
         <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin:8px 0 4px;">
-          <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Context</th><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Key</th><th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Action</th></tr></thead>
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Context</th>
+              <th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Key</th>
+              <th style="text-align:left; padding:3px 6px; color:var(--text-mu);">Action</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>e</kbd></td><td style="padding:3px 6px;">Open Edit modal</td></tr>
-            <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>c</kbd></td><td style="padding:3px 6px;">Open Comments modal</td></tr>
-            <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>d</kbd></td><td style="padding:3px 6px;">Create a Dependent Task</td></tr>
-            <tr><td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td><td style="padding:3px 6px;"><kbd>n</kbd></td><td style="padding:3px 6px;">Duplicate the task</td></tr>
-            <tr><td style="padding:3px 6px;">Hovering Phase/Category row</td><td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>r</kbd></td><td style="padding:3px 6px;">Open Rename modal</td></tr>
-            <tr><td style="padding:3px 6px;">Hovering Phase/Category row</td><td style="padding:3px 6px;"><kbd>n</kbd></td><td style="padding:3px 6px;">Add a new task to that group</td></tr>
-            <tr><td style="padding:3px 6px;">Main view (no modal open)</td><td style="padding:3px 6px;"><kbd>s</kbd></td><td style="padding:3px 6px;">Save Excel</td></tr>
-            <tr><td style="padding:3px 6px;">Any task modal open</td><td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>b</kbd> / <kbd>c</kbd></td><td style="padding:3px 6px;">Switch to Edit / Both / Comments view</td></tr>
-            <tr><td style="padding:3px 6px;">Any modal open</td><td style="padding:3px 6px;"><kbd>Esc</kbd></td><td style="padding:3px 6px;">Close modal (prompts if unsaved)</td></tr>
+            <tr>
+              <td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td>
+              <td style="padding:3px 6px;"><kbd>e</kbd></td>
+              <td style="padding:3px 6px;">Open Edit modal</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td>
+              <td style="padding:3px 6px;"><kbd>c</kbd></td>
+              <td style="padding:3px 6px;">Open Comments modal</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td>
+              <td style="padding:3px 6px;"><kbd>d</kbd></td>
+              <td style="padding:3px 6px;">Create a Dependent Task</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td>
+              <td style="padding:3px 6px;"><kbd>n</kbd></td>
+              <td style="padding:3px 6px;">Duplicate the task</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Hovering Phase/Category row</td>
+              <td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>r</kbd></td>
+              <td style="padding:3px 6px;">Open Rename modal</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Hovering Phase/Category row</td>
+              <td style="padding:3px 6px;"><kbd>n</kbd></td>
+              <td style="padding:3px 6px;">Add a new task to that group</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Main view (no modal open)</td>
+              <td style="padding:3px 6px;"><kbd>s</kbd></td>
+              <td style="padding:3px 6px;">Save Excel</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Any task modal open</td>
+              <td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>b</kbd> / <kbd>c</kbd></td>
+              <td style="padding:3px 6px;">Switch to Edit / Both / Comments view</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Any modal open</td>
+              <td style="padding:3px 6px;"><kbd>Esc</kbd></td>
+              <td style="padding:3px 6px;">Close modal (prompts if unsaved)</td>
+            </tr>
           </tbody>
         </table>
       </details>
@@ -778,9 +924,14 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <details class="info-section">
         <summary class="info-section-heading">Snapshots &amp; Comparison</summary>
         <ul>
-          <li>Use the <strong>"Compare"</strong> dropdown to view a historical snapshot alongside current tasks. Ghost rows (muted italic text) show prior states; the timeline header glows red.</li>
-          <li>Review high-level changes in the <strong>Stats</strong> flyout: milestones achieved, tasks completed, progressed, overdue, added, put on hold, or removed.</li>
-          <li><strong>"Save Excel"</strong> appends a new dated snapshot and downloads the updated workbook. <strong>"Export Chart"</strong> saves a standalone read-only HTML file for sharing.</li>
+          <li>Use the <strong>"Compare"</strong> dropdown to view a historical snapshot alongside current tasks. Ghost
+            rows (muted italic text) show prior states; the timeline header glows red.</li>
+          <li>Review high-level changes in the <strong>Stats</strong> flyout: milestones achieved, tasks completed,
+            progressed, overdue, added, put on hold, or removed.</li>
+          <li><strong>"Save Excel"</strong> appends a new dated snapshot and downloads the updated workbook.
+            <strong>"Export Chart"</strong> saves a standalone read-only HTML file for sharing.
+          </li>
+          <li><strong>"Auto-Save"</strong> appears in the toolbar when your browser supports save-in-place and an `.xlsx` file is opened via "Browse". When enabled, it automatically triggers Save Excel upon any confirmed edits.</li>
         </ul>
       </details>
 
@@ -790,22 +941,35 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
           <li><span style="font-size:0.85rem;">&#x1F6A9;</span> &ensp;Open Phase Milestone</li>
           <li><span style="font-size:0.85rem;">&#x1F3C6;</span> &ensp;Completed Phase Milestone</li>
           <li><span style="color:#16a34a; font-weight:bold;">&#x2713;</span> &ensp;Done items count (category row)</li>
-          <li><span style="color:#dc2626; font-weight:bold;">&#x26A0;&#xFE0F;</span> &ensp;Overdue items count (category row)</li>
-          <li><span style="color:#2563eb; font-weight:bold;">&#x25CF;</span> &ensp;Active items count (category row)</li>
+          <li><span style="color:#dc2626; font-weight:bold;">&#x26A0;&#xFE0F;</span> &ensp;Overdue items count (category
+            row)</li>
+          <li><span style="color:#2563eb; font-weight:bold;">&#x25CF;</span> &ensp;Active items count (category row)
+          </li>
           <li><span style="font-size:0.85rem;">&#x1F4AC;</span> &ensp;Open Comments modal (bar hover)</li>
           <li><span style="font-size:0.85rem;">&#x270E;</span> &ensp;Open Edit modal (bar hover)</li>
           <li><span style="font-size:0.85rem;">&#x270F;</span> &ensp;Rename Phase or Category (row hover)</li>
-          <li><span style="color:#ef4444; font-weight:bold;">[!]</span> &ensp;Hidden task dependency (collapsed parent)</li>
+          <li><span style="color:#ef4444; font-weight:bold;">[!]</span> &ensp;Hidden task dependency (collapsed parent)
+          </li>
           <li><span style="font-size:0.95rem;">&#x27F3;</span> &ensp;Historical Snapshot (Ghost) item</li>
         </ul>
       </details>
     </div>
 
-    <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded &mdash; all processing happens locally.</p>
+    <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
+      &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.3</p>
-      <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a href="https://github.com/kolfers/public_excel_to_gantt_standalone" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">GitHub Repository</a>.</p>
-      <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">Created by <a href="https://www.universiteitleiden.nl/en/staffmembers/kerwin-olfers#tab-1" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">Kerwin Olfers</a> &middot; Released under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:none;">MIT License</a>.</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.4</p>
+      <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
+        <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
+          style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
+          href="https://github.com/kolfers/public_excel_to_gantt_standalone" target="_blank" rel="noopener"
+          style="color:var(--accent); text-decoration:none;">GitHub Repository</a>.
+      </p>
+      <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">Created by <a
+          href="https://www.universiteitleiden.nl/en/staffmembers/kerwin-olfers#tab-1" target="_blank" rel="noopener"
+          style="color:var(--accent); text-decoration:none;">Kerwin Olfers</a> &middot; Released under the <a
+          href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener"
+          style="color:var(--accent); text-decoration:none;">MIT License</a>.</p>
     </div>
   </div>
 </div>
@@ -819,7 +983,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="filter-panel-row">
     <span class="filter-prop-label">Status</span>
     <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="Done">Done</button>
-    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="On Track">On Track</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="On Track">On
+      Track</button>
     <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="Behind">Behind</button>
     <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="Waiting">Waiting</button>
     <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="On Hold">On Hold</button>
@@ -834,13 +999,16 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   </div>
   <div class="filter-panel-row">
     <span class="filter-prop-label">Comments</span>
-    <button class="filter-chip" data-action="toggleFilterChip" data-prop="comments" data-value="yes">Has comments</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="comments" data-value="yes">Has
+      comments</button>
     <button class="filter-chip" data-action="toggleFilterChip" data-prop="comments" data-value="no">No comments</button>
   </div>
   <div class="filter-panel-row">
     <span class="filter-prop-label">Dependency</span>
-    <button class="filter-chip" data-action="toggleFilterChip" data-prop="dependency" data-value="yes">Has dependency</button>
-    <button class="filter-chip" data-action="toggleFilterChip" data-prop="dependency" data-value="no">No dependency</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="dependency" data-value="yes">Has
+      dependency</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="dependency" data-value="no">No
+      dependency</button>
   </div>
   <div class="filter-panel-row">
     <span class="filter-prop-label">Overdue</span>
@@ -851,142 +1019,163 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 
 <!-- Unified Task/Comments Modal -->
 <div id="modal-overlay" class="modal-overlay" style="display:none;">
-    <div id="modal-container" class="modal view-both">
-        <div class="modal-view-bar" id="modal-view-switcher">
-            <div class="btn-group">
-                <button class="btn" data-action="modalSwitchEdit" data-tooltip="Edit view">&#9999; Edit</button>
-                <button class="btn active" data-action="modalSwitchBoth" data-tooltip="Show Edit &amp; Comments side by side">&#9645;&#9645; Both</button>
-                <button class="btn" data-action="modalSwitchComments" data-tooltip="Comments view">&#128172; Comments</button>
-            </div>
-            <button class="modal-view-close" data-action="closeModalConfirm" data-tooltip="Close (Esc)">&times;</button>
-            <div id="modal-taskinfo" class="comments-task-info"></div>
-        </div>
-        <div id="modal-panels">
-            <div id="modal-edit-panel">
-                <div class="modal-header" style="display:flex; align-items:center;">
-                    <h3 id="modal-title" style="margin:0;">Edit Task</h3>
-                    <div style="flex:1;"></div>
-                    <button id="modal-btn-dependent" data-action="createDependentTask" style="display:none;">Dependent Task</button>
-                    <button id="modal-btn-duplicate" data-action="duplicateTaskFromModal" style="display:none;">Duplicate Task</button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Title</label>
-                        <input type="text" id="modal-task-title">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Phase</label>
-                            <input type="text" id="modal-task-phase" style="border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:-1px; z-index:1;" placeholder="Type to create new...">
-                            <select id="modal-phase-sel" onchange="if(this.value){document.getElementById('modal-task-phase').value = this.value; this.value='';}" style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;" title="Select existing phase"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Category</label>
-                            <input type="text" id="modal-task-cat" style="border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:-1px; z-index:1;" placeholder="Type to create new...">
-                            <select id="modal-cat-sel" onchange="if(this.value){document.getElementById('modal-task-cat').value = this.value; this.value='';}" style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;" title="Select existing category"></select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Priority</label>
-                            <div id="modal-priority-container" class="pill-container"></div>
-                        </div>
-                        <div class="form-group">
-                            <label>Status</label>
-                            <div id="modal-status-container" class="pill-container"></div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Start Date</label>
-                            <input type="date" id="modal-task-start">
-                        </div>
-                        <div class="form-group">
-                            <label>End Date</label>
-                            <input type="date" id="modal-task-end">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Progress</label>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <input type="range" id="modal-task-progress-range" min="0" max="100" style="flex:1" oninput="document.getElementById('modal-task-progress-num').value = this.value">
-                            <input type="number" id="modal-task-progress-num" min="0" max="100" style="width:60px" oninput="document.getElementById('modal-task-progress-range').value = this.value">
-                            <span>%</span>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Dependency</label>
-                            <select id="modal-task-dependency"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>ID</label>
-                            <input type="text" id="modal-task-id">
-                        </div>
-                    </div>
-                    <div class="form-group" id="modal-comment-info" style="display:none; flex-direction:column; gap:2px;">
-                        <label>Comments</label>
-                        <div>
-                          <span id="modal-comment-count" data-action="openCommentsFromEdit" style="cursor:pointer; color:var(--accent); font-weight:600;">0 comments</span>
-                          <span id="modal-comment-latest" style="color:var(--text-mu); font-size:0.8rem;"></span>
-                        </div>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0px;">
-                        <label>Description</label>
-                        <textarea id="modal-task-desc" rows="4" style="resize:vertical;"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="modal-btn-delete" class="btn btn-delete" data-action="deleteTaskFromModal" style="display:none;">Delete</button>
-                    <div style="flex:1"></div>
-                    <button class="btn" data-action="closeModalConfirm">Cancel</button>
-                    <button id="modal-btn-save" class="btn btn-primary" data-action="saveTaskModal">Save</button>
-                    <button id="modal-btn-save-close" class="btn btn-primary" data-action="saveTaskModalAndClose">Save &amp; Close</button>
-                </div>
-            </div>
-            <div id="modal-comments-panel">
-                <div class="modal-header">
-                    <h3 style="margin:0; font-size:1rem;">Comments</h3>
-                </div>
-                <div class="modal-body comments-modal-body">
-                    <div class="form-group">
-                        <label>Your name</label>
-                        <input type="text" id="comments-name-input" list="comments-name-list" placeholder="Enter or select name...">
-                        <datalist id="comments-name-list"></datalist>
-                    </div>
-                    <div class="form-group">
-                        <label>Comment</label>
-                        <textarea id="comments-text-input" rows="4" placeholder="Write a comment..." style="resize:vertical;"></textarea>
-                    </div>
-                    <button class="btn btn-primary" data-action="saveComment">Save Comment</button>
-                    <div id="comments-list" class="comments-list"></div>
-                </div>
-            </div>
-        </div>
+  <div id="modal-container" class="modal view-both">
+    <div class="modal-view-bar" id="modal-view-switcher">
+      <div class="btn-group">
+        <button class="btn" data-action="modalSwitchEdit" data-tooltip="Edit view" data-shortcut="e: edit">&#9999; Edit</button>
+        <button class="btn active" data-action="modalSwitchBoth"
+          data-tooltip="Show Edit &amp; Comments side by side" data-shortcut="b: both">&#9645;&#9645; Both</button>
+        <button class="btn" data-action="modalSwitchComments" data-tooltip="Comments view" data-shortcut="c: comments">&#128172; Comments</button>
+      </div>
+      <button class="modal-view-close" data-action="closeModalConfirm" data-tooltip="Close" data-shortcut="Esc: close">&times;</button>
+      <div id="modal-taskinfo" class="comments-task-info"></div>
     </div>
+    <div id="modal-panels">
+      <div id="modal-edit-panel">
+        <div class="modal-header" style="display:flex; align-items:center;">
+          <h3 id="modal-title" style="margin:0;">Edit Task</h3>
+          <div style="flex:1;"></div>
+          <button id="modal-btn-dependent" data-action="createDependentTask" style="display:none;">Dependent
+            Task</button>
+          <button id="modal-btn-duplicate" data-action="duplicateTaskFromModal" style="display:none;">Duplicate
+            Task</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="modal-task-title">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Phase</label>
+              <input type="text" id="modal-task-phase"
+                style="border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:-1px; z-index:1;"
+                placeholder="Type to create new...">
+              <select id="modal-phase-sel"
+                onchange="if(this.value){document.getElementById('modal-task-phase').value = this.value; this.value='';}"
+                style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;"
+                title="Select existing phase"></select>
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <input type="text" id="modal-task-cat"
+                style="border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:-1px; z-index:1;"
+                placeholder="Type to create new...">
+              <select id="modal-cat-sel"
+                onchange="if(this.value){document.getElementById('modal-task-cat').value = this.value; this.value='';}"
+                style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;"
+                title="Select existing category"></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Priority</label>
+              <div id="modal-priority-container" class="pill-container"></div>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <div id="modal-status-container" class="pill-container"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Start Date</label>
+              <input type="date" id="modal-task-start">
+            </div>
+            <div class="form-group">
+              <label>End Date</label>
+              <input type="date" id="modal-task-end">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Progress</label>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <input type="range" id="modal-task-progress-range" min="0" max="100" style="flex:1"
+                oninput="document.getElementById('modal-task-progress-num').value = this.value">
+              <input type="number" id="modal-task-progress-num" min="0" max="100" style="width:60px"
+                oninput="document.getElementById('modal-task-progress-range').value = this.value">
+              <span>%</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Dependency</label>
+              <select id="modal-task-dependency"></select>
+            </div>
+            <div class="form-group">
+              <label>ID</label>
+              <input type="text" id="modal-task-id">
+            </div>
+          </div>
+          <div class="form-group" id="modal-comment-info" style="display:none; flex-direction:column; gap:2px;">
+            <label>Comments</label>
+            <div>
+              <span id="modal-comment-count" data-action="openCommentsFromEdit"
+                style="cursor:pointer; color:var(--accent); font-weight:600;">0 comments</span>
+              <span id="modal-comment-latest" style="color:var(--text-mu); font-size:0.8rem;"></span>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0px;">
+            <label>Description</label>
+            <textarea id="modal-task-desc" rows="4" style="resize:vertical;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="modal-btn-delete" class="btn btn-delete" data-action="deleteTaskFromModal"
+            style="display:none;">Delete</button>
+          <div style="flex:1"></div>
+          <button class="btn" data-action="closeModalConfirm">Cancel</button>
+          <button id="modal-btn-save" class="btn btn-primary" data-action="saveTaskModal">Save</button>
+          <button id="modal-btn-save-close" class="btn btn-primary" data-action="saveTaskModalAndClose">Save &amp;
+            Close</button>
+        </div>
+      </div>
+      <div id="modal-comments-panel">
+        <div class="modal-header">
+          <h3 style="margin:0; font-size:1rem;">Comments</h3>
+        </div>
+        <div class="modal-body comments-modal-body">
+          <div class="form-group">
+            <label>Your name</label>
+            <input type="text" id="comments-name-input" list="comments-name-list" placeholder="Enter or select name...">
+            <datalist id="comments-name-list"></datalist>
+          </div>
+          <div class="form-group">
+            <label>Comment</label>
+            <textarea id="comments-text-input" rows="4" placeholder="Write a comment..."
+              style="resize:vertical;"></textarea>
+          </div>
+          <button class="btn btn-primary" data-action="saveComment">Save Comment</button>
+          <div id="comments-list" class="comments-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Rename Modal -->
 <div id="rename-modal-overlay" class="modal-overlay" style="display:none;">
-    <div class="modal" style="width:340px;">
-        <div class="modal-header" style="display:flex; align-items:center;">
-            <h3 id="rename-modal-title" style="margin:0;">Rename</h3>
-            <div style="flex:1;"></div>
-            <span class="modal-close" data-action="closeRenameModal">&times;</span>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label id="rename-modal-label">Name</label>
-                <input type="text" id="rename-modal-input">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <div style="flex:1"></div>
-            <button class="btn" data-action="closeRenameModal">Cancel</button>
-            <button class="btn btn-primary" data-action="saveRename">Save</button>
-        </div>
+  <div class="modal" style="width:340px;">
+    <div class="modal-header" style="display:flex; align-items:center;">
+      <h3 id="rename-modal-title" style="margin:0;">Rename</h3>
+      <div style="flex:1;"></div>
+      <span class="modal-close" data-action="closeRenameModal">&times;</span>
     </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label id="rename-modal-label">Name</label>
+        <input type="text" id="rename-modal-input">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div style="flex:1"></div>
+      <button class="btn" data-action="closeRenameModal">Cancel</button>
+      <button class="btn btn-primary" data-action="saveRename">Save</button>
+    </div>
+  </div>
 </div>
+
+<div id="toast-container" class="toast-container"></div>
 <script>
 
 window.IS_EXPORTED = false;
@@ -1111,7 +1300,7 @@ const AppState = {
   view: 'month', viewportStart: null, renderStart: null, compareLabel: '', filterMode: 'all',
   viewPadLeft: 0, viewPadRight: 0,
   collapsed: {}, currentTasks: [],
-  changesOnly: false, compactMode: false, unsavedChanges: false,
+  changesOnly: false, compactMode: false, unsavedChanges: false, autoSave: false,
   _highlightId: null, _highlightTimer: null,
   _hoveredTask: null,      // task object currently hovered in chart (for keyboard shortcuts)
   _hoveredPhase: null,     // phase name currently hovered in left panel
@@ -1286,6 +1475,13 @@ function setUnsavedChanges(val) {
   if (toolbar) {
       if (val) {
           toolbar.classList.add('toolbar-unsaved');
+          if (AppState.autoSave && typeof window.isSaveInPlaceSupported === 'function' && window.isSaveInPlaceSupported()) {
+              setTimeout(() => {
+                  if (typeof window.saveSnapshot === 'function' && AppState.unsavedChanges) {
+                      window.saveSnapshot();
+                  }
+              }, 100);
+          }
       } else {
           toolbar.classList.remove('toolbar-unsaved');
       }
@@ -1303,6 +1499,8 @@ window.addEventListener('beforeunload', (e) => {
 });
 let _currentFile = null;
 let _currentArrayBuffer = null;
+let _currentFileHandle = null;
+window.isSaveInPlaceSupported = function() { return _currentFileHandle !== null; };
 
 // Setup Drag and Drop
 const dropCard = document.getElementById('drop-card');
@@ -1318,14 +1516,63 @@ dropCard.addEventListener('drop', (e) => {
     e.preventDefault();
     dropCard.classList.remove('dragover');
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        _currentFileHandle = null; // Drag and drop doesn't provide a writable handle
         loadFile(e.dataTransfer.files[0]);
     }
 });
 
 function handleFileSelect(e) {
     if (e.target.files && e.target.files.length > 0) {
+        _currentFileHandle = null; // Fallback file picker doesn't provide a writable handle
         loadFile(e.target.files[0]);
     }
+}
+
+async function openFilePicker() {
+    if (window.showOpenFilePicker) {
+        try {
+            const [fileHandle] = await window.showOpenFilePicker({
+                types: [{
+                    description: 'Excel Files',
+                    accept: {
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+                        'application/vnd.ms-excel.sheet.macroEnabled.12': ['.xlsm']
+                    }
+                }],
+                multiple: false
+            });
+            const file = await fileHandle.getFile();
+            _currentFileHandle = fileHandle;
+            loadFile(file);
+        } catch (e) {
+            if (e.name !== 'AbortError') {
+                console.error(e);
+                _currentFileHandle = null;
+                document.getElementById('file-input').click();
+            }
+        }
+    } else {
+        _currentFileHandle = null;
+        document.getElementById('file-input').click();
+    }
+}
+
+function showToast(message) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    container.appendChild(toast);
+    
+    // Trigger reflow
+    void toast.offsetWidth;
+    toast.classList.add('toast-show');
+    
+    setTimeout(() => {
+        toast.classList.remove('toast-show');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
 }
 
 function loadFile(file) {
@@ -1340,6 +1587,9 @@ function loadFile(file) {
         document.getElementById('landing-zone').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
         
+        const asw = document.getElementById('autosave-wrapper');
+        if (asw) asw.style.display = (_currentFileHandle && !file.name.toLowerCase().endsWith('.xlsm')) ? 'flex' : 'none';
+
         // Ensure comparison is reset on load
         clearCompare();
         
@@ -1496,6 +1746,17 @@ function parseWorkbook(wb) {
     if (s1Name) {
         const sheet = wb.Sheets[s1Name];
         let rawTasks = XLSX.utils.sheet_to_json(sheet, {raw: true, defval: ''});
+        
+        // Normalize keys to strip out (Optional) or (Required) labels
+        rawTasks = rawTasks.map(row => {
+            const newRow = {};
+            for (let k in row) {
+                const cleanKey = k.replace(/\s*\(\s*(?:Optional|Required)\s*\)\s*$/i, '');
+                newRow[cleanKey] = row[k];
+            }
+            return newRow;
+        });
+        
         tasks = processTasksList(rawTasks);
     }
 
@@ -1504,6 +1765,16 @@ function parseWorkbook(wb) {
     if (s2Name) {
         const sheet2 = wb.Sheets[s2Name];
         let rawLog = XLSX.utils.sheet_to_json(sheet2, {raw: true, defval: ''});
+        
+        // Normalize keys here as well just in case
+        rawLog = rawLog.map(row => {
+            const newRow = {};
+            for (let k in row) {
+                const cleanKey = k.replace(/\s*\(\s*(?:Optional|Required)\s*\)\s*$/i, '');
+                newRow[cleanKey] = row[k];
+            }
+            return newRow;
+        });
         
         const logsByDate = {};
         rawLog.forEach(r => {
@@ -1563,7 +1834,7 @@ function downloadDataAsExcel(data, fileName) {
     const wb = XLSX.utils.book_new();
     
     // 1. Build Current Planning sheet
-    const cpData = [['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments']];
+    const cpData = [['ID (Optional)', 'Phase (Optional)', 'Category (Optional)', 'Title (Required)', 'Priority (Optional)', 'Status (Optional)', 'Start Date (Optional)', 'End Date (Optional)', 'Progress (Optional)', 'Dependency (Optional)', 'Description (Optional)', 'Comments (Optional)']];
     data.tasks.forEach(t => {
         cpData.push([
             t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
@@ -1601,7 +1872,27 @@ function downloadDataAsExcel(data, fileName) {
     
     const wsLog = XLSX.utils.aoa_to_sheet(logData);
     XLSX.utils.book_append_sheet(wb, wsLog, "Log");
-    
+
+    // 3. Build "How to Use" sheet describing each column
+    const instrData = [
+        ['Column', 'Required?', 'Accepted Values / Format', 'Description'],
+        ['ID', 'Optional', 'Any text or number', 'Unique identifier for the task. Auto-generated if left blank.'],
+        ['Phase', 'Optional', 'Any text', 'High-level grouping (e.g. "Design", "Development"). Defaults to "General" if blank.'],
+        ['Category', 'Optional', 'Any text', 'Sub-grouping within a Phase (e.g. "Frontend"). Defaults to "General" if blank.'],
+        ['Title', 'REQUIRED', 'Any text', 'The name of the task. This is the only required column.'],
+        ['Priority', 'Optional', 'High / Medium / Low', 'Task priority level.'],
+        ['Status', 'Optional', 'On Track / Behind / Done / Waiting / On Hold', 'Current status of the task.'],
+        ['Start Date', 'Optional', 'DD/MM/YYYY or MM/DD/YYYY', 'Date the task begins.'],
+        ['End Date', 'Optional', 'DD/MM/YYYY or MM/DD/YYYY', 'Date the task ends.'],
+        ['Progress', 'Optional', '0 – 100', 'Completion percentage (shown as a filled bar on the task).'],
+        ['Dependency', 'Optional', 'A valid Task ID', 'ID of another task this task depends on. Draws a dependency arrow.'],
+        ['Description', 'Optional', 'Any text', 'Free-form notes or details shown in the Edit modal.'],
+        ['Comments', 'Optional', 'Managed by the app', 'Timestamped comments in format: [DD-Mon-YYYY HH:MM:Name] text. Best managed via the app UI.'],
+    ];
+    const wsInstr = XLSX.utils.aoa_to_sheet(instrData);
+    wsInstr['!cols'] = [{wch:14}, {wch:10}, {wch:42}, {wch:62}];
+    XLSX.utils.book_append_sheet(wb, wsInstr, "How to Use");
+
     // Write out the raw workbook as XLSX
     const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
     const blob = new Blob([wbout], {type: "application/octet-stream"});
@@ -1642,7 +1933,7 @@ function buildGanttFileName(sourceName, date) {
     return `${base}_gantt_${dateStr}_${hh}-${mm}.xlsx`;
 }
 
-function saveSnapshot() {
+async function saveSnapshot() {
     if (!_currentArrayBuffer || !_currentFile) {
         // If we have no original file (e.g. Example Data), build a new one from DATA
         let originalName = DATA.meta.source_file || 'New_Plan';
@@ -1685,10 +1976,11 @@ function saveSnapshot() {
     // so that tasks added/edited via the UI are included.
     const nowStr = formatDateTimeStr(new Date());
     const CP_HEADERS = ['ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments'];
+    const CP_HEADERS_EXPORT = ['ID (Optional)', 'Phase (Optional)', 'Category (Optional)', 'Title (Required)', 'Priority (Optional)', 'Status (Optional)', 'Start Date (Optional)', 'End Date (Optional)', 'Progress (Optional)', 'Dependency (Optional)', 'Description (Optional)', 'Comments (Optional)'];
     const LOG_HEADERS = ['Saved On Date', ...CP_HEADERS];
 
     // Rewrite the Current Planning sheet from in-memory DATA.tasks
-    const cpRows = [CP_HEADERS];
+    const cpRows = [CP_HEADERS_EXPORT];
     DATA.tasks.forEach(t => {
         cpRows.push([
             t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
@@ -1751,19 +2043,40 @@ function saveSnapshot() {
     const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
     const blob = new Blob([wbout], {type: "application/octet-stream"});
     
-    // Trigger download
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.style.display = 'none';
-    a.href = url;
-    
     let originalName = _currentFile.name;
-    a.download = buildGanttFileName(originalName);
+    let savedInPlace = false;
     
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    if (_currentFileHandle && !originalName.toLowerCase().endsWith('.xlsm')) {
+        try {
+            const writable = await _currentFileHandle.createWritable();
+            await writable.write(wbout);
+            await writable.close();
+            savedInPlace = true;
+            
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            showToast(`✅ Saved successfully to ${originalName} at ${timeStr}`);
+        } catch (e) {
+            console.error("In-place save failed", e);
+        }
+    } else if (_currentFileHandle && originalName.toLowerCase().endsWith('.xlsm')) {
+        alert("In-place saving is disabled for .xlsm files to avoid losing macros. Downloading a new .xlsx file instead.");
+    }
+    
+    if (!savedInPlace) {
+        // Trigger download
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = 'none';
+        a.href = url;
+        
+        a.download = buildGanttFileName(originalName);
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
     
     // Since we appended a snapshot, artificially add it to state to avoid requiring a reload
     setTimeout(() => {
@@ -2013,6 +2326,16 @@ function initTheme() {
 }
 
 initTheme();
+
+// Check for File System Access API support and show warning if unsupported
+if (!window.showOpenFilePicker) {
+  const bw = document.getElementById('browser-warning');
+  if (bw) bw.style.display = 'block';
+  const ipt = document.getElementById('in-place-tip');
+  if (ipt) ipt.style.display = 'none';
+  const ft = document.getElementById('fallback-tip');
+  if (ft) ft.style.display = 'block';
+}
 
 // Compact mode toggle
 function toggleCompact() {
@@ -2284,10 +2607,10 @@ function renderLeft(visible, today, statsMap) {
     if (!r.ghost) {
       div.addEventListener('mouseenter', () => { AppState._hoveredPhase = r.phase; AppState._hoveredCatInfo = null; });
       div.addEventListener('mouseleave', () => { AppState._hoveredPhase = null; });
-      const editP = document.createElement('span'); editP.className='rename-btn'; editP.dataset.tooltip='Rename Phase'; editP.textContent='\u270F';
+      const editP = document.createElement('span'); editP.className='rename-btn'; editP.dataset.tooltip='Rename Phase'; editP.dataset.shortcut='e / r: rename'; editP.textContent='\u270F';
       editP.onclick = (e) => { e.stopPropagation(); openRenameModal('phase', r.phase); };
       div.appendChild(editP);
-      const addP = document.createElement('span'); addP.className='add-task-btn'; addP.dataset.tooltip='Add Task'; addP.textContent='+';
+      const addP = document.createElement('span'); addP.className='add-task-btn'; addP.dataset.tooltip='Add Task'; addP.dataset.shortcut='n: new'; addP.textContent='+';
       addP.onclick = (e) => { e.stopPropagation(); openTaskModal(null, 'add', r.phase, null); };
       div.appendChild(addP);
 
@@ -2330,10 +2653,10 @@ function renderLeft(visible, today, statsMap) {
     if (!r.ghost) {
       div.addEventListener('mouseenter', () => { AppState._hoveredCatInfo = {phase: r.phase, cat: r.cat}; AppState._hoveredPhase = null; });
       div.addEventListener('mouseleave', () => { AppState._hoveredCatInfo = null; });
-      const editC = document.createElement('span'); editC.className='rename-btn'; editC.dataset.tooltip='Rename Category'; editC.textContent='\u270F';
+      const editC = document.createElement('span'); editC.className='rename-btn'; editC.dataset.tooltip='Rename Category'; editC.dataset.shortcut='e / r: rename'; editC.textContent='\u270F';
       editC.onclick = (e) => { e.stopPropagation(); openRenameModal('category', r.cat, r.phase); };
       div.appendChild(editC);
-      const addC = document.createElement('span'); addC.className='add-task-btn'; addC.dataset.tooltip='Add Task'; addC.textContent='+';
+      const addC = document.createElement('span'); addC.className='add-task-btn'; addC.dataset.tooltip='Add Task'; addC.dataset.shortcut='n: new'; addC.textContent='+';
       addC.onclick = (e) => { e.stopPropagation(); openTaskModal(null, 'add', r.phase, r.cat); };
       div.appendChild(addC);
 
@@ -2531,12 +2854,12 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
   actions.style.top  = btnTop  + 'px';
 
   // Edit button (✎) is leftmost, Comments (💬) is to the right
-  const btnE = document.createElement('button'); btnE.textContent = '\u270E'; btnE.dataset.tooltip = 'Edit task (e)';
+  const btnE = document.createElement('button'); btnE.textContent = '\u270E'; btnE.dataset.tooltip = 'Edit task'; btnE.dataset.shortcut = 'e: edit';
   btnE.addEventListener('mouseenter', () => clearTimeout(_hoverOverlayTimer));
   btnE.addEventListener('mouseleave', _scheduleHideBarHover);
   btnE.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openTaskModal(task, 'edit'); };
 
-  const btnC = document.createElement('button'); btnC.textContent = '\uD83D\uDCAC'; btnC.dataset.tooltip = 'Comments (c)';
+  const btnC = document.createElement('button'); btnC.textContent = '\uD83D\uDCAC'; btnC.dataset.tooltip = 'Comments'; btnC.dataset.shortcut = 'c: comments';
   btnC.addEventListener('mouseenter', () => clearTimeout(_hoverOverlayTimer));
   btnC.addEventListener('mouseleave', _scheduleHideBarHover);
   btnC.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openCommentsModal(task); };
@@ -2577,8 +2900,11 @@ function renderChart(visible, today) {
   const mk = svgEl('marker',{id:'arr',markerWidth:6,markerHeight:6,refX:6,refY:3,orient:'auto'});
   mk.appendChild(svgEl('path',{d:'M0,0 L6,3 L0,6 Z',fill:'#94a3b8'}));
   defs.appendChild(mk);
-  const mkHi = svgEl('marker',{id:'arr-hi',markerWidth:6,markerHeight:6,refX:6,refY:3,orient:'auto'});
-  mkHi.appendChild(svgEl('path',{d:'M0,0 L6,3 L0,6 Z',fill:'#f59e0b'}));
+
+  // The highlighted stroke-width is 2.5, while normal is 1.5. 
+  // We scale the marker coordinates down by 1.5 / 2.5 = 0.6 so the arrowhead size stays exactly the same on screen.
+  const mkHi = svgEl('marker',{id:'arr-hi',markerWidth:3.6,markerHeight:3.6,refX:3.6,refY:1.8,orient:'auto'});
+  mkHi.appendChild(svgEl('path',{d:'M0,0 L3.6,1.8 L0,3.6 Z',fill:'#f59e0b'}));
   defs.appendChild(mkHi);
   svg.appendChild(defs);
 
@@ -2980,10 +3306,14 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
   tt.innerHTML = `${snap}<div class="tt-title">${escHtml(t.Title||'')}</div>${phaseCatHtml}${rows}`;
   tt.style.display='block'; moveTooltip(e);
 }
-function showSimpleTooltip(e, text) {
+function showSimpleTooltip(e, text, shortcut) {
   if (e) e.stopPropagation();
   const tt = document.getElementById('tooltip');
-  tt.innerHTML = `<div style="font-size:0.75rem; color:var(--text); line-height:1.4">${escHtml(text)}</div>`;
+  let html = `<div style="font-size:0.75rem; color:var(--text); line-height:1.4">${escHtml(text)}</div>`;
+  if (shortcut) {
+    html += `<div style="color:var(--text-mu); font-size:0.85em; margin-top:3px; border-top:1px solid var(--border); padding-top:2px;">${escHtml(shortcut)}</div>`;
+  }
+  tt.innerHTML = html;
   tt.style.display = 'block';
   moveTooltip(e);
 }
@@ -3838,6 +4168,14 @@ function _closeFilterPanel() {
   AppState._filterPanelOpen = false;
   panel.style.display = 'none';
 }
+function toggleAutoSave(checkbox) {
+    if (!checkbox) return;
+    AppState.autoSave = checkbox.checked;
+    if (AppState.autoSave && AppState.unsavedChanges && typeof window.isSaveInPlaceSupported === 'function' && window.isSaveInPlaceSupported()) {
+        window.saveSnapshot();
+    }
+}
+
 function initEvents() {
     if (_eventsInit) return;
     document.body.addEventListener('click', (e) => {
@@ -3867,7 +4205,8 @@ function initEvents() {
                 case 'toggleAll': toggleAll(); break;
                 case 'toggleCompact': toggleCompact(); break;
                 case 'toggleDarkMode': toggleDarkMode(); break;
-                case 'browseFile': document.getElementById('file-input').click(); break;
+                case 'browseFile': openFilePicker(); break;
+                case 'toggleAutoSave': toggleAutoSave(actionEl); break;
                 // Task modal actions
                 case 'openTaskModalNew': openTaskModal(null, 'add'); break;
                 case 'closeTaskModal': closeModal(); break;
@@ -3988,7 +4327,7 @@ function initEvents() {
     document.body.addEventListener('mousemove', (e) => {
         const tooltipEl = e.target.closest('[data-tooltip]');
         if (tooltipEl) {
-            showSimpleTooltip(e, tooltipEl.dataset.tooltip);
+            showSimpleTooltip(e, tooltipEl.dataset.tooltip, tooltipEl.dataset.shortcut);
         } else if (e.target.closest('#unsaved-warning')) {
             showHTMLTooltip(e, UNSAVED_WARNING_HTML);
         } else if (e.target.closest('#toolbar')) {

@@ -35,7 +35,7 @@ Each row defines a single task:
 | `Description` | Any extra notes, visible in the hover tooltip. |
 
 ### "Log" Sheet (or "Sheet2")
-A historical archive of your plan. Each time you click **💾 Save Excel** in the app, a snapshot of the current tasks is appended to this sheet. The browser will prompt you to download the updated `.xlsx` file.
+A historical archive of your plan. Each time you click **💾 Save Excel** in the app, a snapshot of the current tasks is appended to this sheet. On supported browsers (Chrome/Edge), if you opened the file via **"Browse..."**, changes are saved directly back to the original file. Otherwise the updated `.xlsx` is downloaded.
 
 ## Features
 
@@ -59,6 +59,7 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 ### Snapshots & Export
 - Once the Log sheet contains snapshots, the **Compare** dropdown overlays an older snapshot as ghost tracks on the chart. Changed items are highlighted and the timeline header turns red. A stats panel summarises milestones, completions, holds, and overruns relative to the chosen baseline.
 - **Export Chart** packages the entire UI and current data into a single self-contained `.html` file that can be opened on any computer without the original Excel file.
+- **Auto-Save**: In supported browsers (Edge, Chrome), loading an `.xlsx` file via the "Browse" button unlocks an **Auto-save** toggle. When enabled, confirmed edits are seamlessly saved directly back to the original Excel file.
 
 ---
 *Released under the MIT License.*
