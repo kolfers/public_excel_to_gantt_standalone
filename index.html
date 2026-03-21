@@ -165,7 +165,8 @@ body {
   padding: 0 14px 0 0;
   gap: 12px;
   flex-shrink: 0;
-  z-index: 10
+  z-index: 10;
+  position: relative
 }
 
 .toolbar-left {
@@ -182,7 +183,14 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0
+  position: absolute;
+  left: calc(50% + var(--left-w) / 2);
+  transform: translateX(-50%);
+  pointer-events: auto
+}
+
+#toolbar.compact-mode .toolbar-center {
+  left: calc(50% + 67.5px)
 }
 
 .toolbar-right {
@@ -190,6 +198,8 @@ body {
   align-items: center;
   gap: 6px;
   flex: 1;
+  position: relative;
+  z-index: 1;
   justify-content: flex-end
 }
 
@@ -1254,6 +1264,11 @@ select#compare-sel {
 }
 
 @media(max-width:960px) {
+  .toolbar-center {
+    position: static;
+    transform: none
+  }
+
   .compare-label {
     display: none
   }
@@ -2345,7 +2360,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="drop-card" id="drop-card" style="position: relative;">
     <div class="drop-title">&#128200; Gantt Chart Builder</div>
     <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
-    <div class="drop-version">v2.5</div>
+    <div class="drop-version">v2.10</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
       Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
@@ -2472,14 +2487,13 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <button class="btn" id="save-btn" data-action="saveSnapshot"
         style="margin-right:12px; border-color:#16a34a; color:#16a34a;"
         data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file."
-        data-shortcut="s: save">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short">
-          Save</span></button>
+        data-shortcut="s: save">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short txt-min"> S</span></button>
       <button class="btn" id="export-btn" data-action="exportChart"
         style="margin-right:12px; border-color:#2563eb; color:#2563eb;"
         data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart.">&#128228;<span
-          class="txt-full"> Export Chart</span><span class="txt-short"> Export</span></button>
+          class="txt-full"> Export Chart</span><span class="txt-short txt-min"> E</span></button>
       <button class="btn" id="info-btn" data-action="toggleInfoPanel" style="border-color:#d97706; color:#d97706;"
-        data-tooltip="View application info and version">&#10067; Info</button>
+        data-tooltip="View application info and version">&#10067;<span class="txt-full"> Info</span><span class="txt-short txt-min"> I</span></button>
     </div>
   </header>
 
@@ -2490,7 +2504,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         <div class="filter-btns">
           <button class="fbtn active" id="fb-all" data-action="setFilter" data-value="all"
             data-tooltip="Show all items">All</button>
-          <button class="fbtn" id="fb-unfinished" data-action="setFilter" data-value="unfinished"
+          <button class="fbtn" id="fb-active" data-action="setFilter" data-value="active"
             data-tooltip="Show only active (non-completed) items">Active</button>
           <button class="fbtn" id="fb-overdue" data-action="setFilter" data-value="overdue"
             data-tooltip="Show only items past their end date that are not 100% complete">Overdue</button>
@@ -2590,7 +2604,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         <ul>
           <li><strong>Scrolling:</strong> Click and drag the chart to pan. Release mid-swipe for momentum scrolling.
             Click the glowing pills at the timeline edges to extend past or future range.</li>
-          <li><strong>Views:</strong> Toggle between Week, Month, and Year timelines. Week mode aligns to Mondays.</li>
+          <li><strong>Views:</strong> Toggle between Week, Month, and Year timelines. Week mode aligns to Mondays. Press <kbd>v</kbd> to cycle through views, or <kbd>t</kbd> to jump back to today.</li>
           <li><strong>Filters:</strong> Use "All", "Active" (excludes On Hold), and "Overdue" to focus on specific
             tasks. Empty categories are automatically hidden. The <strong>Filter</strong> button opens a panel with
             toggleable chips to filter by Status, Priority, Comments, Dependency, and Overdue state &mdash; active
@@ -2649,6 +2663,26 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
               <td style="padding:3px 6px;">Main view (no modal open)</td>
               <td style="padding:3px 6px;"><kbd>s</kbd></td>
               <td style="padding:3px 6px;">Save Excel</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Main view (no modal open)</td>
+              <td style="padding:3px 6px;"><kbd>i</kbd></td>
+              <td style="padding:3px 6px;">Toggle Info panel open / closed</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Main view (no modal open)</td>
+              <td style="padding:3px 6px;"><kbd>v</kbd></td>
+              <td style="padding:3px 6px;">Cycle view: Week &rarr; Month &rarr; Year &rarr; &hellip;</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Main view (no modal open)</td>
+              <td style="padding:3px 6px;"><kbd>t</kbd></td>
+              <td style="padding:3px 6px;">Jump to Today</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Main view (no modal open)</td>
+              <td style="padding:3px 6px;"><kbd>m</kbd></td>
+              <td style="padding:3px 6px;">Toggle Light / Dark mode</td>
             </tr>
             <tr>
               <td style="padding:3px 6px;">Any task modal open</td>
@@ -2713,7 +2747,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
       &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.5</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.10</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
         <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
@@ -2737,13 +2771,13 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   </div>
   <div class="filter-panel-row">
     <span class="filter-prop-label">Status</span>
-    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="Done">Done</button>
-    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="On Track">On
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="done">Done</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="on track">On
       Track</button>
-    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="Behind">Behind</button>
-    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="Waiting">Waiting</button>
-    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="On Hold">On Hold</button>
-    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="">none</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="behind">Behind</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="waiting">Waiting</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="on hold">On Hold</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="status" data-value="none">none</button>
   </div>
   <div class="filter-panel-row">
     <span class="filter-prop-label">Priority</span>
@@ -2938,8 +2972,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 <script>
 
 window.IS_EXPORTED = false;
-// ==EXPORT_DATA_PLACEHOLDER==
-let DATA = { tasks: [], snapshots: {}, meta: { source_file: 'None' } };
+let DATA = /*__GANTT_DATA__*/{ tasks: [], snapshots: {}, meta: { source_file: 'None' } };
 const STATUS_COLORS = {"done": "#22c55e", "on track": "#3b82f6", "behind": "#ef4444", "waiting": "#eab308", "on hold": "#6b7280"};
 const CAT_COLORS    = ["#0d9488", "#d97706", "#0284c7", "#e11d48", "#65a30d", "#ea580c", "#0891b2", "#db2777", "#059669", "#4338ca"];
 
@@ -3054,24 +3087,88 @@ const MIN_BAR_W = 48;  // min width to fit 3 chars + status circle
 const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DIFF_FIELDS = ['Progress','Status','Start Date','End Date','Title','Priority','Dependency'];
 
+// ── Named timing / layout constants ──────────────────────────────────
+const HIGHLIGHT_DURATION_MS   = 2500; // ms: row highlight after expand or task create/scroll
+const NARROW_BREAKPOINT_PX    = 1465; // px: viewport width that triggers auto-compact mode
+const VIEW_PAD_MONTH_DAYS     = 180;  // days: default render-window half-width in month view
+const VIEW_PAD_WEEK_DAYS_L    = 28;   // days: default left pad in week view
+const VIEW_PAD_WEEK_DAYS_R    = 56;   // days: default right pad in week view
+const VIEW_PAD_YEAR_MONTHS_L  = 12;   // months: default left pad in year view
+const VIEW_PAD_YEAR_MONTHS_R  = 24;   // months: default right pad in year view
+const BAR_HOVER_HIDE_DELAY_MS = 500;  // ms: delay before hiding the bar-hover overlay
+const BAR_HOVER_BTN_W         = 68;   // px: approx total width of the bar-hover button group
+const BAR_HOVER_CURSOR_GAP    = 20;   // px: clearance between cursor and hover buttons
+
 // ── State ────────────────────────────────────────────────────────────
 const AppState = {
+  // View / Navigation
   view: 'month', viewportStart: null, renderStart: null, compareLabel: '', filterMode: 'all',
   viewPadLeft: 0, viewPadRight: 0,
   collapsed: {}, currentTasks: [],
   changesOnly: false, compactMode: false, unsavedChanges: false, autoSave: false,
+
+  // Row highlight
   _highlightId: null, _highlightTimer: null,
-  _hoveredTask: null,      // task object currently hovered in chart (for keyboard shortcuts)
-  _hoveredPhase: null,     // phase name currently hovered in left panel
-  _hoveredCatInfo: null,   // {phase, cat} currently hovered in left panel
-  _hoveredLeftTask: null,  // task object currently hovered in left panel task rows
-  _commenterName: '',      // last used commenter name (session only)
-  _modalLayout: 'both',    // 'edit' | 'comments' | 'both'  — persisted view preference for unified modal
-  _highlightCat: null,     // {phase, cat} for category row highlight after expand
+  _highlightCat: null,
+
+  // Hover state (chart + left panel)
+  _hoveredTask: null,
+  _hoveredPhase: null,
+  _hoveredCatInfo: null,
+  _hoveredLeftTask: null,
+  _cursorInChartArea: false,
+  _chartCursorClientY: 0,
+
+  // Session preferences
+  _commenterName: '',
+  _modalLayout: 'both',
+
+  // Filters
   _customFilters: { status: [], priority: [], comments: [], dependency: [], due: [] },
   _filterPanelOpen: false,
-  _cursorInChartArea: false,   // true when cursor is inside the chart-area (right panel SVG)
-  _chartCursorClientY: 0,      // last clientY of the cursor while in chart-area
+  _filterCloseTimeout: null,
+
+  // File state (managed by js_data_layer)
+  _currentFile: null,
+  _currentArrayBuffer: null,
+  _currentFileHandle: null,
+  _pendingIsReload: false,
+
+  // Modal state
+  _modalTask: null,
+  _modalMode: 'edit',
+  _modalOriginal: null,
+  _commentsDirty: false,
+  _pendingDuplicateComments: null,
+  _modalIdInit: false,
+
+  // UI panel state
+  _flyoutOpen: false,
+  _infoPanelOpen: false,
+
+  // Init flags
+  _dragScrollInit: false,
+  _eventsInit: false,
+
+  // Timer / DOM handles
+  _hoverOverlayTimer: null,
+  _highlightedDepArrow: null,
+  _toolbarTimer: null,
+  _toolbarHoverX: 0,
+  _toolbarHoverY: 0,
+
+  // Responsive state (initialised at runtime — see bottom of js_render)
+  _wasNarrow: false,
+
+  // Color maps (reset on each file load via _resetColorMaps())
+  _catMap: {}, _catIdx: 0,
+  _commenterMap: {}, _commenterIdx: 0,
+
+  // Easter egg state
+  _easterClickCount: 0,
+  _easterClickTimer: null,
+  _milestone42Shown: false,
+  _prevDoneMilestoneCount: 0,
 };
 
 // ── Title trimmer & snapshot formatter ───────────────────────────────
@@ -3122,17 +3219,25 @@ function getISOWeek(d) {
 }
 
 // ── Colour helpers ────────────────────────────────────────────────────
-const _catMap = {}; let _catIdx = 0;
-function catColor(cat) { if(!_catMap[cat]) _catMap[cat]=CAT_COLORS[_catIdx++%CAT_COLORS.length]; return _catMap[cat]; }
-
-const _commenterMap = {}; let _commenterIdx = 0;
-function commenterColor(name) { if(!_commenterMap[name]) _commenterMap[name]=CAT_COLORS[_commenterIdx++%CAT_COLORS.length]; return _commenterMap[name]; }
+function catColor(cat) {
+  if (!AppState._catMap[cat]) AppState._catMap[cat] = CAT_COLORS[AppState._catIdx++ % CAT_COLORS.length];
+  return AppState._catMap[cat];
+}
+function commenterColor(name) {
+  if (!AppState._commenterMap[name]) AppState._commenterMap[name] = CAT_COLORS[AppState._commenterIdx++ % CAT_COLORS.length];
+  return AppState._commenterMap[name];
+}
+// Call at the start of each file load to ensure consistent color assignment per session.
+function _resetColorMaps() {
+  for (const k in AppState._catMap) delete AppState._catMap[k];
+  AppState._catIdx = 0;
+  for (const k in AppState._commenterMap) delete AppState._commenterMap[k];
+  AppState._commenterIdx = 0;
+}
 
 // ── Column width ──────────────────────────────────────────────────────
-function getColWidth() {
-  if (AppState.view === 'year') { const rw = document.getElementById('right-panel').offsetWidth||960; return Math.max(60,Math.floor(rw/12)); }
-  return COL_W[AppState.view];
-}
+// NOTE: The authoritative getColWidth() lives in js_render.js and handles all three views
+// including week-view clamping. Do not add a duplicate here.
 
 // ── Difference helpers ────────────────────────────────────────────────
 function hasDifferences(t1, t2) {
@@ -3175,7 +3280,7 @@ function hasCustomFilters() {
 function isCustomFilterMatch(task, today) {
   const f = AppState._customFilters;
   if (f.status.length > 0) {
-    const taskStatus = (task.Status || '').trim();
+    const taskStatus = (task.Status || 'none').trim();
     if (!f.status.some(v => v === taskStatus)) return false;
   }
   if (f.priority.length > 0) {
@@ -3203,7 +3308,7 @@ function isTaskVisible(task, today) {
   if (hasCustomFilters()) return isCustomFilterMatch(task, today);
   const prog = Number(task.Progress)||0;
   if (AppState.filterMode==='all') return true;
-  if (AppState.filterMode==='unfinished') {
+  if (AppState.filterMode==='active') {
     if (prog >= 100) return false;
     if ((task.Status||'').toLowerCase() === 'on hold') return false;
     return true;
@@ -3218,10 +3323,12 @@ function isTaskVisible(task, today) {
 
 // ── Compare controls ──────────────────────────────────────────────────
 
-// ── Data Sync & Sanitisation ──────────────────────────────────────────
-function sanitizeInput(str) {
+// ── Data Sync & Normalisation ─────────────────────────────────────────
+// Strips characters that cause HTML injection risk at input boundaries (Excel cells,
+// user-typed text). This is a data normalisation step, NOT an HTML-safety guarantee —
+// always use escHtml() when inserting any value into innerHTML.
+function normalizeText(str) {
   if (!str) return '';
-  // Strip characters that could be used for script injection (basic safety)
   return String(str).replace(/[<>]/g, '').trim();
 }
 
@@ -3239,10 +3346,10 @@ function setUnsavedChanges(val) {
   if (toolbar) {
       if (val) {
           toolbar.classList.add('toolbar-unsaved');
-          if (AppState.autoSave && typeof window.isSaveInPlaceSupported === 'function' && window.isSaveInPlaceSupported()) {
+          if (AppState.autoSave && isSaveInPlaceSupported()) {
               setTimeout(() => {
-                  if (typeof window.saveSnapshot === 'function' && AppState.unsavedChanges) {
-                      window.saveSnapshot(false);
+                  if (typeof saveSnapshot === 'function' && AppState.unsavedChanges) {
+                      saveSnapshot(false);
                   }
               }, 100);
           }
@@ -3261,10 +3368,7 @@ window.addEventListener('beforeunload', (e) => {
     e.returnValue = ''; // Required for Chrome/Edge to trigger the dialog
   }
 });
-let _currentFile = null;
-let _currentArrayBuffer = null;
-let _currentFileHandle = null;
-window.isSaveInPlaceSupported = function() { return _currentFileHandle !== null; };
+// ── File state is held in AppState (_currentFile, _currentArrayBuffer, _currentFileHandle)
 
 // Setup Drag and Drop
 const dropCard = document.getElementById('drop-card');
@@ -3280,15 +3384,17 @@ dropCard.addEventListener('drop', (e) => {
     e.preventDefault();
     dropCard.classList.remove('dragover');
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        _currentFileHandle = null; // Drag and drop doesn't provide a writable handle
+        AppState._currentFileHandle = null; // Drag and drop doesn't provide a writable handle
         loadFile(e.dataTransfer.files[0]);
     }
 });
 
 function handleFileSelect(e) {
     if (e.target.files && e.target.files.length > 0) {
-        _currentFileHandle = null; // Fallback file picker doesn't provide a writable handle
-        loadFile(e.target.files[0]);
+        AppState._currentFileHandle = null; // Fallback file picker doesn't provide a writable handle
+        const _isReload = AppState._pendingIsReload;
+        AppState._pendingIsReload = false;
+        loadFile(e.target.files[0], _isReload);
     }
 }
 
@@ -3306,20 +3412,26 @@ async function openFilePicker() {
                 multiple: false
             });
             const file = await fileHandle.getFile();
-            _currentFileHandle = fileHandle;
-            loadFile(file);
+            AppState._currentFileHandle = fileHandle;
+            const _isReload = AppState._pendingIsReload;
+            AppState._pendingIsReload = false;
+            loadFile(file, _isReload);
         } catch (e) {
             if (e.name !== 'AbortError') {
                 console.error(e);
-                _currentFileHandle = null;
+                AppState._currentFileHandle = null;
                 document.getElementById('file-input').click();
             }
         }
     } else {
-        _currentFileHandle = null;
+        AppState._currentFileHandle = null;
         document.getElementById('file-input').click();
     }
 }
+
+// Returns true when the current file was opened via the File System Access API
+// and can be saved in-place (as opposed to triggering a download).
+function isSaveInPlaceSupported() { return AppState._currentFileHandle !== null; }
 
 function showToast(message) {
     const container = document.getElementById('toast-container');
@@ -3328,11 +3440,11 @@ function showToast(message) {
     toast.className = 'toast';
     toast.textContent = message;
     container.appendChild(toast);
-    
+
     // Trigger reflow
     void toast.offsetWidth;
     toast.classList.add('toast-show');
-    
+
     setTimeout(() => {
         toast.classList.remove('toast-show');
         setTimeout(() => toast.remove(), 300);
@@ -3341,12 +3453,25 @@ function showToast(message) {
 
 function loadFile(file, isReload = false) {
     if (window.IS_EXPORTED) return;
-    _currentFile = file;
+    AppState._currentFile = file;
     const reader = new FileReader();
     reader.onload = async function(e) {
-        _currentArrayBuffer = e.target.result;
-        const wb = XLSX.read(_currentArrayBuffer, {type: 'array', cellDates: true});
-        parseWorkbook(wb);
+        AppState._currentArrayBuffer = e.target.result;
+
+        try {
+            const wb = XLSX.read(AppState._currentArrayBuffer, {type: 'array', cellDates: true});
+            parseWorkbook(wb);
+        } catch (err) {
+            console.error('Failed to parse workbook:', err);
+            showToast('Could not read the file. Is it a valid Excel (.xlsx/.xlsm) workbook?');
+            // Restore landing zone so the user can try again
+            document.getElementById('landing-zone').style.display = '';
+            document.getElementById('app').style.display = 'none';
+            AppState._currentFile = null;
+            AppState._currentArrayBuffer = null;
+            AppState._currentFileHandle = null;
+            return;
+        }
 
         // On initial load (not a reload), snapshot the previous session's auto-save
         // state if Current Planning differs from the last Log snapshot.
@@ -3358,7 +3483,7 @@ function loadFile(file, isReload = false) {
         document.getElementById('app').style.display = 'flex';
 
         const asw = document.getElementById('autosave-wrapper');
-        if (asw) asw.style.display = (_currentFileHandle && !file.name.toLowerCase().endsWith('.xlsm')) ? 'flex' : 'none';
+        if (asw) asw.style.display = (isSaveInPlaceSupported() && !file.name.toLowerCase().endsWith('.xlsm')) ? 'flex' : 'none';
 
         // Ensure comparison is reset on load
         clearCompare();
@@ -3370,9 +3495,10 @@ function loadFile(file, isReload = false) {
 
 function startEmptyChart() {
     if (window.IS_EXPORTED) return;
-    _currentFile = { name: "New_Plan.xlsx" };
-    _currentArrayBuffer = null;
-    
+    AppState._currentFile = { name: "New_Plan.xlsx" };
+    AppState._currentArrayBuffer = null;
+    _resetColorMaps();
+
     DATA = {
         tasks: [],
         snapshots: {},
@@ -3381,15 +3507,12 @@ function startEmptyChart() {
             generated_at: formatDateTimeStr(new Date())
         }
     };
-    
+
     document.getElementById('landing-zone').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     clearCompare();
     init();
-    
-    setTimeout(() => {
-        openTaskModal(null, 'add', null, null);
-    }, 100);
+    openTaskModal(null, 'add', null, null);
 }
 
 function parseAnyDate(d) {
@@ -3398,7 +3521,7 @@ function parseAnyDate(d) {
     if (typeof d === 'number' || (typeof d === 'string' && !isNaN(Number(d)) && String(d).trim() !== '')) {
         const num = Number(d);
         if (num < 10000) return null; // Probably not a valid excel date
-        const dateObj = new Date(Date.UTC(1899, 11, 30)); 
+        const dateObj = new Date(Date.UTC(1899, 11, 30));
         dateObj.setUTCDate(dateObj.getUTCDate() + Math.floor(num));
         const ms = Math.round((num - Math.floor(num)) * 86400000);
         const s = new Date(dateObj.getUTCFullYear(), dateObj.getUTCMonth(), dateObj.getUTCDate());
@@ -3415,8 +3538,7 @@ function parseAnyDate(d) {
 function formatDateStr(d) {
     const dt = parseAnyDate(d);
     if (!dt) return typeof d === 'string' ? d : '';
-    const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${String(dt.getDate()).padStart(2, '0')}-${mo[dt.getMonth()]}-${dt.getFullYear()}`;
+    return `${String(dt.getDate()).padStart(2, '0')}-${MONTH_ABBR[dt.getMonth()]}-${dt.getFullYear()}`;
 }
 
 function formatDateTimeStr(d) {
@@ -3448,10 +3570,12 @@ function parseComments(raw) {
     const re = /\[(\d{2}-[A-Za-z]{3}-\d{4}(?:\s+\d{2}:\d{2})?):([^\]]+)\]\s*([\s\S]*?)(?=\[|$)/g;
     let m;
     while ((m = re.exec(raw)) !== null) {
-        const dateStr = sanitizeInput(m[1].trim());
-        const name = sanitizeInput(m[2].trim());
-        const text = sanitizeInput(m[3].trim());
-        if (name && text) results.push({ date: dateStr, name, text });
+        const dateStr = normalizeText(m[1].trim());
+        const name = normalizeText(m[2].trim());
+        const text = normalizeText(m[3].trim());
+        const safeName = name || 'unknown';
+        const safeText = text || 'empty';
+        results.push({ date: dateStr, name: safeName, text: safeText });
     }
     return results;
 }
@@ -3465,10 +3589,10 @@ function processTasksList(rawArray) {
     let mapped = [];
     let idCounts = {};
     rawArray.forEach(r => {
-        let title = sanitizeInput(r['Title'] || '');
+        let title = normalizeText(r['Title'] || '');
         if (!title) return; // Title is required
-        
-        let id = sanitizeInput(r['ID'] || '');
+
+        let id = normalizeText(r['ID'] || '');
         if (!id) {
             let baseId = title;
             if (idCounts[baseId]) {
@@ -3481,42 +3605,50 @@ function processTasksList(rawArray) {
         } else {
             if (idCounts[id]) {
                 idCounts[id]++;
+                id = id + ' (' + idCounts[id] + ')';
             } else {
                 idCounts[id] = 1;
             }
         }
-        
+
         let progress = (r['Progress'] !== undefined && r['Progress'] !== '') ? formatNum(r['Progress']) : '0';
         if (progress === '') progress = '0';
-        
+
         mapped.push({
             'ID': id,
-            'Phase': sanitizeInput(r['Phase']) || 'Phase 1',
-            'Category': sanitizeInput(r['Category']) || 'Category 1',
+            'Phase': normalizeText(r['Phase']) || 'Phase 1',
+            'Category': normalizeText(r['Category']) || 'Category 1',
             'Title': title,
-            'Priority': sanitizeInput(r['Priority']) || 'Medium',
-            'Status': sanitizeInput(r['Status']) ? sanitizeInput(r['Status']).toLowerCase() : 'none',
+            'Priority': normalizeText(r['Priority']) || 'Medium',
+            'Status': normalizeText(r['Status']) ? normalizeText(r['Status']).toLowerCase() : 'none',
             'Start Date': formatDateStr(r['Start Date']),
             'End Date': formatDateStr(r['End Date']),
             'Progress': progress,
-            'Dependency': sanitizeInput(r['Dependency']) || '',
-            'Description': sanitizeInput(r['Description']) || '',
-            'Comments': parseComments(sanitizeInput(r['Comments']) || '')
+            'Dependency': normalizeText(r['Dependency']) || '',
+            'Description': normalizeText(r['Description']) || '',
+            'Comments': parseComments(normalizeText(r['Comments']) || '')
         });
     });
     return mapped;
 }
 
 function parseWorkbook(wb) {
-    const s1Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g, '') === 'currentplanning' || n.toLowerCase().replace(/\s/g, '') === 'sheet1');
-    const s2Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g, '') === 'log' || n.toLowerCase().replace(/\s/g, '') === 'sheet2');
-    
+    _resetColorMaps();
+    let s1Name = _findSheetName(wb, 'currentplanning', 'sheet1');
+    const s2Name = _findSheetName(wb, 'log', 'sheet2');
+
+    // Fallback: if no recognized sheet name, try the first sheet that isn't the Log sheet
+    const usedFallback = !s1Name && wb.SheetNames.length > 0;
+    if (usedFallback) {
+        s1Name = wb.SheetNames.find(n => n !== s2Name) || wb.SheetNames[0];
+    }
+
     // Read Current Planning (Sheet 1)
     let tasks = [];
     if (s1Name) {
         const sheet = wb.Sheets[s1Name];
         let rawTasks = XLSX.utils.sheet_to_json(sheet, {raw: true, defval: ''});
-        
+
         // Normalize keys to strip out (Optional) or (Required) labels
         rawTasks = rawTasks.map(row => {
             const newRow = {};
@@ -3526,8 +3658,13 @@ function parseWorkbook(wb) {
             }
             return newRow;
         });
-        
+
         tasks = processTasksList(rawTasks);
+
+        if (usedFallback && tasks.length === 0) {
+            const names = wb.SheetNames.join(', ');
+            showToast(`\u26A0 Sheet 'Current Planning' not found. Tried '${s1Name}' but it appears empty or has unrecognized columns. Detected sheets: ${names}`);
+        }
     }
 
     // Read Log (Sheet 2)
@@ -3535,7 +3672,7 @@ function parseWorkbook(wb) {
     if (s2Name) {
         const sheet2 = wb.Sheets[s2Name];
         let rawLog = XLSX.utils.sheet_to_json(sheet2, {raw: true, defval: ''});
-        
+
         // Normalize keys here as well just in case
         rawLog = rawLog.map(row => {
             const newRow = {};
@@ -3545,7 +3682,7 @@ function parseWorkbook(wb) {
             }
             return newRow;
         });
-        
+
         // Group by full timestamp (no per-day deduplication — each snapshot is intentional)
         const logGroups = {};
         rawLog.forEach(r => {
@@ -3563,20 +3700,20 @@ function parseWorkbook(wb) {
         });
         sortedKeys.forEach(k => { snapshotsDict[k] = processTasksList(logGroups[k]); });
     }
-    
+
     const now = new Date();
     DATA = {
         tasks: tasks,
         snapshots: snapshotsDict,
         meta: {
-            source_file: _currentFile.name,
+            source_file: AppState._currentFile.name,
             generated_at: formatDateTimeStr(now)
         }
     };
 }
 
 function reloadFile() {
-    if (!_currentFile) {
+    if (!AppState._currentFile) {
         alert("No file loaded");
         return;
     }
@@ -3585,49 +3722,78 @@ function reloadFile() {
             return;
         }
     }
-    loadFile(_currentFile, true);
+    if (AppState._currentFileHandle) {
+        // Direct file access (Browse): get a fresh copy from the handle
+        AppState._currentFileHandle.getFile().then(file => {
+            AppState._currentFile = file;
+            loadFile(file, true);
+        }).catch(err => {
+            console.error("Failed to get file from handle:", err);
+            showToast("\u26A0 Could not reload from file handle. Please re-open the file.");
+        });
+    } else {
+        // Drag-drop: the File object is stale — prompt the user to re-select the file
+        AppState._pendingIsReload = true;
+        openFilePicker();
+    }
+}
+
+// ── Shared workbook helpers ───────────────────────────────────────────
+
+// Returns the first sheet name whose normalised form matches any of the provided aliases.
+function _findSheetName(wb, ...aliases) {
+    return wb.SheetNames.find(n => aliases.includes(n.toLowerCase().replace(/\s/g, '')));
+}
+
+// Returns a 2-D array (header row + one data row per task) for the Current Planning sheet.
+const _CP_HEADERS = [
+    'ID (Optional)', 'Phase (Optional)', 'Category (Optional)', 'Title (Required)',
+    'Priority (Optional)', 'Status (Optional)', 'Start Date (Optional)', 'End Date (Optional)',
+    'Progress (Optional)', 'Dependency (Optional)', 'Description (Optional)', 'Comments (Optional)'
+];
+function _buildCPRows(tasks) {
+    const rows = [_CP_HEADERS];
+    tasks.forEach(t => {
+        rows.push([
+            t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
+            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+            serializeComments(t.Comments||[])
+        ]);
+    });
+    return rows;
+}
+
+const _LOG_HEADERS = [
+    'Saved On Date', 'ID', 'Phase', 'Category', 'Title', 'Priority', 'Status',
+    'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments'
+];
+function _buildLogNewRows(tasks, timestamp) {
+    return tasks.map(t => [
+        timestamp,
+        t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
+        t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+        serializeComments(t.Comments||[])
+    ]);
 }
 
 function downloadDataAsExcel(data, fileName) {
     const wb = XLSX.utils.book_new();
-    
+
     // 1. Build Current Planning sheet
-    const cpData = [['ID (Optional)', 'Phase (Optional)', 'Category (Optional)', 'Title (Required)', 'Priority (Optional)', 'Status (Optional)', 'Start Date (Optional)', 'End Date (Optional)', 'Progress (Optional)', 'Dependency (Optional)', 'Description (Optional)', 'Comments (Optional)']];
-    data.tasks.forEach(t => {
-        cpData.push([
-            t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
-            serializeComments(t.Comments||[])
-        ]);
-    });
-    const wsCurrent = XLSX.utils.aoa_to_sheet(cpData);
+    const wsCurrent = XLSX.utils.aoa_to_sheet(_buildCPRows(data.tasks));
     XLSX.utils.book_append_sheet(wb, wsCurrent, "Current Planning");
 
     // 2. Build Log sheet (Saved On Date is first column)
-    const logData = [['Saved On Date', 'ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments']];
+    const logData = [_LOG_HEADERS];
     // Insert existing snapshots if any
     Object.keys(data.snapshots).sort((a,b) => new Date(a) - new Date(b)).forEach(dateKey => {
-        data.snapshots[dateKey].forEach(t => {
-            logData.push([
-                dateKey,
-                t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-                t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
-                serializeComments(t.Comments||[])
-            ]);
-        });
+        _buildLogNewRows(data.snapshots[dateKey], dateKey).forEach(r => logData.push(r));
     });
 
     // Append the brand new snapshot representing "Right Now"
     const nowStr = formatDateTimeStr(new Date());
-    data.tasks.forEach(t => {
-        logData.push([
-            nowStr,
-            t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
-            serializeComments(t.Comments||[])
-        ]);
-    });
-    
+    _buildLogNewRows(data.tasks, nowStr).forEach(r => logData.push(r));
+
     const wsLog = XLSX.utils.aoa_to_sheet(logData);
     XLSX.utils.book_append_sheet(wb, wsLog, "Log");
 
@@ -3640,8 +3806,8 @@ function downloadDataAsExcel(data, fileName) {
         ['Title', 'REQUIRED', 'Any text', 'The name of the task. This is the only required column.'],
         ['Priority', 'Optional', 'High / Medium / Low', 'Task priority level.'],
         ['Status', 'Optional', 'On Track / Behind / Done / Waiting / On Hold', 'Current status of the task.'],
-        ['Start Date', 'Optional', 'DD/MM/YYYY or MM/DD/YYYY', 'Date the task begins.'],
-        ['End Date', 'Optional', 'DD/MM/YYYY or MM/DD/YYYY', 'Date the task ends.'],
+        ['Start Date', 'Optional', 'DD-Mon-YYYY (e.g., 15-Mar-2026) — or use a proper Excel date cell', 'Date the task begins.'],
+        ['End Date', 'Optional', 'DD-Mon-YYYY (e.g., 15-Mar-2026) — or use a proper Excel date cell', 'Date the task ends.'],
         ['Progress', 'Optional', '0 – 100', 'Completion percentage (shown as a filled bar on the task).'],
         ['Dependency', 'Optional', 'A valid Task ID', 'ID of another task this task depends on. Draws a dependency arrow.'],
         ['Description', 'Optional', 'Any text', 'Free-form notes or details shown in the Edit modal.'],
@@ -3654,19 +3820,19 @@ function downloadDataAsExcel(data, fileName) {
     // Write out the raw workbook as XLSX
     const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
     const blob = new Blob([wbout], {type: "application/octet-stream"});
-    
+
     // Trigger download
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.style.display = 'none';
     a.href = url;
     a.download = fileName;
-    
+
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     return nowStr;
 }
 
@@ -3698,9 +3864,10 @@ function _tasksDiffer(tasks, snapTasks) {
     if (tasks.length !== snapTasks.length) return true;
     const FIELDS = ['Title','Phase','Category','Start Date','End Date','Status','Priority','Progress','Description','Dependency'];
     const byId = {};
-    snapTasks.forEach(t => { byId[t.ID || t.Title] = t; });
+    const _taskKey = t => t.ID || (t.Phase + '||' + t.Category + '||' + t.Title);
+    snapTasks.forEach(t => { byId[_taskKey(t)] = t; });
     for (const t of tasks) {
-        const s = byId[t.ID || t.Title];
+        const s = byId[_taskKey(t)];
         if (!s) return true;
         for (const f of FIELDS) {
             if (String(t[f]||'') !== String(s[f]||'')) return true;
@@ -3738,39 +3905,32 @@ function _migrateLogHeaders(logData) {
 }
 
 // Appends a snapshot row-set to the Log sheet and writes the file in-place.
-// Updates _currentArrayBuffer on success so subsequent saves accumulate correctly.
+// Updates AppState._currentArrayBuffer on success so subsequent saves accumulate correctly.
 async function _appendSnapshotToLog(timestamp, tasks) {
-    if (!_currentArrayBuffer) return;
-    const LOG_HEADER = ['Saved On Date', 'ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments'];
-    const wb = XLSX.read(_currentArrayBuffer, {type: 'array', cellDates: true});
-    let s2Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g,'') === 'log' || n.toLowerCase().replace(/\s/g,'') === 'sheet2');
+    if (!AppState._currentArrayBuffer) return;
+    const wb = XLSX.read(AppState._currentArrayBuffer, {type: 'array', cellDates: true});
+    let s2Name = _findSheetName(wb, 'log', 'sheet2');
 
     if (!s2Name) {
         s2Name = "Log";
         wb.SheetNames.push(s2Name);
-        wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet([LOG_HEADER]);
+        wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet([_LOG_HEADERS]);
     }
 
     let logData = XLSX.utils.sheet_to_json(wb.Sheets[s2Name], {raw: false, header: 1});
-    if (logData.length === 0) logData = [LOG_HEADER];
+    if (logData.length === 0) logData = [_LOG_HEADERS];
     else logData = _migrateLogHeaders(logData);
 
-    const newRows = tasks.map(t => [
-        timestamp,
-        t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-        t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
-        serializeComments(t.Comments||[])
-    ]);
-    logData = logData.concat(newRows);
+    logData = logData.concat(_buildLogNewRows(tasks, timestamp));
     wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet(logData);
 
     const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
-    if (_currentFileHandle) {
+    if (AppState._currentFileHandle) {
         try {
-            const writable = await _currentFileHandle.createWritable();
+            const writable = await AppState._currentFileHandle.createWritable();
             await writable.write(wbout);
             await writable.close();
-            _currentArrayBuffer = wbout;
+            AppState._currentArrayBuffer = wbout;
         } catch(e) {
             console.error("Failed to persist on-open snapshot", e);
         }
@@ -3804,7 +3964,7 @@ async function _maybeCreateOnOpenSnapshot(file) {
 
     DATA.snapshots[snapTimestamp] = DATA.tasks.map(t => ({...t}));
 
-    if (_currentFileHandle && !file.name.toLowerCase().endsWith('.xlsm')) {
+    if (AppState._currentFileHandle && !file.name.toLowerCase().endsWith('.xlsm')) {
         await _appendSnapshotToLog(snapTimestamp, DATA.tasks);
     }
 }
@@ -3812,31 +3972,22 @@ async function _maybeCreateOnOpenSnapshot(file) {
 async function saveSnapshot(manual = true) {
     if (!manual) {
         // ── AUTO-SAVE: rewrite Current Planning only, no Log entry ──────
-        if (!_currentArrayBuffer || !_currentFile) {
+        if (!AppState._currentArrayBuffer || !AppState._currentFile) {
             // No backing file (e.g. Example Data) — auto-save not possible.
             setUnsavedChanges(false);
             return;
         }
-        const wb = XLSX.read(_currentArrayBuffer, {type: 'array', cellDates: true});
-        const s1Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g,'') === 'currentplanning' || n.toLowerCase().replace(/\s/g,'') === 'sheet1') || wb.SheetNames[0];
-        const CP_HEADERS_EXPORT = ['ID (Optional)', 'Phase (Optional)', 'Category (Optional)', 'Title (Required)', 'Priority (Optional)', 'Status (Optional)', 'Start Date (Optional)', 'End Date (Optional)', 'Progress (Optional)', 'Dependency (Optional)', 'Description (Optional)', 'Comments (Optional)'];
-        const cpRows = [CP_HEADERS_EXPORT];
-        DATA.tasks.forEach(t => {
-            cpRows.push([
-                t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-                t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
-                serializeComments(t.Comments||[])
-            ]);
-        });
-        wb.Sheets[s1Name] = XLSX.utils.aoa_to_sheet(cpRows);
+        const wb = XLSX.read(AppState._currentArrayBuffer, {type: 'array', cellDates: true});
+        const s1Name = _findSheetName(wb, 'currentplanning', 'sheet1') || wb.SheetNames[0];
+        wb.Sheets[s1Name] = XLSX.utils.aoa_to_sheet(_buildCPRows(DATA.tasks));
         const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
 
-        if (_currentFileHandle && !_currentFile.name.toLowerCase().endsWith('.xlsm')) {
+        if (isSaveInPlaceSupported() && !AppState._currentFile.name.toLowerCase().endsWith('.xlsm')) {
             try {
-                const writable = await _currentFileHandle.createWritable();
+                const writable = await AppState._currentFileHandle.createWritable();
                 await writable.write(wbout);
                 await writable.close();
-                _currentArrayBuffer = wbout;
+                AppState._currentArrayBuffer = wbout;
                 const now = new Date();
                 const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
                 showToast(`✅ Auto-saved at ${timeStr}`);
@@ -3849,81 +4000,63 @@ async function saveSnapshot(manual = true) {
     }
 
     // ── MANUAL SAVE: rewrite Current Planning + append Log snapshot ──────
-    if (!_currentArrayBuffer || !_currentFile) {
+    if (!AppState._currentArrayBuffer || !AppState._currentFile) {
         // No backing file (e.g. Example Data) — download a fresh workbook.
         let originalName = DATA.meta.source_file || 'New_Plan';
         const fileName = buildGanttFileName(originalName);
         const nowStr = downloadDataAsExcel(DATA, fileName);
-        setTimeout(() => {
-            DATA.snapshots[nowStr] = DATA.tasks.map(t => ({...t}));
-            setUnsavedChanges(false);
-            const currentCmp = AppState.compareLabel;
-            populateCompare();
-            if (currentCmp) {
-                const sel = document.getElementById('compare-sel');
-                sel.value = currentCmp;
-            }
-        }, 200);
+        // Update in-memory snapshot state so the Compare dropdown is immediately current.
+        DATA.snapshots[nowStr] = DATA.tasks.map(t => ({...t}));
+        setUnsavedChanges(false);
+        const currentCmp = AppState.compareLabel;
+        populateCompare();
+        if (currentCmp) {
+            const sel = document.getElementById('compare-sel');
+            if (sel) sel.value = currentCmp;
+        }
         return;
     }
 
     // Read and update the workbook
-    const wb = XLSX.read(_currentArrayBuffer, {type: 'array', cellDates: true});
-    const s1Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g,'') === 'currentplanning' || n.toLowerCase().replace(/\s/g,'') === 'sheet1') || wb.SheetNames[0];
-    let s2Name = wb.SheetNames.find(n => n.toLowerCase().replace(/\s/g,'') === 'log' || n.toLowerCase().replace(/\s/g,'') === 'sheet2');
+    const wb = XLSX.read(AppState._currentArrayBuffer, {type: 'array', cellDates: true});
+    const s1Name = _findSheetName(wb, 'currentplanning', 'sheet1') || wb.SheetNames[0];
+    let s2Name = _findSheetName(wb, 'log', 'sheet2');
 
     if (!s2Name) {
         s2Name = "Log";
         wb.SheetNames.push(s2Name);
-        wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet([
-            ['Saved On Date', 'ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments']
-        ]);
+        wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet([_LOG_HEADERS]);
     }
 
     // IMPORTANT: Use DATA.tasks (in-memory state) — NOT the raw sheet buffer —
     // so that tasks added/edited via the UI are included.
     const nowStr = formatDateTimeStr(new Date());
-    const CP_HEADERS_EXPORT = ['ID (Optional)', 'Phase (Optional)', 'Category (Optional)', 'Title (Required)', 'Priority (Optional)', 'Status (Optional)', 'Start Date (Optional)', 'End Date (Optional)', 'Progress (Optional)', 'Dependency (Optional)', 'Description (Optional)', 'Comments (Optional)'];
 
     // Rewrite Current Planning sheet from in-memory DATA.tasks
-    const cpRows = [CP_HEADERS_EXPORT];
-    DATA.tasks.forEach(t => {
-        cpRows.push([
-            t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
-            serializeComments(t.Comments||[])
-        ]);
-    });
-    wb.Sheets[s1Name] = XLSX.utils.aoa_to_sheet(cpRows);
+    wb.Sheets[s1Name] = XLSX.utils.aoa_to_sheet(_buildCPRows(DATA.tasks));
 
     // Append snapshot to Log sheet
     let logData = XLSX.utils.sheet_to_json(wb.Sheets[s2Name], {raw: false, header: 1});
     if (logData.length === 0) {
-        logData = [['Saved On Date', 'ID', 'Phase', 'Category', 'Title', 'Priority', 'Status', 'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments']];
+        logData = [_LOG_HEADERS];
     } else {
         logData = _migrateLogHeaders(logData);
     }
-    const newRows = DATA.tasks.map(t => [
-        nowStr,
-        t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-        t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
-        serializeComments(t.Comments||[])
-    ]);
-    logData = logData.concat(newRows);
+    logData = logData.concat(_buildLogNewRows(DATA.tasks, nowStr));
     wb.Sheets[s2Name] = XLSX.utils.aoa_to_sheet(logData);
 
     const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
     const blob = new Blob([wbout], {type: "application/octet-stream"});
 
-    let originalName = _currentFile.name;
+    let originalName = AppState._currentFile.name;
     let savedInPlace = false;
 
-    if (_currentFileHandle && !originalName.toLowerCase().endsWith('.xlsm')) {
+    if (isSaveInPlaceSupported() && !originalName.toLowerCase().endsWith('.xlsm')) {
         try {
-            const writable = await _currentFileHandle.createWritable();
+            const writable = await AppState._currentFileHandle.createWritable();
             await writable.write(wbout);
             await writable.close();
-            _currentArrayBuffer = wbout; // keep buffer in sync for subsequent saves
+            AppState._currentArrayBuffer = wbout; // keep buffer in sync for subsequent saves
             savedInPlace = true;
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
@@ -3931,7 +4064,7 @@ async function saveSnapshot(manual = true) {
         } catch(e) {
             console.error("In-place save failed", e);
         }
-    } else if (_currentFileHandle && originalName.toLowerCase().endsWith('.xlsm')) {
+    } else if (isSaveInPlaceSupported() && originalName.toLowerCase().endsWith('.xlsm')) {
         alert("In-place saving is disabled for .xlsm files to avoid losing macros. Downloading a new .xlsx file instead.");
     }
 
@@ -3947,25 +4080,23 @@ async function saveSnapshot(manual = true) {
         URL.revokeObjectURL(url);
     }
 
-    // Update in-memory snapshot state so the dropdown reflects the new save immediately.
-    setTimeout(() => {
-        DATA.snapshots[nowStr] = DATA.tasks.map(t => ({...t}));
-        setUnsavedChanges(false);
-        const currentCmp = AppState.compareLabel;
-        populateCompare();
-        if (currentCmp) {
-            const sel = document.getElementById('compare-sel');
-            sel.value = currentCmp;
-        }
-        if (originalName.endsWith(".xlsm")) {
-            alert(`Snapshot saved as .xlsx\n(macros not preserved in standalone version)`);
-        }
-    }, 200);
+    // Update in-memory snapshot state so the Compare dropdown reflects the new save immediately.
+    DATA.snapshots[nowStr] = DATA.tasks.map(t => ({...t}));
+    setUnsavedChanges(false);
+    const currentCmp = AppState.compareLabel;
+    populateCompare();
+    if (currentCmp) {
+        const sel = document.getElementById('compare-sel');
+        if (sel) sel.value = currentCmp;
+    }
+    if (originalName.endsWith(".xlsm")) {
+        alert(`Snapshot saved as .xlsx\n(macros not preserved in standalone version)`);
+    }
 }
 
 function exportChart(asTemplate = false) {
     const rootClone = document.documentElement.cloneNode(true);
-    
+
     // Clean up dynamic UI elements
     const svg = rootClone.querySelector('#gantt-svg');
     if (svg) svg.innerHTML = '';
@@ -3973,7 +4104,7 @@ function exportChart(asTemplate = false) {
     if (hdr) hdr.innerHTML = '';
     const lrows = rootClone.querySelector('#left-rows');
     if (lrows) lrows.innerHTML = '';
-    
+
     // For Read-Only Export, we hide the landing zone and show the app.
     // For Template Download, we want to leave the landing zone visible and the app hidden.
     if (!asTemplate) {
@@ -3982,19 +4113,19 @@ function exportChart(asTemplate = false) {
         const app = rootClone.querySelector('#app');
         if (app) app.style.display = 'flex';
     }
-    
+
     const tt = rootClone.querySelector('#tooltip');
     if (tt) tt.style.display = 'none';
     const flyout = rootClone.querySelector('#flyout-pane');
     if (flyout) { flyout.classList.remove('open'); flyout.style.transform = ''; }
-    
+
     // Hide UI elements that shouldn't appear in export
     if (!asTemplate) {
         const sbtn = rootClone.querySelector('#save-btn'); if(sbtn) sbtn.style.display='none';
         const ebtn = rootClone.querySelector('#export-btn'); if(ebtn) ebtn.style.display='none';
         const unsavedWarn = rootClone.querySelector('#unsaved-warning'); if(unsavedWarn) unsavedWarn.style.display='none';
         const tb = rootClone.querySelector('#toolbar'); if(tb) tb.classList.remove('toolbar-unsaved');
-        const datePill = rootClone.querySelector('#date-pill'); 
+        const datePill = rootClone.querySelector('#date-pill');
         if(datePill) {
             datePill.removeAttribute('onclick');
             datePill.removeAttribute('data-action');
@@ -4005,22 +4136,23 @@ function exportChart(asTemplate = false) {
     }
 
     let htmlStr = "<!DOCTYPE html>\n<html lang=\"en\">\n" + rootClone.innerHTML + "\n</html>";
-    
+
     if (!asTemplate) {
         // Set IS_EXPORTED to true
         htmlStr = htmlStr.replace("window.IS_EXPORTED = false;", "window.IS_EXPORTED = true;");
-        
-        // Replace DATA initialization.
+
+        // Inject current DATA via the unique token embedded by the build script.
+        // Simple string replace — no regex — so it cannot accidentally match task content.
         const safeJsonStr = JSON.stringify(DATA).replace(/</g, '\\u003c');
-        htmlStr = htmlStr.replace(/\/\/ ==EXPORT_DATA_PLACEHOLDER==[\s\S]*?let DATA =[^;]+;/, "// ==EXPORT_DATA_PLACEHOLDER==\nlet DATA = " + safeJsonStr + ";");
+        htmlStr = htmlStr.replace('/*__GANTT_DATA__*/', safeJsonStr);
     }
-    
+
     const blob = new Blob([htmlStr], {type: "text/html;charset=utf-8"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.style.display = 'none';
     a.href = url;
-    
+
     if (asTemplate) {
         a.download = `gantt_standalone.html`;
     } else {
@@ -4030,7 +4162,7 @@ function exportChart(asTemplate = false) {
         const dateStr = formatDateStr(now);
         a.download = `gantt_${baseName}_${dateStr}.html`;
     }
-    
+
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -4038,21 +4170,22 @@ function exportChart(asTemplate = false) {
 }
 
 // ── Build row list (current + interleaved ghosts) ─────────────────────
-function buildAllRows(current, compareTasks, snapLabel) {
+// today is passed in so this function can be called with a controlled date
+// (consistent with the callers in render, scrollToTask, toggleCategory, etc.)
+function buildAllRows(current, compareTasks, snapLabel, today) {
   const hasCmp = compareTasks && compareTasks.length > 0;
   const currentIdSet  = new Set(current.map(t=>getTaskId(t)).filter(Boolean));
   const currentCatSet = new Set(current.map(t=>t.Phase+'||'+t.Category));
   const cmpById = {};
   if (hasCmp) compareTasks.forEach(t => { const id=getTaskId(t); if(id) cmpById[id]=t; });
 
-  const rows = []; 
-  
+  const rows = [];
+
   // Group tasks by Phase and Category, preserving order of first appearance
   const phaseOrder = [];
   const catOrder = {}; // phase -> [categories]
   const tasksByCat = {}; // phase||cat -> [tasks]
 
-  const _today = new Date(); _today.setHours(0,0,0,0);
   const PRIORITY_ORDER = {high:0, medium:1, low:2, '':3};
 
   current.forEach(t => {
@@ -4079,7 +4212,7 @@ function buildAllRows(current, compareTasks, snapLabel) {
           const pa = PRIORITY_ORDER[(a.Priority||'').toLowerCase()] ?? 3;
           const pb = PRIORITY_ORDER[(b.Priority||'').toLowerCase()] ?? 3;
           if (pa !== pb) return pa - pb;
-          const oa = overdueInfo(a, _today); const ob = overdueInfo(b, _today);
+          const oa = overdueInfo(a, today); const ob = overdueInfo(b, today);
           const da = oa ? oa.days : -1; const db = ob ? ob.days : -1;
           if (da !== db) return db - da;
           const sa = parseDate(a['Start Date']); const sb = parseDate(b['Start Date']);
@@ -4094,8 +4227,8 @@ function buildAllRows(current, compareTasks, snapLabel) {
           rows.push({type:'category', phase:ph, cat:ca, color:catColor(ca), ghost:false});
           tasksByCat[ph+'||'+ca].forEach(t => {
               rows.push({type:'task', phase:ph, cat:ca, color:catColor(ca), task:t, ghost:false});
-              if (hasCmp) { 
-                  const id=getTaskId(t); 
+              if (hasCmp) {
+                  const id=getTaskId(t);
                   if(id && cmpById[id]) {
                       rows.push({type:'task', phase:ph, cat:ca, color:catColor(ca), task:cmpById[id], ghost:true, snapshotLabel:snapLabel});
                   }
@@ -4209,8 +4342,8 @@ function toggleCompact() {
   const btn = document.getElementById('compact-btn');
   if (btn) btn.textContent = AppState.compactMode ? '\u25B7 Full' : '\u25C1 Compact';
   
-  const fbUnfinished = document.getElementById('fb-unfinished');
-  if (fbUnfinished) fbUnfinished.textContent = AppState.compactMode ? 'Act' : 'Active';
+  const fbActive = document.getElementById('fb-active');
+  if (fbActive) fbActive.textContent = AppState.compactMode ? 'Act' : 'Active';
   
   const fbOverdue = document.getElementById('fb-overdue');
   if (fbOverdue) fbOverdue.textContent = AppState.compactMode ? 'Due' : 'Overdue';
@@ -4417,6 +4550,17 @@ function dateToX(d) {
   }
   return dayDiff(AppState.renderStart, d) * cw;
 }
+function xToDate(x) {
+  const cw = getColWidth();
+  if (AppState.view === 'year') {
+    const totalMonths = x / cw;
+    const wholeMonths = Math.floor(totalMonths);
+    const base = addMonths(AppState.renderStart, wholeMonths);
+    const days = Math.round((totalMonths - wholeMonths) * daysInMonth(base.getFullYear(), base.getMonth()));
+    return addDays(base, days);
+  }
+  return addDays(AppState.renderStart, Math.round(x / cw));
+}
 
 // ── SVG helper ────────────────────────────────────────────────────────
 
@@ -4573,14 +4717,7 @@ function renderLeft(visible, today, statsMap) {
       titleSpan.style.marginRight = '4px';
       titleSpan.style.flexShrink = '0';
       lbl.appendChild(titleSpan);
-      if (!r.ghost) { // && !AppState.compactMode) {
-      //  const statusKey = (r.task.Status||'').toLowerCase();
-      //  const pillColor = STATUS_COLORS[statusKey] || '#94a3b8';
-      //  const pill = document.createElement('span'); pill.className='status-pill';
-      //  pill.style.background = pillColor; pill.textContent = r.task.Status||''; lbl.appendChild(pill);
-      //  const ov = overdueInfo(r.task, today);
-      //  if (ov) { const tag=document.createElement('span'); tag.className='overdue-tag'; tag.style.color=ov.color; tag.textContent=`(${ov.label})`; lbl.appendChild(tag); }
-      //} else if (!r.ghost && AppState.compactMode) {
+      if (!r.ghost) {
         const statusKey = (r.task.Status||'').toLowerCase();
         const sc = STATUS_COLORS[statusKey] || '#94a3b8';
         const circ = document.createElement('span');
@@ -4650,20 +4787,17 @@ function _buildDepOptions(depSel, excludeId) {
 }
 
 // ── Bar hover overlay helpers ─────────────────────────────────────────
-let _hoverOverlayTimer = null;
-let _highlightedDepArrow = null;
-
 function _clearDepArrowHighlight() {
-  if (_highlightedDepArrow) {
-    _highlightedDepArrow.setAttribute('stroke', '#94a3b8');
-    _highlightedDepArrow.setAttribute('stroke-width', '1.5');
-    _highlightedDepArrow.setAttribute('marker-end', 'url(#arr)');
-    _highlightedDepArrow = null;
+  if (AppState._highlightedDepArrow) {
+    AppState._highlightedDepArrow.setAttribute('stroke', '#94a3b8');
+    AppState._highlightedDepArrow.setAttribute('stroke-width', '1.5');
+    AppState._highlightedDepArrow.setAttribute('marker-end', 'url(#arr)');
+    AppState._highlightedDepArrow = null;
   }
 }
 
 function _removeBarHoverOverlay() {
-  clearTimeout(_hoverOverlayTimer); _hoverOverlayTimer = null;
+  clearTimeout(AppState._hoverOverlayTimer); AppState._hoverOverlayTimer = null;
   _clearDepArrowHighlight();
   const ov = document.getElementById('bar-hover-overlay');
   if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
@@ -4671,12 +4805,12 @@ function _removeBarHoverOverlay() {
 }
 
 function _scheduleHideBarHover() {
-  clearTimeout(_hoverOverlayTimer);
-  _hoverOverlayTimer = setTimeout(_removeBarHoverOverlay, 500);
+  clearTimeout(AppState._hoverOverlayTimer);
+  AppState._hoverOverlayTimer = setTimeout(_removeBarHoverOverlay, BAR_HOVER_HIDE_DELAY_MS);
 }
 
 function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
-  clearTimeout(_hoverOverlayTimer); _hoverOverlayTimer = null;
+  clearTimeout(AppState._hoverOverlayTimer); AppState._hoverOverlayTimer = null;
 
   // If already showing for the same task, just keep it — don't move the buttons
   if (AppState._hoveredTask === task && document.getElementById('bar-hover-overlay')) return;
@@ -4694,7 +4828,7 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
           a.setAttribute('stroke-width', '2.5');
           a.setAttribute('marker-end', 'url(#arr-hi)');
           a.parentNode.appendChild(a); // bring to front
-          _highlightedDepArrow = a;
+          AppState._highlightedDepArrow = a;
         }
       });
     }
@@ -4721,8 +4855,8 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
   // Always place buttons to the right of the cursor (clear zone = cursorGap).
   // If that overflows the right edge, float the group just past the right edge.
   const cursorInBar = cursorClientX - hitClientRect.left;
-  const btnGroupW   = 68;   // approx total width: 2 buttons + 4px gap
-  const cursorGap   = 20;   // small clear zone so cursor doesn't cover buttons
+  const btnGroupW   = BAR_HOVER_BTN_W;    // approx total width: 2 buttons + 4px gap
+  const cursorGap   = BAR_HOVER_CURSOR_GAP; // small clear zone so cursor doesn't cover buttons
 
   let btnLeft = cursorInBar + cursorGap;
   if (btnLeft + btnGroupW > hitClientRect.width) {
@@ -4738,12 +4872,12 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
 
   // Edit button (✎) is leftmost, Comments (💬) is to the right
   const btnE = document.createElement('button'); btnE.textContent = '\u270E'; btnE.dataset.tooltip = 'Edit task'; btnE.dataset.shortcut = 'e: edit';
-  btnE.addEventListener('mouseenter', () => clearTimeout(_hoverOverlayTimer));
+  btnE.addEventListener('mouseenter', () => clearTimeout(AppState._hoverOverlayTimer));
   btnE.addEventListener('mouseleave', _scheduleHideBarHover);
   btnE.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openTaskModal(task, 'edit'); };
 
   const btnC = document.createElement('button'); btnC.textContent = '\uD83D\uDCAC'; btnC.dataset.tooltip = 'Comments'; btnC.dataset.shortcut = 'c: comments';
-  btnC.addEventListener('mouseenter', () => clearTimeout(_hoverOverlayTimer));
+  btnC.addEventListener('mouseenter', () => clearTimeout(AppState._hoverOverlayTimer));
   btnC.addEventListener('mouseleave', _scheduleHideBarHover);
   btnC.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openCommentsModal(task); };
 
@@ -5063,16 +5197,16 @@ function renderChart(visible, today) {
     svg.appendChild(hit);
   });
 
-  syncScroll();
   _renderFilterSummary();
 }
 
 // ── Scroll sync ───────────────────────────────────────────────────────
-function syncScroll(){
-  const ca=document.getElementById('chart-area');
-  const lr=document.getElementById('left-rows');
-  const hd=document.getElementById('timeline-header');
-  ca.onscroll=()=>{ lr.scrollTop=ca.scrollTop; hd.scrollLeft=ca.scrollLeft; };
+// Registered once in init() via addEventListener — not called every render.
+function _initSyncScroll() {
+  const ca = document.getElementById('chart-area');
+  const lr = document.getElementById('left-rows');
+  const hd = document.getElementById('timeline-header');
+  if (ca) ca.addEventListener('scroll', () => { lr.scrollTop = ca.scrollTop; hd.scrollLeft = ca.scrollLeft; });
 }
 
 
@@ -5229,36 +5363,33 @@ document.addEventListener('mousemove',e=>{if(document.getElementById('tooltip').
 function hideTooltip(){document.getElementById('tooltip').style.display='none';}
 
 // ── Toolbar Hover Tooltip ─────────────────────────────────────────────
-let _toolbarHoverX = 0, _toolbarHoverY = 0;
-let _toolbarTimer = null;
-
 const UNSAVED_WARNING_HTML = '<div style="max-width:250px; white-space:normal;"><b>Unsaved changes are active</b><br/><br/>You have modified the Gantt chart in memory.<br/>&bull; Click <b>Save Excel</b> to commit changes.<br/>&bull; Click the <b>green date indicator on the top left</b> to discard and reload.</div>';
 
 function onToolbarMove(e) {
   // Ignore if hovering over interactive elements, EXCEPT for the unsaved warning itself
   if (e.target.closest('button') || e.target.closest('.btn') || e.target.closest('.date-pill') || e.target.id === 'snap-pill') {
-    clearTimeout(_toolbarTimer);
-    _toolbarTimer = null;
+    clearTimeout(AppState._toolbarTimer);
+    AppState._toolbarTimer = null;
     hideTooltip();
     return;
   }
-  
-  _toolbarHoverX = e.clientX;
-  _toolbarHoverY = e.clientY;
-  
+
+  AppState._toolbarHoverX = e.clientX;
+  AppState._toolbarHoverY = e.clientY;
+
   if (!AppState.unsavedChanges) return;
-  
-  if (!_toolbarTimer) {
-     _toolbarTimer = setTimeout(() => {
-         showHTMLTooltip({clientX: _toolbarHoverX, clientY: _toolbarHoverY, stopPropagation:()=>{}}, UNSAVED_WARNING_HTML);
+
+  if (!AppState._toolbarTimer) {
+     AppState._toolbarTimer = setTimeout(() => {
+         showHTMLTooltip({clientX: AppState._toolbarHoverX, clientY: AppState._toolbarHoverY, stopPropagation:()=>{}}, UNSAVED_WARNING_HTML);
      }, 600);
   }
 }
 
 function onToolbarOut(_e) {
-  clearTimeout(_toolbarTimer);
-  _toolbarTimer = null;
-  hideTooltip(); 
+  clearTimeout(AppState._toolbarTimer);
+  AppState._toolbarTimer = null;
+  hideTooltip();
 }
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
@@ -5267,7 +5398,7 @@ function scrollToTask(task){
   const start=parseDate(task['Start Date']); if(!start) return;
   AppState._highlightId=getTaskId(task);
   if(AppState._highlightTimer) clearTimeout(AppState._highlightTimer);
-  AppState._highlightTimer=setTimeout(()=>{ AppState._highlightId=null; render(); },2500);
+  AppState._highlightTimer=setTimeout(()=>{ AppState._highlightId=null; render(); },HIGHLIGHT_DURATION_MS);
   if(AppState.view==='year'){
     AppState.viewportStart=new Date(start.getFullYear(),Math.max(start.getMonth()-1,0),1);
   } else {
@@ -5278,10 +5409,10 @@ function scrollToTask(task){
   setTimeout(()=>{
     const ca=document.getElementById('chart-area');
     const lr=document.getElementById('left-rows');
-    ca.scrollLeft=Math.max(0,dateToX(start)-100);
+    ca.scrollLeft=Math.max(0,dateToX(start)-ca.clientWidth/2);
     const today2=new Date(); today2.setHours(0,0,0,0);
     const cmpT=AppState.compareLabel&&DATA.snapshots[AppState.compareLabel]?DATA.snapshots[AppState.compareLabel]:[];
-    const allR=buildAllRows(AppState.currentTasks,cmpT,AppState.compareLabel);
+    const allR=buildAllRows(AppState.currentTasks,cmpT,AppState.compareLabel,today2);
     const vis=getVisibleRows(allR,today2);
     const rowIdx=vis.findIndex(r=>r.type==='task'&&!r.ghost&&
       getTaskId(r.task)===AppState._highlightId);
@@ -5306,8 +5437,6 @@ function updateScrollAnchoring() {
 }
 
 // ── Flyout comparison pane & Info panel ──────────────────────────────────
-let flyoutOpen = false;
-let infoPanelOpen = false;
 function isMilestoneTask(t) { return /\(milestone\)/i.test(t.Title||''); }
 function isDoneTask(t) { return Number(t.Progress||0)>=100 || (t.Status||'').trim().toLowerCase()==='done'; }
 function isOverdueNow(t,today) {
@@ -5316,19 +5445,19 @@ function isOverdueNow(t,today) {
 }
 
 function toggleFlyout(){
-  if(infoPanelOpen) toggleInfoPanel();
-  flyoutOpen = !flyoutOpen;
+  if(AppState._infoPanelOpen) toggleInfoPanel();
+  AppState._flyoutOpen = !AppState._flyoutOpen;
   const pane=document.getElementById('flyout-pane');
   const btn=document.getElementById('stats-btn');
-  if(pane) pane.classList.toggle('open',flyoutOpen);
-  if(btn) btn.classList.toggle('active', flyoutOpen);
+  if(pane) pane.classList.toggle('open',AppState._flyoutOpen);
+  if(btn) btn.classList.toggle('active', AppState._flyoutOpen);
 }
 
 function toggleInfoPanel(){
-  if(flyoutOpen && document.getElementById('flyout-pane').classList.contains('open')) toggleFlyout();
-  infoPanelOpen = !infoPanelOpen;
+  if(AppState._flyoutOpen && document.getElementById('flyout-pane').classList.contains('open')) toggleFlyout();
+  AppState._infoPanelOpen = !AppState._infoPanelOpen;
   const pane=document.getElementById('info-panel');
-  if(pane) pane.classList.toggle('open',infoPanelOpen);
+  if(pane) pane.classList.toggle('open',AppState._infoPanelOpen);
 }
 
 function updateFlyout(){
@@ -5336,7 +5465,7 @@ function updateFlyout(){
   const pane=document.getElementById('flyout-pane');
   if(!AppState.compareLabel){
     if(statsBtn) statsBtn.style.display='none';
-    if(pane){ pane.classList.remove('open'); flyoutOpen=false; }
+    if(pane){ pane.classList.remove('open'); AppState._flyoutOpen=false; }
     const sb=document.getElementById('stats-btn'); if(sb) sb.classList.remove('active');
     return;
   }
@@ -5425,15 +5554,15 @@ function showFlyoutTooltip(e, items, statLabel) {
 
 function resetViewPadding() {
   if (AppState.view === 'year') {
-    AppState.viewPadLeft = 12; // 12 months past
-    AppState.viewPadRight = 24; // 12 months future + 12 months for current year scope = 24
+    AppState.viewPadLeft  = VIEW_PAD_YEAR_MONTHS_L;
+    AppState.viewPadRight = VIEW_PAD_YEAR_MONTHS_R;
   } else if (AppState.view === 'week') {
-    AppState.viewPadLeft = 28;
-    AppState.viewPadRight = 56;
+    AppState.viewPadLeft  = VIEW_PAD_WEEK_DAYS_L;
+    AppState.viewPadRight = VIEW_PAD_WEEK_DAYS_R;
   } else {
     // month
-    AppState.viewPadLeft = 180; // 6 months past
-    AppState.viewPadRight = 180 + 60; // 6 months future + ~2 months current screen
+    AppState.viewPadLeft  = VIEW_PAD_MONTH_DAYS;
+    AppState.viewPadRight = VIEW_PAD_MONTH_DAYS + 60; // 6 months future + ~2 months current screen
   }
 }
 
@@ -5444,22 +5573,22 @@ function loadMore(dir) {
   let addedWidth = 0;
   if (dir === 'past') {
     if (AppState.view === 'year') {
-      AppState.viewPadLeft += 12; // 1 year
-      addedWidth = 12 * cw;
+      AppState.viewPadLeft += VIEW_PAD_YEAR_MONTHS_L; // 1 year
+      addedWidth = VIEW_PAD_YEAR_MONTHS_L * cw;
     } else if (AppState.view === 'week') {
-      AppState.viewPadLeft += 28; // 4 weeks
-      addedWidth = 28 * cw;
+      AppState.viewPadLeft += VIEW_PAD_WEEK_DAYS_L; // 4 weeks
+      addedWidth = VIEW_PAD_WEEK_DAYS_L * cw;
     } else {
-      AppState.viewPadLeft += 180; // 6 months
-      addedWidth = 180 * cw;
+      AppState.viewPadLeft += VIEW_PAD_MONTH_DAYS; // 6 months
+      addedWidth = VIEW_PAD_MONTH_DAYS * cw;
     }
   } else {
     if (AppState.view === 'year') {
-      AppState.viewPadRight += 12;
+      AppState.viewPadRight += VIEW_PAD_YEAR_MONTHS_L;
     } else if (AppState.view === 'week') {
-      AppState.viewPadRight += 28;
+      AppState.viewPadRight += VIEW_PAD_WEEK_DAYS_L;
     } else {
-      AppState.viewPadRight += 180; // 6 months
+      AppState.viewPadRight += VIEW_PAD_MONTH_DAYS; // 6 months
     }
   }
   
@@ -5472,11 +5601,6 @@ function loadMore(dir) {
 }
 
 // ── Easter Eggs ───────────────────────────────────────────────────────
-let _easterClickCount = 0;
-let _easterClickTimer = null;
-let _milestone42Shown = false;
-let _prevDoneMilestoneCount = 0;
-
 const _EGG_SAD_CAT = [
   '                                       ',
   '         /\\_____/\\                    ',
@@ -5572,7 +5696,7 @@ function render(){
   
   const today=new Date(); today.setHours(0,0,0,0);
   const compareTasks=AppState.compareLabel&&DATA.snapshots[AppState.compareLabel]?DATA.snapshots[AppState.compareLabel]:[];
-  const allRows=buildAllRows(AppState.currentTasks,compareTasks,AppState.compareLabel);
+  const allRows=buildAllRows(AppState.currentTasks,compareTasks,AppState.compareLabel,today);
   const visible=getVisibleRows(allRows,today);
   const statsMap=buildStatsMap(AppState.currentTasks,today);
   renderLeft(visible,today,statsMap);
@@ -5580,25 +5704,36 @@ function render(){
   updateToggleBtn();
   updateFlyout();
   // Easter egg: 42nd milestone
-  if (!_milestone42Shown) {
+  if (!AppState._milestone42Shown) {
     const doneMilestoneCount = AppState.currentTasks.filter(t => isMilestoneTask(t) && isDoneTask(t)).length;
-    if (doneMilestoneCount >= 42 && _prevDoneMilestoneCount < 42) {
-      _milestone42Shown = true;
+    if (doneMilestoneCount >= 42 && AppState._prevDoneMilestoneCount < 42) {
+      AppState._milestone42Shown = true;
       setTimeout(() => _showEasterEggPopup(_EGG_HAPPY_DOG, 'Yay!'), 400);
     }
-    _prevDoneMilestoneCount = doneMilestoneCount;
+    AppState._prevDoneMilestoneCount = doneMilestoneCount;
   }
 }
 
 function setView(v){
+  // Capture the date at the horizontal center of the screen before switching views
+  const ca = document.getElementById('chart-area');
+  let centerDate = null;
+  if (ca && AppState.renderStart) {
+    centerDate = xToDate(ca.scrollLeft + ca.clientWidth / 2);
+  }
   AppState.view=v;
   resetViewPadding();
   document.querySelectorAll('#view-btns .btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('btn-'+v).classList.add('active');
-  const d=AppState.viewportStart;
-  AppState.viewportStart=v==='year'?new Date(d.getFullYear(),d.getMonth(),1):startOf(d,v);
+  const anchor = centerDate || AppState.viewportStart;
+  AppState.viewportStart=v==='year'?new Date(anchor.getFullYear(),anchor.getMonth(),1):startOf(anchor,v);
   render();
-  updateScrollAnchoring();
+  // Scroll so the captured center date appears at the center of the screen in the new view
+  if (ca && centerDate && AppState.renderStart) {
+    ca.scrollLeft = Math.max(0, dateToX(centerDate) - ca.clientWidth / 2);
+  } else {
+    updateScrollAnchoring();
+  }
 }
 function navigate(dir){
   const d=AppState.viewportStart;
@@ -5616,13 +5751,8 @@ function goToday(){
   resetViewPadding();
   render();
   
-  // Directly target today date instead of start of month for Year scaling anchor if today button
-  if (AppState.view === 'year') {
-      const ca = document.getElementById('chart-area');
-      ca.scrollLeft = Math.max(0, dateToX(now) - (ca.clientWidth / 2)); // center the today date
-  } else {
-      updateScrollAnchoring();
-  }
+  const ca = document.getElementById('chart-area');
+  ca.scrollLeft = Math.max(0, dateToX(now) - ca.clientWidth / 2);
 }
 
 // ── Collapse / expand ─────────────────────────────────────────────────
@@ -5634,12 +5764,12 @@ function toggleCategory(ph, ca) {
     // Expanding: highlight category row and scroll chart to it
     AppState._highlightCat = { phase: ph, cat: ca };
     if (AppState._highlightTimer) clearTimeout(AppState._highlightTimer);
-    AppState._highlightTimer = setTimeout(() => { AppState._highlightCat = null; render(); }, 2500);
+    AppState._highlightTimer = setTimeout(() => { AppState._highlightCat = null; render(); }, HIGHLIGHT_DURATION_MS);
     render();
     setTimeout(() => {
       const today2 = new Date(); today2.setHours(0,0,0,0);
       const cmpT = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
-      const allR = buildAllRows(AppState.currentTasks, cmpT, AppState.compareLabel);
+      const allR = buildAllRows(AppState.currentTasks, cmpT, AppState.compareLabel, today2);
       const vis = getVisibleRows(allR, today2);
       const rowIdx = vis.findIndex(r => r.type === 'category' && r.phase === ph && r.cat === ca);
       if (rowIdx >= 0) {
@@ -5652,14 +5782,14 @@ function toggleCategory(ph, ca) {
       const catTasks = AppState.currentTasks.filter(t => t.Phase === ph && t.Category === ca);
       if (catTasks.length > 0) {
         const closest = catTasks.reduce((best, t) => {
-          const end = parseDate(t['End Date']);
-          if (!end) return best;
-          const diff = Math.abs(end - today2);
+          const s = parseDate(t['Start Date']);
+          if (!s) return best;
+          const diff = Math.abs(s - today2);
           if (!best || diff < best.diff) return { task: t, diff };
           return best;
         }, null);
         if (closest) {
-          const targetDate = parseDate(closest.task['End Date']);
+          const targetDate = parseDate(closest.task['Start Date']);
           const chartArea = document.getElementById('chart-area');
           chartArea.scrollLeft = Math.max(0, dateToX(targetDate) - chartArea.clientWidth / 2);
         }
@@ -5691,11 +5821,11 @@ function _updateFilterBtnState() {
   const active = hasCustomFilters();
   if (filterBtn) filterBtn.classList.toggle('active', active);
   if (active) {
-    ['all','unfinished','overdue'].forEach(m => {
+    ['all','active','overdue'].forEach(m => {
       const el = document.getElementById('fb-'+m); if (el) el.classList.remove('active');
     });
   } else {
-    ['all','unfinished','overdue'].forEach(m => {
+    ['all','active','overdue'].forEach(m => {
       const el = document.getElementById('fb-'+m);
       if (el) el.classList.toggle('active', m === AppState.filterMode);
     });
@@ -5780,15 +5910,14 @@ function setFilter(mode){
   AppState._customFilters={ status:[], priority:[], comments:[], dependency:[], due:[] };
   const filterBtn=document.getElementById('filter-btn');
   if(filterBtn) filterBtn.classList.remove('active');
-  ['all','unfinished','overdue'].forEach(m=>document.getElementById('fb-'+m).classList.toggle('active',m===mode));
+  ['all','active','overdue'].forEach(m=>document.getElementById('fb-'+m).classList.toggle('active',m===mode));
   render();
 }
 
 
 // ── Click and Drag Scrolling ──────────────────────────────────────────
-let _dragScrollInit = false;
 function initDragScroll() {
-  if (_dragScrollInit) return;
+  if (AppState._dragScrollInit) return;
   const ca = document.getElementById('chart-area');
   if (!ca) return;
   let isDragging = false;
@@ -5870,7 +5999,7 @@ function initDragScroll() {
     }
     animationFrameId = requestAnimationFrame(updateInertia);
   }
-  _dragScrollInit = true;
+  AppState._dragScrollInit = true;
 }
 
 // ── Shared modal task-info helper ─────────────────────────────────────
@@ -5887,9 +6016,6 @@ function _setModalTaskInfo(elId, task) {
     `<span class="comments-task-title" data-tooltip="${escHtml(task.Title||'')}">${escHtml(task.Title||'')}</span>`;
 }
 
-// ── Comments task ref (alias for _modalTask in unified modal) ─────────
-let _commentsTask = null;
-
 function openCommentsModal(task) {
     if (!task) return;
     openTaskModal(task, 'edit');
@@ -5901,9 +6027,9 @@ function closeCommentsModal() { closeModal(); }
 
 function renderCommentList() {
     const list = document.getElementById('comments-list');
-    if (!list || !_modalTask) return;
+    if (!list || !AppState._modalTask) return;
     list.innerHTML = '';
-    const comments = (_modalTask.Comments || []).slice().sort((a, b) => {
+    const comments = (AppState._modalTask.Comments || []).slice().sort((a, b) => {
         const da = parseDate(a.date), db = parseDate(b.date);
         if (da && db) return db - da; // newest first
         return 0;
@@ -5915,7 +6041,7 @@ function renderCommentList() {
         list.appendChild(empty); return;
     }
     comments.forEach((c) => {
-        const realIdx = _modalTask.Comments.indexOf(c); // index in original array
+        const realIdx = AppState._modalTask.Comments.indexOf(c); // index in original array
         const item = document.createElement('div'); item.className = 'comment-item';
         const color = commenterColor(c.name);
         item.innerHTML = `
@@ -5939,9 +6065,9 @@ function renderCommentList() {
             cancelBtn.style.fontSize = '0.72rem'; cancelBtn.style.padding = '2px 8px';
             acts.appendChild(saveBtn); acts.appendChild(cancelBtn); item.appendChild(acts);
             saveBtn.addEventListener('click', () => {
-                const newText = sanitizeInput(ta.value);
+                const newText = normalizeText(ta.value);
                 if (!newText) return;
-                _modalTask.Comments[realIdx].text = newText;
+                AppState._modalTask.Comments[realIdx].text = newText;
                 syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
             });
             cancelBtn.addEventListener('click', () => renderCommentList());
@@ -5950,7 +6076,7 @@ function renderCommentList() {
         item.querySelector('.comment-delete-btn').addEventListener('click', () => {
             hideTooltip();
             if (confirm('Delete this comment?')) {
-                _modalTask.Comments.splice(realIdx, 1);
+                AppState._modalTask.Comments.splice(realIdx, 1);
                 syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
             }
         });
@@ -5959,13 +6085,13 @@ function renderCommentList() {
 }
 
 function saveComment() {
-    if (!_modalTask) return;
-    const name = sanitizeInput(document.getElementById('comments-name-input').value);
-    const text = sanitizeInput(document.getElementById('comments-text-input').value);
+    if (!AppState._modalTask) return;
+    const name = normalizeText(document.getElementById('comments-name-input').value);
+    const text = normalizeText(document.getElementById('comments-text-input').value);
     if (!name || !text) { alert('Please enter both your name and a comment.'); return; }
     AppState._commenterName = name;
-    if (!_modalTask.Comments) _modalTask.Comments = [];
-    _modalTask.Comments.push({ date: formatDateTimeStr(new Date()), name, text });
+    if (!AppState._modalTask.Comments) AppState._modalTask.Comments = [];
+    AppState._modalTask.Comments.push({ date: formatDateTimeStr(new Date()), name, text });
     syncCurrentTasksToData(); setUnsavedChanges(true);
     document.getElementById('comments-text-input').value = '';
     _clearCommentsDirty();
@@ -5979,8 +6105,8 @@ function saveComment() {
 }
 
 function _refreshCommentInfo() {
-    if (!_modalTask) return;
-    const comments = _modalTask.Comments || [];
+    if (!AppState._modalTask) return;
+    const comments = AppState._modalTask.Comments || [];
     const infoEl = document.getElementById('modal-comment-info');
     if (infoEl) {
         infoEl.style.display = comments.length > 0 ? 'block' : 'none';
@@ -6018,25 +6144,17 @@ function modalSwitchEdit()     { _setView('edit'); }
 function modalSwitchComments() { _setView('comments'); }
 function modalSwitchBoth()     { _setView('both'); }
 
-// ── (openDualModal removed — unified modal handles all views) ─────────
-function openDualModal(task) { if (task) openTaskModal(task, 'edit'); } // stub for safety
-
-// ── Pending duplicate comments (set by duplicateTaskFromModal, consumed by saveTaskModal) ─────
-let _pendingDuplicateComments = null;
-
 // ── Pending-comment dirty flag ────────────────────────────────────────
-let _commentsDirty = false;
 function _markCommentsDirty() {
     const txt = document.getElementById('comments-text-input');
-    _commentsDirty = !!(txt && txt.value.trim());
+    AppState._commentsDirty = !!(txt && txt.value.trim());
 }
-function _clearCommentsDirty() { _commentsDirty = false; }
+function _clearCommentsDirty() { AppState._commentsDirty = false; }
 
 // ── Unified modal close ────────────────────────────────────────────────
 function closeModal() {
-    _modalOriginal = null;
-    _modalTask = null;
-    _commentsTask = null;
+    AppState._modalOriginal = null;
+    AppState._modalTask = null;
     document.querySelectorAll('#modal-overlay .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
     const txt = document.getElementById('comments-text-input');
     if (txt) txt.value = '';
@@ -6047,17 +6165,10 @@ function closeModal() {
 
 function closeModalConfirm() {
     _markCommentsDirty();
-    if ((_isEditDirty() || _commentsDirty) && !confirm('Discard unsaved changes?')) return;
+    if ((_isEditDirty() || AppState._commentsDirty) && !confirm('Discard unsaved changes?')) return;
     _clearCommentsDirty();
     closeModal();
 }
-
-// Backward-compat aliases (keyboard shortcuts and any lingering references)
-function closeTaskModal()           { closeModal(); }
-function closeDualModal()           { closeModal(); }
-function closeTaskModalConfirm()    { closeModalConfirm(); }
-function closeDualModalConfirm()    { closeModalConfirm(); }
-function closeCommentsModalConfirm(){ closeModalConfirm(); }
 
 // ── Rename Modal ───────────────────────────────────────────────────────
 let _renameType = null, _renameOldValue = null, _renamePhase = null;
@@ -6076,7 +6187,7 @@ function closeRenameModal() {
 }
 
 function saveRename() {
-    const newName = sanitizeInput(document.getElementById('rename-modal-input').value);
+    const newName = normalizeText(document.getElementById('rename-modal-input').value);
     if (!newName) return;
     if (newName === _renameOldValue) { closeRenameModal(); return; }
 
@@ -6168,8 +6279,6 @@ function deletePhaseOrCategory() {
 }
 
 // ── Init Events ───────────────────────────────────────────────────────
-let _eventsInit = false;
-let _filterCloseTimeout = null;
 function _openFilterPanel() {
   const panel = document.getElementById('filter-panel');
   const btn   = document.getElementById('filter-btn');
@@ -6190,13 +6299,13 @@ function _closeFilterPanel() {
 function toggleAutoSave(checkbox) {
     if (!checkbox) return;
     AppState.autoSave = checkbox.checked;
-    if (AppState.autoSave && AppState.unsavedChanges && typeof window.isSaveInPlaceSupported === 'function' && window.isSaveInPlaceSupported()) {
-        window.saveSnapshot(false);
+    if (AppState.autoSave && AppState.unsavedChanges && isSaveInPlaceSupported()) {
+        saveSnapshot(false);
     }
 }
 
 function initEvents() {
-    if (_eventsInit) return;
+    if (AppState._eventsInit) return;
     document.body.addEventListener('click', (e) => {
         const actionEl = e.target.closest('[data-action]');
         if (actionEl) {
@@ -6265,8 +6374,7 @@ function initEvents() {
       const panel = document.getElementById('filter-panel');
       const btn   = document.getElementById('filter-btn');
       if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
-        AppState._filterPanelOpen = false;
-        panel.style.display = 'none';
+        _closeFilterPanel();
       }
     });
 
@@ -6299,6 +6407,14 @@ function initEvents() {
         if (e.key === 'b') { e.preventDefault(); modalSwitchBoth(); }
       } else if (!anyModalOpen) {
         if (e.key === 's') { e.preventDefault(); saveSnapshot(); }
+        if (e.key === 'i') { e.preventDefault(); toggleInfoPanel(); }
+        if (e.key === 't') { e.preventDefault(); goToday(); }
+        if (e.key === 'm') { e.preventDefault(); toggleDarkMode(); }
+        if (e.key === 'v') {
+          e.preventDefault();
+          const _views = ['week', 'month', 'year'];
+          setView(_views[(_views.indexOf(AppState.view) + 1) % 3]);
+        }
         const _activeHoverTask = AppState._hoveredTask || AppState._hoveredLeftTask;
         if (_activeHoverTask) {
           if (e.key === 'c') { e.preventDefault(); openCommentsModal(_activeHoverTask); }
@@ -6330,7 +6446,7 @@ function initEvents() {
           const ca = document.getElementById('chart-area');
           const today2 = new Date(); today2.setHours(0,0,0,0);
           const compareTasks2 = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
-          const allRows2 = buildAllRows(AppState.currentTasks, compareTasks2, AppState.compareLabel);
+          const allRows2 = buildAllRows(AppState.currentTasks, compareTasks2, AppState.compareLabel, today2);
           const visRows2 = getVisibleRows(allRows2, today2);
           let defPhase = null, defCat = null;
           if (ca && visRows2.length) {
@@ -6362,7 +6478,7 @@ function initEvents() {
         }
         // Track pending unsaved comment text for dirty-state warning (single and dual modal)
         if (e.target.id === 'comments-text-input') {
-            _commentsDirty = !!(e.target.value.trim());
+            _markCommentsDirty();
         }
     });
 
@@ -6391,14 +6507,14 @@ function initEvents() {
     const _filterPanelEl = document.getElementById('filter-panel');
     if (_filterBtnEl && _filterPanelEl) {
       _filterBtnEl.addEventListener('mouseenter', () => {
-        clearTimeout(_filterCloseTimeout);
+        clearTimeout(AppState._filterCloseTimeout);
         if (!AppState._filterPanelOpen) _openFilterPanel();
       });
       _filterBtnEl.addEventListener('mouseleave', () => {
-        _filterCloseTimeout = setTimeout(() => { if (!AppState._filterPanelOpen || !_filterPanelEl.matches(':hover')) _closeFilterPanel(); }, 120);
+        AppState._filterCloseTimeout = setTimeout(() => { if (!AppState._filterPanelOpen || !_filterPanelEl.matches(':hover')) _closeFilterPanel(); }, 120);
       });
       _filterPanelEl.addEventListener('mouseenter', () => {
-        clearTimeout(_filterCloseTimeout);
+        clearTimeout(AppState._filterCloseTimeout);
       });
       _filterPanelEl.addEventListener('mouseleave', () => {
         _closeFilterPanel();
@@ -6410,26 +6526,26 @@ function initEvents() {
     if (_titleEl) {
         _titleEl.addEventListener('click', (e) => {
             if (e.button !== 0) return;
-            _easterClickCount++;
-            clearTimeout(_easterClickTimer);
-            if (_easterClickCount >= 21) {
-                _easterClickCount = 0;
+            AppState._easterClickCount++;
+            clearTimeout(AppState._easterClickTimer);
+            if (AppState._easterClickCount >= 21) {
+                AppState._easterClickCount = 0;
                 _showEasterEggPopup(_EGG_SAD_CAT, "I'm sorry..");
             } else {
-                _easterClickTimer = setTimeout(() => { _easterClickCount = 0; }, 2000);
+                AppState._easterClickTimer = setTimeout(() => { AppState._easterClickCount = 0; }, 2000);
             }
         });
     }
 
-    _eventsInit = true;
+    AppState._eventsInit = true;
 }
 
 // ── Auto-Compact Resize Logic ─────────────────────────────────────────
-let _wasNarrow = window.innerWidth <= 1465;
+AppState._wasNarrow = window.innerWidth <= NARROW_BREAKPOINT_PX;
 window.addEventListener('resize', () => {
-    const isNarrow = window.innerWidth <= 1465;
-    if (isNarrow !== _wasNarrow) {
-        _wasNarrow = isNarrow;
+    const isNarrow = window.innerWidth <= NARROW_BREAKPOINT_PX;
+    if (isNarrow !== AppState._wasNarrow) {
+        AppState._wasNarrow = isNarrow;
         if (isNarrow && !AppState.compactMode) toggleCompact();
         else if (!isNarrow && AppState.compactMode) toggleCompact();
     }
@@ -6477,10 +6593,11 @@ function init(){
   AppState.viewportStart=addDays(AppState.viewportStart,-7);
   populateCompare();
   
-  if (window.innerWidth <= 1465 && !AppState.compactMode) {
+  if (window.innerWidth <= NARROW_BREAKPOINT_PX && !AppState.compactMode) {
       toggleCompact();
   }
 
+  _initSyncScroll();
   initDragScroll();
   initEvents();
   render();
@@ -6491,9 +6608,6 @@ window.addEventListener('load',init);
 // --- STANDALONE DATA LOADING LAYER ---
 
 // ── Modal Logic ───────────────────────────────────────────────────────
-let _modalTask = null;
-let _modalMode = 'edit';
-let _modalOriginal = null;
 const PREDEFINED_STATUSES = ['done', 'on track', 'behind', 'waiting', 'on hold', 'none'];
 const PREDEFINED_PRIORITIES = ['high', 'medium', 'low', 'none'];
 
@@ -6514,15 +6628,15 @@ function _getEditFieldValues() {
     };
 }
 function _captureEditSnapshot() {
-    _modalOriginal = (_modalMode === 'edit') ? _getEditFieldValues() : null;
+    AppState._modalOriginal = (AppState._modalMode === 'edit') ? _getEditFieldValues() : null;
 }
 function _isEditDirty() {
-    if (!_modalOriginal) return false;
+    if (!AppState._modalOriginal) return false;
     const cur = _getEditFieldValues();
-    return Object.keys(_modalOriginal).some(k => cur[k] !== _modalOriginal[k]);
+    return Object.keys(AppState._modalOriginal).some(k => cur[k] !== AppState._modalOriginal[k]);
 }
 function _updateEditDirtyHighlights() {
-    if (!_modalOriginal) return;
+    if (!AppState._modalOriginal) return;
     const cur = _getEditFieldValues();
     [['title','modal-task-title'],['phase','modal-task-phase'],['cat','modal-task-cat'],
      ['desc','modal-task-desc'],['start','modal-task-start'],['end','modal-task-end'],
@@ -6531,13 +6645,12 @@ function _updateEditDirtyHighlights() {
     ].forEach(([key, elId]) => {
         const el = document.getElementById(elId); if (!el) return;
         const fg = el.closest('.form-group'); if (!fg) return;
-        fg.classList.toggle('form-group--dirty', cur[key] !== _modalOriginal[key]);
+        fg.classList.toggle('form-group--dirty', cur[key] !== AppState._modalOriginal[key]);
     });
 }
 function openTaskModal(task, mode, defaultPhase, defaultCat) {
-    _modalTask = task;
-    _commentsTask = task;
-    _modalMode = mode;
+    AppState._modalTask = task;
+    AppState._modalMode = mode;
     const isEdit = mode === 'edit';
 
     document.getElementById('modal-title').textContent = isEdit ? 'Edit Task' : 'Add Task';
@@ -6683,27 +6796,24 @@ function onTaskTitleInput() {
     }
 }
 
-let _modalIdInit = false;
 function ensureModalIdHandler() {
-    if (_modalIdInit) return;
+    if (AppState._modalIdInit) return;
     const idInput = document.getElementById('modal-task-id');
     if (idInput) {
         idInput.addEventListener('input', function() { this.dataset.autoGenerated = 'false'; });
-        _modalIdInit = true;
+        AppState._modalIdInit = true;
     }
 }
 
-// closeTaskModal is now an alias defined above in the backward-compat block
-
 function saveTaskModal() {
     ensureModalIdHandler();
-    const isEdit = _modalMode === 'edit';
-    const t = isEdit ? _modalTask : {};
+    const isEdit = AppState._modalMode === 'edit';
+    const t = isEdit ? AppState._modalTask : {};
 
-    t.Title = sanitizeInput(document.getElementById('modal-task-title').value) || 'New Task';
-    t.Phase = sanitizeInput(document.getElementById('modal-task-phase').value) || 'Phase 1';
-    t.Category = sanitizeInput(document.getElementById('modal-task-cat').value) || 'Category 1';
-    t.Description = sanitizeInput(document.getElementById('modal-task-desc').value);
+    t.Title = normalizeText(document.getElementById('modal-task-title').value) || 'New Task';
+    t.Phase = normalizeText(document.getElementById('modal-task-phase').value) || 'Phase 1';
+    t.Category = normalizeText(document.getElementById('modal-task-cat').value) || 'Category 1';
+    t.Description = normalizeText(document.getElementById('modal-task-desc').value);
 
     let priorityStr = document.getElementById('modal-priority-container').dataset.value;
     t.Priority = priorityStr === 'none' ? '' : priorityStr.charAt(0).toUpperCase() + priorityStr.slice(1);
@@ -6719,11 +6829,19 @@ function saveTaskModal() {
     t.Progress = document.getElementById('modal-task-progress-range').value;
     t.Dependency = document.getElementById('modal-task-dependency').value;
 
-    let idVal = sanitizeInput(document.getElementById('modal-task-id').value);
+    let idVal = normalizeText(document.getElementById('modal-task-id').value);
     if (!idVal) idVal = t.Title.replace(/[^a-zA-Z0-9 ]/g, '');
     if (!isEdit) {
         // Ensure uniqueness for new tasks
         const existingIds = new Set(AppState.currentTasks.map(t2 => getTaskId(t2)));
+        let candidate = idVal; let n = 2;
+        while (candidate && existingIds.has(candidate)) { candidate = idVal + ' (' + n++ + ')'; }
+        idVal = candidate;
+    } else {
+        // Ensure uniqueness for edited tasks — exclude the task currently being edited
+        const existingIds = new Set(
+            AppState.currentTasks.filter(t2 => t2 !== AppState._modalTask).map(t2 => getTaskId(t2))
+        );
         let candidate = idVal; let n = 2;
         while (candidate && existingIds.has(candidate)) { candidate = idVal + ' (' + n++ + ')'; }
         idVal = candidate;
@@ -6732,9 +6850,9 @@ function saveTaskModal() {
 
     if (!isEdit) {
         // Copy comments from duplicate source if present (not for dependent tasks)
-        if (_pendingDuplicateComments) {
-            t.Comments = _pendingDuplicateComments;
-            _pendingDuplicateComments = null;
+        if (AppState._pendingDuplicateComments) {
+            t.Comments = AppState._pendingDuplicateComments;
+            AppState._pendingDuplicateComments = null;
         }
         AppState.currentTasks.push(t);
         syncCurrentTasksToData();
@@ -6769,7 +6887,7 @@ function saveTaskModal() {
 
 function saveTaskModalAndClose() {
     ensureModalIdHandler();
-    const isEdit = _modalMode === 'edit';
+    const isEdit = AppState._modalMode === 'edit';
     // Auto-flush any pending comment (if both name and text are filled)
     const _cNameEl = document.getElementById('comments-name-input');
     const _cTextEl = document.getElementById('comments-text-input');
@@ -6781,9 +6899,9 @@ function saveTaskModalAndClose() {
 }
 
 function deleteTaskFromModal() {
-    if (_modalMode !== 'edit' || !_modalTask) return;
+    if (AppState._modalMode !== 'edit' || !AppState._modalTask) return;
     if (confirm('Are you sure you want to delete this task?')) {
-        AppState.currentTasks = AppState.currentTasks.filter(t => t !== _modalTask);
+        AppState.currentTasks = AppState.currentTasks.filter(t => t !== AppState._modalTask);
         syncCurrentTasksToData();
         setUnsavedChanges(true);
         closeModal();
@@ -6793,8 +6911,8 @@ function deleteTaskFromModal() {
 
 function duplicateTaskFromModal() {
     // Copy comments from the original task to the new duplicate
-    _pendingDuplicateComments = (_modalTask && _modalTask.Comments && _modalTask.Comments.length)
-        ? _modalTask.Comments.map(c => ({...c}))
+    AppState._pendingDuplicateComments = (AppState._modalTask && AppState._modalTask.Comments && AppState._modalTask.Comments.length)
+        ? AppState._modalTask.Comments.map(c => ({...c}))
         : null;
     document.getElementById('modal-task-title').value += " - COPY";
     document.getElementById('modal-task-id').value = "";
@@ -6805,7 +6923,7 @@ function duplicateTaskFromModal() {
     const depSel = document.getElementById('modal-task-dependency');
     _buildDepOptions(depSel, null); // allow depending on the duplicated task
     depSel.value = currentDep;
-    _modalMode = 'add';
+    AppState._modalMode = 'add';
     document.getElementById('modal-title').textContent = 'Add Task';
     document.getElementById('modal-btn-delete').style.display = 'none';
     const dupBtn = document.getElementById('modal-btn-duplicate');
@@ -6816,7 +6934,7 @@ function duplicateTaskFromModal() {
 }
 
 function createDependentTask() {
-    _pendingDuplicateComments = null; // dependent tasks never copy parent comments
+    AppState._pendingDuplicateComments = null; // dependent tasks never copy parent comments
     const parentId = document.getElementById('modal-task-id').value || document.getElementById('modal-task-title').value.replace(/[^a-zA-Z0-9 ]/g, '');
     
     document.getElementById('modal-task-title').value = "";
@@ -6844,7 +6962,7 @@ function createDependentTask() {
         }
     }
 
-    _modalMode = 'add';
+    AppState._modalMode = 'add';
     document.getElementById('modal-title').textContent = 'Add Task';
     document.getElementById('modal-btn-delete').style.display = 'none';
     const dupBtn = document.getElementById('modal-btn-duplicate');
