@@ -1,8 +1,0 @@
-# URGENT
-- dependency dropdown should be (sorted in alphabetical order): phase, cat, title
-- Phase and category should be renameable 
-
-
-# LOW 
-- by default: auto-collapse for active?
-- make sure creation of items also triggers the delayed check. <- NVM, works already, as long as status is set properly
