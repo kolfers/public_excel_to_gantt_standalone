@@ -3070,6 +3070,8 @@ const AppState = {
   _highlightCat: null,     // {phase, cat} for category row highlight after expand
   _customFilters: { status: [], priority: [], comments: [], dependency: [], due: [] },
   _filterPanelOpen: false,
+  _cursorInChartArea: false,   // true when cursor is inside the chart-area (right panel SVG)
+  _chartCursorClientY: 0,      // last clientY of the cursor while in chart-area
 };
 
 // ── Title trimmer & snapshot formatter ───────────────────────────────
@@ -4603,6 +4605,8 @@ function renderLeft(visible, today, statsMap) {
         }
         if (r.task.Status) htmlContext += `<br/><span style="display:inline-block;padding:2px 8px;border-radius:10px;color:#fff;background:${sc};font-size:0.65rem;font-weight:bold;margin-top:6px;margin-bottom:2px;">${escHtml(r.task.Status)}</span>`;
         if (ov) { htmlContext += ` <span style="color:${ov.color};font-weight:bold;font-size:0.65rem;">(${ov.label})</span>`; }
+        htmlContext += `<div style="color:var(--text-mu); font-size:0.85em; margin-top:3px; border-top:1px solid var(--border); padding-top:2px;">e: edit  \u2022  c: comments  \u2022  d: dependent  \u2022  n: duplicate</div>`;
+        titleSpan.dataset.shortcut = 'e: edit  \u2022  c: comments  \u2022  d: dependent  \u2022  n: duplicate';
         div.onmousemove = e => showHTMLTooltip(e, htmlContext);
         div.onmouseleave = hideTooltip;
       }
@@ -5182,7 +5186,18 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
     }
   }
 
-  tt.innerHTML = `${snap}<div class="tt-title">${escHtml(t.Title||'')}</div>${phaseCatHtml}${rows}`;
+  // Hotkey hints (only for real tasks, not snapshot ghosts)
+  let hotkeyHtml = '';
+  if (!isGhost) {
+    hotkeyHtml = `<div style="margin-top:6px;border-top:1px solid var(--border);padding-top:4px;display:flex;gap:10px;flex-wrap:wrap;color:var(--text-mu);font-size:0.72rem;">` +
+      `<span><kbd style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:0.85em;">e</kbd> Edit</span>` +
+      `<span><kbd style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:0.85em;">c</kbd> Comments</span>` +
+      `<span><kbd style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:0.85em;">d</kbd> Add Dependent</span>` +
+      `<span><kbd style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:0.85em;">n</kbd> Duplicate</span>` +
+      `</div>`;
+  }
+
+  tt.innerHTML = `${snap}<div class="tt-title">${escHtml(t.Title||'')}</div>${phaseCatHtml}${rows}${hotkeyHtml}`;
   tt.style.display='block'; moveTooltip(e);
 }
 function showSimpleTooltip(e, text, shortcut) {
@@ -5240,7 +5255,7 @@ function onToolbarMove(e) {
   }
 }
 
-function onToolbarOut(e) {
+function onToolbarOut(_e) {
   clearTimeout(_toolbarTimer);
   _toolbarTimer = null;
   hideTooltip(); 
@@ -5435,16 +5450,16 @@ function loadMore(dir) {
       AppState.viewPadLeft += 28; // 4 weeks
       addedWidth = 28 * cw;
     } else {
-      AppState.viewPadLeft += 30; // 30 days
-      addedWidth = 30 * cw;
+      AppState.viewPadLeft += 180; // 6 months
+      addedWidth = 180 * cw;
     }
   } else {
     if (AppState.view === 'year') {
-      AppState.viewPadRight += 12; 
+      AppState.viewPadRight += 12;
     } else if (AppState.view === 'week') {
       AppState.viewPadRight += 28;
     } else {
-      AppState.viewPadRight += 30; 
+      AppState.viewPadRight += 180; // 6 months
     }
   }
   
@@ -5454,6 +5469,93 @@ function loadMore(dir) {
   if (dir === 'past') {
     ca.scrollLeft = oldScrollLeft + addedWidth;
   }
+}
+
+// ── Easter Eggs ───────────────────────────────────────────────────────
+let _easterClickCount = 0;
+let _easterClickTimer = null;
+let _milestone42Shown = false;
+let _prevDoneMilestoneCount = 0;
+
+const _EGG_SAD_CAT = [
+  '                                       ',
+  '         /\\_____/\\                    ',
+  '        /  T   T  \\                   ',
+  '       (  = ︿ =   )                   ',
+  '        \\    _    /                   ',
+  '         `-------\'                    ',
+  '          |     |                     ',
+  '          (  U  )                     ',
+  '          |_____|                     ',
+  '                                      ',
+  '        (っ ´Д`)っ                   ',
+  '                                      ',
+  '  "why did you click me 21 times..."  ',
+].join('\n');
+
+const _EGG_HAPPY_DOG = [
+  '                                        ',
+  '    /\\_/\\  __                         ',
+  '   (  ^ᴥ^ )b  <-- thumbs up!           ',
+  '   /|     |\\                           ',
+  '  ( |  W  | )                          ',
+  '   \\|_____|/                           ',
+  '      | |                              ',
+  '     _| |_                             ',
+  '                                       ',
+  '   WOOF WOOF WOOF!!                    ',
+  '   42nd milestone complete!            ',
+  '   you absolute legend!! 🐾            ',
+].join('\n');
+
+function _showEasterEggPopup(asciiArt, btnLabel) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = [
+        'position:fixed', 'inset:0', 'display:flex', 'align-items:center',
+        'justify-content:center', 'z-index:9999', 'background:rgba(0,0,0,0.55)',
+        'cursor:default', 'animation:fadeIn 0.2s ease'
+    ].join(';');
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const container = document.createElement('div');
+    container.style.cssText = [
+        'display:flex', 'flex-direction:column', 'align-items:center', 'gap:20px',
+        'background:' + (dark ? '#1e293b' : '#f8fafc'),
+        'color:' + (dark ? '#e2e8f0' : '#1e293b'),
+        'border-radius:14px',
+        'padding:32px 40px',
+        'box-shadow:0 24px 64px rgba(0,0,0,0.45)',
+        'max-width:92vw',
+        'max-height:90vh',
+        'overflow:auto',
+        'border:2px solid ' + (dark ? '#334155' : '#cbd5e1')
+    ].join(';');
+    const box = document.createElement('pre');
+    box.style.cssText = [
+        'font-size:0.9rem', 'line-height:1.5', 'font-family:monospace',
+        'white-space:pre', 'text-align:center', 'margin:0'
+    ].join(';');
+    box.textContent = asciiArt;
+    const btn = document.createElement('button');
+    btn.textContent = btnLabel;
+    btn.style.cssText = [
+        'padding:10px 28px',
+        'border-radius:8px',
+        'border:none',
+        'cursor:pointer',
+        'font-size:1rem',
+        'font-weight:600',
+        'background:' + (dark ? '#334155' : '#1e293b'),
+        'color:' + (dark ? '#e2e8f0' : '#f8fafc'),
+        'transition:opacity 0.15s'
+    ].join(';');
+    btn.addEventListener('mouseenter', () => { btn.style.opacity = '0.8'; });
+    btn.addEventListener('mouseleave', () => { btn.style.opacity = '1'; });
+    container.appendChild(box);
+    container.appendChild(btn);
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
+    const _close = () => { overlay.remove(); };
+    btn.addEventListener('click', _close);
 }
 
 // ── Master render ─────────────────────────────────────────────────────
@@ -5477,6 +5579,15 @@ function render(){
   renderChart(visible,today);
   updateToggleBtn();
   updateFlyout();
+  // Easter egg: 42nd milestone
+  if (!_milestone42Shown) {
+    const doneMilestoneCount = AppState.currentTasks.filter(t => isMilestoneTask(t) && isDoneTask(t)).length;
+    if (doneMilestoneCount >= 42 && _prevDoneMilestoneCount < 42) {
+      _milestone42Shown = true;
+      setTimeout(() => _showEasterEggPopup(_EGG_HAPPY_DOG, 'Yay!'), 400);
+    }
+    _prevDoneMilestoneCount = doneMilestoneCount;
+  }
 }
 
 function setView(v){
@@ -5702,7 +5813,9 @@ function initDragScroll() {
     lastTimestamp = e.timeStamp;
   });
 
+  ca.addEventListener('mouseenter', () => { AppState._cursorInChartArea = true; });
   ca.addEventListener('mouseleave', () => {
+    AppState._cursorInChartArea = false;
     if (isDragging) {
       isDragging = false;
       ca.style.cursor = '';
@@ -5717,12 +5830,13 @@ function initDragScroll() {
   });
 
   ca.addEventListener('mousemove', (e) => {
+    AppState._chartCursorClientY = e.clientY;
     if (!isDragging) return;
     e.preventDefault();
     const x = e.pageX - ca.offsetLeft;
     const walk = (x - startX);
     ca.scrollLeft = scrollLeft - walk;
-    
+
     // Calculate instantaneous velocity (pixels per ms)
     const dt = e.timeStamp - lastTimestamp;
     if (dt > 0) {
@@ -6205,10 +6319,31 @@ function initEvents() {
             if (AppState._hoveredPhase) { e.preventDefault(); openRenameModal('phase', AppState._hoveredPhase); }
             else if (AppState._hoveredCatInfo) { e.preventDefault(); openRenameModal('category', AppState._hoveredCatInfo.cat, AppState._hoveredCatInfo.phase); }
           }
-          if (e.key === 'n') {
+            if (e.key === 'n') {
             if (AppState._hoveredPhase) { e.preventDefault(); openTaskModal(null, 'add', AppState._hoveredPhase, null); }
             else if (AppState._hoveredCatInfo) { e.preventDefault(); openTaskModal(null, 'add', AppState._hoveredCatInfo.phase, AppState._hoveredCatInfo.cat); }
           }
+        }
+        // 'n' in chart area (no task/phase/cat hovered) — open Add Task pre-filled to closest visible task
+        if (e.key === 'n' && AppState._cursorInChartArea && !_activeHoverTask && !AppState._hoveredPhase && !AppState._hoveredCatInfo) {
+          e.preventDefault();
+          const ca = document.getElementById('chart-area');
+          const today2 = new Date(); today2.setHours(0,0,0,0);
+          const compareTasks2 = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
+          const allRows2 = buildAllRows(AppState.currentTasks, compareTasks2, AppState.compareLabel);
+          const visRows2 = getVisibleRows(allRows2, today2);
+          let defPhase = null, defCat = null;
+          if (ca && visRows2.length) {
+            const caRect = ca.getBoundingClientRect();
+            const cursorRowF = (AppState._chartCursorClientY - caRect.top + ca.scrollTop) / ROW_H;
+            let closestDist = Infinity;
+            visRows2.forEach((r, ri) => {
+              if (r.type !== 'task' || r.ghost) return;
+              const dist = Math.abs(ri - cursorRowF);
+              if (dist < closestDist) { closestDist = dist; defPhase = r.task.Phase; defCat = r.task.Category; }
+            });
+          }
+          openTaskModal(null, 'add', defPhase || 'Phase 1', defCat || 'Category 1');
         }
       }
     });
@@ -6268,6 +6403,22 @@ function initEvents() {
       _filterPanelEl.addEventListener('mouseleave', () => {
         _closeFilterPanel();
       });
+    }
+
+    // Easter egg: 21 clicks on source data name
+    const _titleEl = document.getElementById('app-title');
+    if (_titleEl) {
+        _titleEl.addEventListener('click', (e) => {
+            if (e.button !== 0) return;
+            _easterClickCount++;
+            clearTimeout(_easterClickTimer);
+            if (_easterClickCount >= 21) {
+                _easterClickCount = 0;
+                _showEasterEggPopup(_EGG_SAD_CAT, "I'm sorry..");
+            } else {
+                _easterClickTimer = setTimeout(() => { _easterClickCount = 0; }, 2000);
+            }
+        });
     }
 
     _eventsInit = true;
