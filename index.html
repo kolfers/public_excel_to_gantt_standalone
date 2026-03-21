@@ -692,56 +692,56 @@ select#compare-sel {
 }
 
 /* Status chip colors */
-.filter-chip[data-prop="status"][data-value="Done"] {
+.filter-chip[data-prop="status"][data-value="done"] {
   color: #22c55e;
   border-color: #22c55e
 }
 
-.filter-chip[data-prop="status"][data-value="Done"].active {
+.filter-chip[data-prop="status"][data-value="done"].active {
   background: #22c55e;
   color: #fff;
   border-color: #22c55e
 }
 
-.filter-chip[data-prop="status"][data-value="On Track"] {
+.filter-chip[data-prop="status"][data-value="on track"] {
   color: #3b82f6;
   border-color: #3b82f6
 }
 
-.filter-chip[data-prop="status"][data-value="On Track"].active {
+.filter-chip[data-prop="status"][data-value="on track"].active {
   background: #3b82f6;
   color: #fff;
   border-color: #3b82f6
 }
 
-.filter-chip[data-prop="status"][data-value="Behind"] {
+.filter-chip[data-prop="status"][data-value="behind"] {
   color: #ef4444;
   border-color: #ef4444
 }
 
-.filter-chip[data-prop="status"][data-value="Behind"].active {
+.filter-chip[data-prop="status"][data-value="behind"].active {
   background: #ef4444;
   color: #fff;
   border-color: #ef4444
 }
 
-.filter-chip[data-prop="status"][data-value="Waiting"] {
+.filter-chip[data-prop="status"][data-value="waiting"] {
   color: #eab308;
   border-color: #eab308
 }
 
-.filter-chip[data-prop="status"][data-value="Waiting"].active {
+.filter-chip[data-prop="status"][data-value="waiting"].active {
   background: #eab308;
   color: #fff;
   border-color: #eab308
 }
 
-.filter-chip[data-prop="status"][data-value="On Hold"] {
+.filter-chip[data-prop="status"][data-value="on hold"] {
   color: #6b7280;
   border-color: #6b7280
 }
 
-.filter-chip[data-prop="status"][data-value="On Hold"].active {
+.filter-chip[data-prop="status"][data-value="on hold"].active {
   background: #6b7280;
   color: #fff;
   border-color: #6b7280
@@ -829,53 +829,53 @@ select#compare-sel {
 }
 
 /* Summary chip colors matching filter-chip colors */
-.filter-summary-chip[data-prop="status"][data-value="Done"] {
+.filter-summary-chip[data-prop="status"][data-value="done"] {
   background: rgba(34, 197, 94, .12);
   color: #22c55e;
   border-color: rgba(34, 197, 94, .35)
 }
 
-.filter-summary-chip[data-prop="status"][data-value="Done"]:hover {
+.filter-summary-chip[data-prop="status"][data-value="done"]:hover {
   background: rgba(34, 197, 94, .25)
 }
 
-.filter-summary-chip[data-prop="status"][data-value="On Track"] {
+.filter-summary-chip[data-prop="status"][data-value="on track"] {
   background: rgba(59, 130, 246, .12);
   color: #3b82f6;
   border-color: rgba(59, 130, 246, .35)
 }
 
-.filter-summary-chip[data-prop="status"][data-value="On Track"]:hover {
+.filter-summary-chip[data-prop="status"][data-value="on track"]:hover {
   background: rgba(59, 130, 246, .25)
 }
 
-.filter-summary-chip[data-prop="status"][data-value="Behind"] {
+.filter-summary-chip[data-prop="status"][data-value="behind"] {
   background: rgba(239, 68, 68, .12);
   color: #ef4444;
   border-color: rgba(239, 68, 68, .35)
 }
 
-.filter-summary-chip[data-prop="status"][data-value="Behind"]:hover {
+.filter-summary-chip[data-prop="status"][data-value="behind"]:hover {
   background: rgba(239, 68, 68, .25)
 }
 
-.filter-summary-chip[data-prop="status"][data-value="Waiting"] {
+.filter-summary-chip[data-prop="status"][data-value="waiting"] {
   background: rgba(234, 179, 8, .12);
   color: #eab308;
   border-color: rgba(234, 179, 8, .35)
 }
 
-.filter-summary-chip[data-prop="status"][data-value="Waiting"]:hover {
+.filter-summary-chip[data-prop="status"][data-value="waiting"]:hover {
   background: rgba(234, 179, 8, .25)
 }
 
-.filter-summary-chip[data-prop="status"][data-value="On Hold"] {
+.filter-summary-chip[data-prop="status"][data-value="on hold"] {
   background: rgba(107, 114, 128, .12);
   color: #6b7280;
   border-color: rgba(107, 114, 128, .35)
 }
 
-.filter-summary-chip[data-prop="status"][data-value="On Hold"]:hover {
+.filter-summary-chip[data-prop="status"][data-value="on hold"]:hover {
   background: rgba(107, 114, 128, .25)
 }
 
@@ -3280,7 +3280,7 @@ function hasCustomFilters() {
 function isCustomFilterMatch(task, today) {
   const f = AppState._customFilters;
   if (f.status.length > 0) {
-    const taskStatus = (task.Status || 'none').trim();
+    const taskStatus = (task.Status || 'none').trim().toLowerCase();
     if (!f.status.some(v => v === taskStatus)) return false;
   }
   if (f.priority.length > 0) {
