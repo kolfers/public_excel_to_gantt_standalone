@@ -3025,7 +3025,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="drop-card" id="drop-card" style="position: relative;">
     <div class="drop-title">&#128200; Gantt Chart Builder</div>
     <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
-    <div class="drop-version">v2.10</div>
+    <div class="drop-version">v2.11</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
       Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
@@ -3423,7 +3423,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
       &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.10</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.11</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
         <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
@@ -6507,14 +6507,14 @@ function navigate(dir) {
   updateScrollAnchoring();
 }
 function goToday() {
-  const now = new Date();
-  AppState.viewportStart = AppState.view === 'year' ? new Date(now.getFullYear(), now.getMonth(), 1) : startOf(now, AppState.view);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  AppState.viewportStart = AppState.view === 'year' ? new Date(today.getFullYear(), today.getMonth(), 1) : startOf(today, AppState.view);
   if (AppState.view === 'month') AppState.viewportStart = addDays(AppState.viewportStart, -7);
   resetViewPadding();
   render();
 
   const ca = document.getElementById('chart-area');
-  ca.scrollLeft = Math.max(0, dateToX(now) - ca.clientWidth / 2);
+  ca.scrollLeft = Math.max(0, dateToX(today) - ca.clientWidth / 2);
 }
 
 // ── Collapse / expand ─────────────────────────────────────────────────
@@ -6535,7 +6535,7 @@ function isAllCollapsed() {
 }
 function updateToggleBtn() {
   const btn = document.getElementById('toggle-all-btn');
-  if (btn) btn.textContent = isAllCollapsed() ? '▶ Expand all' : '▼ Collapse all';
+  if (btn) btn.textContent = isAllCollapsed() ? '▶ Expand' : '▼ Collapse';
 }
 function toggleAll() { isAllCollapsed() ? expandAll() : collapseAll(); }
 
