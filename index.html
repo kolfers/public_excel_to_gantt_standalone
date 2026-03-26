@@ -40,6 +40,7 @@ html {
   --green-800: #166534;
   --green-900: #14532d;
   --green-old: #008000;
+  --fbtn-active-fg: #fff;
   --gray-500: #6b7280;
   --gray-600: #4b5563;
   --toolbar-h: 64px;
@@ -226,6 +227,7 @@ html {
   --green-800: #8bd5ca;
   --green-900: #a6da95;
   --green-old: #a6da95;
+  --fbtn-active-fg: var(--bg);
   --gray-500: #6e738d;
   --gray-600: #8087a2;
 
@@ -282,6 +284,7 @@ html {
   --green-800: #81c8be;
   --green-900: #a6d189;
   --green-old: #a6d189;
+  --fbtn-active-fg: var(--bg);
   --gray-500: #626880;
   --gray-600: #737994;
 
@@ -458,6 +461,7 @@ html {
   --green-800: #bae67e;
   --green-900: #9acd57;
   --green-old: #bae67e;
+  --fbtn-active-fg: var(--bg);
   --gray-500: #6c7e8d;
   --gray-600: #8695a5;
 
@@ -518,6 +522,7 @@ html {
   --green-800: #a6e22e;
   --green-900: #8bc21d;
   --green-old: #a6e22e;
+  --fbtn-active-fg: var(--bg);
   --gray-500: #75715e;
   --gray-600: #948d80;
 
@@ -578,6 +583,7 @@ html {
   --green-800: #50fa7b;
   --green-900: #33e860;
   --green-old: #50fa7b;
+  --fbtn-active-fg: var(--bg);
   --gray-500: #6272a4;
   --gray-600: #8492b8;
 
@@ -691,6 +697,7 @@ html {
   --green-800: #76946a;
   --green-900: #98bb6c;
   --green-old: #98bb6c;
+  --fbtn-active-fg: var(--bg);
   --gray-500: #727169;
   --gray-600: #54546d;
 
@@ -782,7 +789,7 @@ body {
 }
 
 #toolbar.compact-mode .toolbar-center {
-  left: calc(50% + 67.5px)
+  left: calc(50% + var(--lp-compact-w, 135px) / 2)
 }
 
 .toolbar-right {
@@ -804,12 +811,26 @@ body {
   white-space: nowrap;
   flex-shrink: 0;
   cursor: default;
-  width: 270px;
+  width: var(--left-w);
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+}
+
+#toolbar.compact-mode .app-title {
+  width: var(--lp-compact-w, 135px);
+  justify-content: flex-start;
+  padding-left: 12px;
+}
+
+#toolbar.compact-mode .app-title .txt-full {
+  display: none !important;
+}
+
+#toolbar.compact-mode .app-title .txt-short {
+  display: inline !important;
 }
 
 .date-pill {
@@ -1123,7 +1144,7 @@ select#compare-sel {
 
 .fbtn.active {
   background: var(--green-old);
-  color: #fff;
+  color: var(--fbtn-active-fg);
   border-color: var(--green-old)
 }
 
@@ -1166,9 +1187,9 @@ select#compare-sel {
 }
 
 .filter-btn.active {
-  background: #d97706;
-  color: #fff;
-  border-color: #d97706;
+  background: var(--accent);
+  color: var(--fbtn-active-fg);
+  border-color: var(--accent);
   font-weight: 600
 }
 
@@ -1376,7 +1397,7 @@ select#compare-sel {
 #filter-summary {
   position: fixed;
   top: calc(var(--toolbar-h) + var(--head-h));
-  left: var(--left-w);
+  left: var(--lp-compact-w, var(--left-w));
   display: flex;
   align-items: center;
   gap: 4px;
@@ -1385,12 +1406,8 @@ select#compare-sel {
   pointer-events: auto;
   flex-wrap: nowrap;
   max-width: 60vw;
-  justify-content: flex-start
-}
-
-#left-panel.compact-mode~*~#filter-summary,
-#left-panel.compact-mode~#filter-summary {
-  left: 135px
+  justify-content: flex-start;
+  transition: left .2s
 }
 
 .filter-summary-chip {
@@ -1666,8 +1683,8 @@ select#compare-sel {
 
 /* Compact mode overrides */
 #left-panel.compact-mode {
-  width: 135px !important;
-  min-width: 135px !important
+  width: var(--lp-compact-w, 135px) !important;
+  min-width: var(--lp-compact-w, 135px) !important
 }
 
 #left-panel.compact-mode .tasks-label {
@@ -1836,7 +1853,7 @@ select#compare-sel {
   }
 
   .app-title {
-    width: 135px;
+    width: var(--lp-compact-w, 135px);
     justify-content: flex-start;
     padding-left: 12px;
   }
@@ -3092,16 +3109,16 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     </div>
     <div class="toolbar-center">
       <div class="btn-group" id="view-btns">
-        <button class="btn" id="btn-week" data-action="setView" data-value="week" data-tooltip="Week view"><span
+        <button class="btn" id="btn-week" data-action="setView" data-value="week" data-tooltip="Week view" data-shortcut="v: cycle views"><span
             class="txt-full">Week</span><span class="txt-short">W</span></button>
         <button class="btn active" id="btn-month" data-action="setView" data-value="month"
-          data-tooltip="Month view"><span class="txt-full">Month</span><span class="txt-short">M</span></button>
-        <button class="btn" id="btn-year" data-action="setView" data-value="year" data-tooltip="Year view"><span
+          data-tooltip="Month view" data-shortcut="v: cycle views"><span class="txt-full">Month</span><span class="txt-short">M</span></button>
+        <button class="btn" id="btn-year" data-action="setView" data-value="year" data-tooltip="Year view" data-shortcut="v: cycle views"><span
             class="txt-full">Year</span><span class="txt-short">Y</span></button>
       </div>
       <button class="btn icon-btn" data-action="navigate" data-value="-1"
         data-tooltip="Previous time period">&#8592;</button>
-      <button class="btn today-btn" data-action="goToday" data-tooltip="Jump to today"><span
+      <button class="btn today-btn" data-action="goToday" data-tooltip="Jump to today" data-shortcut="t: today"><span
           class="txt-full">Today</span><span class="txt-short">T</span></button>
       <button class="btn icon-btn" data-action="navigate" data-value="1"
         data-tooltip="Next time period">&#8594;</button>
@@ -3124,10 +3141,10 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         data-shortcut="s: save">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short txt-min"> S</span></button>
       <button class="btn" id="export-btn" data-action="exportChart"
         style="margin-right:12px; border-color:var(--status-on-track); color:var(--status-on-track);"
-        data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart.">&#128228;<span
+        data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart." data-shortcut="x: export">&#128228;<span
           class="txt-full"> Export Chart</span><span class="txt-short txt-min"> E</span></button>
       <button class="btn" id="info-btn" data-action="toggleInfoPanel" style="border-color:var(--status-waiting); color:var(--status-waiting);"
-        data-tooltip="View application info and version">&#10067;<span class="txt-full"> Info</span><span class="txt-short txt-min"> I</span></button>
+        data-tooltip="View application info and version" data-shortcut="i: info">&#10067;<span class="txt-full"> Info</span><span class="txt-short txt-min"> I</span></button>
     </div>
   </header>
 
@@ -3616,8 +3633,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 </div>
 
 <div class="floating-btn-group">
-  <button id="darkmode-btn" class="floating-dark-btn" data-tooltip="Toggle dark/light mode" data-action="toggleDarkMode">&#9789;</button>
-  <button id="theme-cycle-btn" class="floating-theme-btn" data-tooltip="Cycle Color Theme" data-action="cycleTheme">
+  <button id="darkmode-btn" class="floating-dark-btn" data-tooltip="Toggle dark/light mode" data-shortcut="m: toggle" data-action="toggleDarkMode">&#9789;</button>
+  <button id="theme-cycle-btn" class="floating-theme-btn" data-tooltip="Cycle Color Theme" data-shortcut="p: cycle palette" data-action="cycleTheme">
     &#127912; <span id="theme-cycle-label" style="font-size: 1rem; margin-left: 8px; font-weight: 700;">Default</span>
   </button>
 </div>
@@ -4955,6 +4972,7 @@ function toggleDarkMode() {
   const palette = localStorage.getItem(modeKey) || (next === 'dark' ? 'frappe' : 'ayu');
   document.documentElement.setAttribute('data-palette', palette);
   _updateThemeLabel(palette);
+  _measureLeftPanel();
   render();
 }
 
@@ -4973,6 +4991,7 @@ function cycleTheme() {
   localStorage.setItem(modeKey, next);
   localStorage.setItem('gantt_palette', next);
   _updateThemeLabel(next);
+  _measureLeftPanel();
   render();
 }
 
@@ -5027,6 +5046,35 @@ if (!window.showOpenFilePicker) {
   if (ft) ft.style.display = 'block';
 }
 
+// Measure and apply the minimum left-panel width needed to avoid clipping header buttons.
+// Called whenever the font can change (palette/dark-mode switch) or compact mode toggles.
+function _measureLeftPanel() {
+  const lp = document.getElementById('left-panel');
+  const header = document.getElementById('left-header');
+  const subheader = document.getElementById('left-subheader');
+  if (!lp || !header || !subheader) return;
+  // Temporarily give each header row its intrinsic (max-content) width so we can
+  // read the natural button widths without the panel's constraint interfering.
+  header.style.width = 'max-content';
+  subheader.style.width = 'max-content';
+  void lp.offsetWidth; // force synchronous layout reflow
+  const w = Math.max(header.offsetWidth, subheader.offsetWidth);
+  header.style.width = '';
+  subheader.style.width = '';
+  if (AppState.compactMode) {
+    // Set on :root so all dependents (app-title, toolbar-center, filter-summary) pick it up
+    document.documentElement.style.setProperty('--lp-compact-w', Math.max(w, 110) + 'px');
+  } else {
+    document.documentElement.style.removeProperty('--lp-compact-w');
+    document.documentElement.style.setProperty('--left-w', Math.max(w, 270) + 'px');
+  }
+}
+
+// Re-measure after any web font batch finishes loading (palette fonts vary widely).
+if (document.fonts && document.fonts.addEventListener) {
+  document.fonts.addEventListener('loadingdone', _measureLeftPanel);
+}
+
 // Compact mode toggle
 function toggleCompact() {
   AppState.compactMode = !AppState.compactMode;
@@ -5034,19 +5082,20 @@ function toggleCompact() {
   if (lp) lp.classList.toggle('compact-mode', AppState.compactMode);
   const tb = document.getElementById('toolbar');
   if (tb) tb.classList.toggle('compact-mode', AppState.compactMode);
-  
+
   const btn = document.getElementById('compact-btn');
   if (btn) btn.textContent = AppState.compactMode ? '\u25B7 Full' : '\u25C1 Compact';
-  
+
   const fbActive = document.getElementById('fb-active');
   if (fbActive) fbActive.textContent = AppState.compactMode ? 'Act' : 'Active';
-  
+
   const fbOverdue = document.getElementById('fb-overdue');
   if (fbOverdue) fbOverdue.textContent = AppState.compactMode ? 'Due' : 'Overdue';
-  
+
   const filterBtn = document.getElementById('filter-btn');
   if (filterBtn) filterBtn.textContent = AppState.compactMode ? 'Filt' : 'Filter';
 
+  _measureLeftPanel();
   render();
 }
 
@@ -6022,12 +6071,7 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
   // Hotkey hints (only for real tasks, not snapshot ghosts)
   let hotkeyHtml = '';
   if (!isGhost) {
-    hotkeyHtml = `<div style="margin-top:6px;border-top:1px solid var(--border);padding-top:4px;display:flex;gap:10px;flex-wrap:wrap;color:var(--text-mu);font-size:0.72rem;">` +
-      `<span><kbd style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:0.85em;">e</kbd> Edit</span>` +
-      `<span><kbd style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:0.85em;">c</kbd> Comments</span>` +
-      `<span><kbd style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:0.85em;">d</kbd> Add Dependent</span>` +
-      `<span><kbd style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:0.85em;">n</kbd> Duplicate</span>` +
-      `</div>`;
+    hotkeyHtml = `<div style="color:var(--text-mu); font-size:0.85em; margin-top:3px; border-top:1px solid var(--border); padding-top:2px;">e: edit  \u2022  c: comments  \u2022  d: add dependent  \u2022  n: duplicate</div>`;
   }
 
   tt.innerHTML = `${snap}<div class="tt-title">${escHtml(t.Title||'')}</div>${phaseCatHtml}${rows}${hotkeyHtml}`;
@@ -6519,9 +6563,6 @@ function _renderFilterSummary() {
   };
   const wrap = document.createElement('div');
   wrap.id = 'filter-summary';
-  // Position at left edge of the right panel
-  const rp = document.getElementById('right-panel');
-  if (rp) wrap.style.left = rp.getBoundingClientRect().left + 'px';
   Object.entries(f).forEach(([prop, vals]) => {
     if (!vals.length) return;
     vals.forEach(v => {
@@ -7069,9 +7110,11 @@ function initEvents() {
         if (e.key === 'b') { e.preventDefault(); modalSwitchBoth(); }
       } else if (!anyModalOpen) {
         if (e.key === 's') { e.preventDefault(); saveSnapshot(); }
+        if (e.key === 'x') { e.preventDefault(); exportChart(); }
         if (e.key === 'i') { e.preventDefault(); toggleInfoPanel(); }
         if (e.key === 't') { e.preventDefault(); goToday(); }
         if (e.key === 'm') { e.preventDefault(); toggleDarkMode(); }
+        if (e.key === 'p') { e.preventDefault(); cycleTheme(); }
         if (e.key === 'v') {
           e.preventDefault();
           const _views = ['week', 'month', 'year'];
@@ -7230,7 +7273,7 @@ function init(){
   const titleEl=document.getElementById('app-title');
   if(titleEl) {
     titleEl.innerHTML=`<span class="txt-full">${escHtml(trimmed)}</span><span class="txt-short">${escHtml(narrowed)}</span>`;
-    if(src.length>20) titleEl.dataset.tooltip = src;
+    if(src.length>5) titleEl.dataset.tooltip = src;
     else delete titleEl.dataset.tooltip;
   }
   const pillEl=document.getElementById('date-pill');
@@ -7263,6 +7306,10 @@ function init(){
   initDragScroll();
   initEvents();
   render();
+  // Measure immediately with whatever fonts are available, then re-measure once
+  // web fonts have finished loading (palette fonts vary widely in glyph widths).
+  _measureLeftPanel();
+  document.fonts.ready.then(() => _measureLeftPanel());
   updateScrollAnchoring();
 }
 window.addEventListener('load',init);
