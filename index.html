@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Gantt Chart (Standalone)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Outfit:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 html {
   margin: 0;
@@ -57,15 +60,24 @@ html {
   --row-task-hover: var(--surface2);
   --tooltip-bg: #ffffff;
   --modal-overlay: rgba(0, 0, 0, 0.4);
-  --modal-header-bg: var(--surface);
+  --modal-header-bg: var(--surface2);
   --timeline-line: var(--surface2);
   --timeline-grid: var(--border);
   --glow: rgba(239, 68, 68, 0.6);
+  --chart-prog: #bbf7d0;
+  --grid-minor: #f1f5f9;
+  /* Overdue severity colors — derived from palette vars so they switch automatically */
+  --overdue-recent: var(--today);
+  --overdue-mid: color-mix(in srgb, var(--today) 50%, var(--danger));
+  --overdue-old: var(--danger);
   /* Status Colors */
   --status-done: #22c55e;
   --status-on-track: #3b82f6;
   --status-behind: #ef4444;
   --status-waiting: #eab308;
+  --status-on-hold: #6b7280;
+  --pill-text: #ffffff;
+  --pill-text-active: #ffffff;
 
   /* Category Colors */
   --cat-1: #0d9488;
@@ -105,6 +117,9 @@ html {
   --status-on-track: #60a5fa;
   --status-behind: #f87171;
   --status-waiting: #fbbf24;
+  --status-on-hold: #94a3b8;
+  --pill-text: #0f172a;
+  --pill-text-active: #0f172a;
 
   /* Category Colors */
   --cat-1: #2dd4bf;
@@ -130,11 +145,587 @@ html {
   --row-task-hover: #0d1117;
   --tooltip-bg: #0d1117;
   --modal-overlay: rgba(0, 0, 0, 0.7);
-  --modal-header-bg: #0d1117;
+  --modal-header-bg: var(--surface2);
   --timeline-line: #000000;
   --timeline-grid: #0d0d0d;
   --shadow: rgba(0, 0, 0, 0.4);
   --glow: rgba(239, 68, 68, 0.6);
+  --chart-prog: #134e2a;
+  --grid-minor: #0d0d0d;
+}
+
+/* Catppuccin (Latte for Light, Macchiato/Mocha for Dark) */
+[data-palette='catppuccin'] {
+  --font: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --bg: #eff1f5;
+  --surface: #e6e9ef;
+  --surface2: #dce0e8;
+  --border: #ccd0da;
+  --border-md: #bcc0cc;
+  --text: #4c4f69;
+  --text-mu: #7c7f93;
+  --text-lt: #9ca0b0;
+  --accent: #1e66f5;
+  --today: #df8e1d;
+  --danger: #d20f39;
+  --slate-700: #8c8fa1;
+  --slate-600: #9ca0b0;
+  --green-800: #40a02b;
+  --green-900: #317f22;
+  --green-old: #40a02b;
+  --gray-500: #8c8fa1;
+  --gray-600: #7c7f93;
+
+  /* Status */
+  --status-done: #40a02b;
+  --status-on-track: #1e66f5;
+  --status-behind: #d20f39;
+  --status-waiting: #df8e1d;
+  --status-on-hold: #9ca0b0;
+  --pill-text: #ffffff;
+
+  /* Categories */
+  --cat-1: #dc8a78;
+  --cat-2: #dd7878;
+  --cat-3: #8839ef;
+  --cat-4: #d20f39;
+  --cat-5: #fe640b;
+  --cat-6: #df8e1d;
+  --cat-7: #40a02b;
+  --cat-8: #179299;
+  --cat-9: #04a5e5;
+  --cat-10: #7287fd;
+
+  --header-bg: #ccd0da;
+  --header-text: #4c4f69;
+  --pill-date-bg: #40a02b;
+  --pill-date-hover: #317f22;
+  --btn-active-bg: #bcc0cc;
+  --btn-hover-bg: #dce0e8;
+  --row-phase-bg: #ccd0da;
+  --row-phase-text: #4c4f69;
+  --row-task-hover: #e6e9ef;
+  --tooltip-bg: #e6e9ef;
+  --chart-prog: #a6d1a1;
+  --grid-minor: #dce0e8;
+}
+[data-theme='dark'][data-palette='catppuccin'] {
+  --bg: #24273a;
+  --surface: #1e2030;
+  --surface2: #181926;
+  --border: #363a4f;
+  --border-md: #494d64;
+  --text: #cad3f5;
+  --text-mu: #a5adcb;
+  --text-lt: #8087a2;
+  --accent: #8aadf4;
+  --today: #eed49f;
+  --danger: #ed8796;
+  --slate-700: #1e2030;
+  --slate-600: #181926;
+  --green-800: #8bd5ca;
+  --green-900: #a6da95;
+  --green-old: #a6da95;
+  --gray-500: #6e738d;
+  --gray-600: #8087a2;
+
+  /* Status */
+  --status-done: #a6da95;
+  --status-on-track: #8aadf4;
+  --status-behind: #ed8796;
+  --status-waiting: #eed49f;
+  --status-on-hold: #6e738d;
+  --pill-text: #24273a;
+
+  /* Categories */
+  --cat-1: #f5e0dc;
+  --cat-2: #f2cdcd;
+  --cat-3: #cba6f7;
+  --cat-4: #f38ba8;
+  --cat-5: #fab387;
+  --cat-6: #f9e2af;
+  --cat-7: #a6e3a1;
+  --cat-8: #94e2d5;
+  --cat-9: #89dceb;
+  --cat-10: #b4befe;
+
+  --header-bg: #1e2030;
+  --header-text: #cad3f5;
+  --pill-date-bg: #40a02b;
+  --pill-date-hover: #317f22;
+  --btn-active-bg: #363a4f;
+  --btn-hover-bg: #1e2030;
+  --row-phase-bg: #1e2030;
+  --row-phase-text: #cad3f5;
+  --row-task-hover: #1e2030;
+  --tooltip-bg: #181926;
+  --chart-prog: #1a4f32;
+  --grid-minor: #181926;
+}
+
+/* Catppuccin Frappé */
+[data-palette='frappe'] {
+  --font: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --bg: #303446;
+  --surface: #292c3c;
+  --surface2: #232634;
+  --border: #414559;
+  --border-md: #51576d;
+  --text: #c6d0f5;
+  --text-mu: #a5adce;
+  --text-lt: #838ba7;
+  --accent: #8caaee;
+  --today: #e5c890;
+  --danger: #e78284;
+  --slate-700: #292c3c;
+  --slate-600: #232634;
+  --green-800: #81c8be;
+  --green-900: #a6d189;
+  --green-old: #a6d189;
+  --gray-500: #626880;
+  --gray-600: #737994;
+
+  /* Status */
+  --status-done: #a6d189;
+  --status-on-track: #8caaee;
+  --status-behind: #e78284;
+  --status-waiting: #e5c890;
+  --status-on-hold: #838ba7;
+  --pill-text: #303446;
+  --pill-text-active: #303446;
+
+  /* Categories */
+  --cat-1: #e78284;
+  --cat-2: #ea999c;
+  --cat-3: #ca9ee6;
+  --cat-4: #f4b8e4;
+  --cat-5: #ef9f76;
+  --cat-6: #e5c890;
+  --cat-7: #a6d189;
+  --cat-8: #81c8be;
+  --cat-9: #85c1dc;
+  --cat-10: #babbf1;
+
+  --header-bg: #292c3c;
+  --header-text: #c6d0f5;
+  --pill-date-bg: #81c8be;
+  --pill-date-hover: #6bbcb0;
+  --btn-active-bg: #414559;
+  --btn-hover-bg: #292c3c;
+  --row-phase-bg: #292c3c;
+  --row-phase-text: #c6d0f5;
+  --row-task-hover: #292c3c;
+  --tooltip-bg: #232634;
+  --modal-header-bg: var(--surface2);
+  --chart-prog: #2e4a30;
+  --grid-minor: #232634;
+  --shadow: rgba(0,0,0,0.35);
+  --glow: rgba(231, 130, 132, 0.6);
+}
+
+
+/* GitHub Light (light mode only) */
+[data-palette='github-light'] {
+  --font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --surface2: #eaeef2;
+  --border: #d0d7de;
+  --border-md: #bcc1c7;
+  --text: #24292f;
+  --text-mu: #57606a;
+  --text-lt: #8c959f;
+  --accent: #0969da;
+  --today: #bf8700;
+  --danger: #cf222e;
+  --slate-700: #24292f;
+  --slate-600: #32383f;
+  --green-800: #1a7f37;
+  --green-900: #116329;
+  --green-old: #1a7f37;
+  --gray-500: #6e7781;
+  --gray-600: #57606a;
+
+  /* Status */
+  --status-done: #1a7f37;
+  --status-on-track: #0969da;
+  --status-behind: #cf222e;
+  --status-waiting: #bf8700;
+  --status-on-hold: #6e7781;
+  --pill-text: #ffffff;
+  --pill-text-active: #ffffff;
+
+  /* Categories */
+  --cat-1: #cf222e;
+  --cat-2: #bc4c00;
+  --cat-3: #8250df;
+  --cat-4: #0969da;
+  --cat-5: #1a7f37;
+  --cat-6: #bf8700;
+  --cat-7: #0550ae;
+  --cat-8: #8250df;
+  --cat-9: #0a3069;
+  --cat-10: #953800;
+
+  --header-bg: #24292f;
+  --header-text: #f6f8fa;
+  --pill-date-bg: #1a7f37;
+  --pill-date-hover: #116329;
+  --btn-active-bg: #24292f;
+  --btn-hover-bg: #eaeef2;
+  --row-phase-bg: #24292f;
+  --row-phase-text: #f6f8fa;
+  --row-task-hover: #f6f8fa;
+  --tooltip-bg: #ffffff;
+  --modal-header-bg: var(--surface2);
+  --chart-prog: #acf2bd;
+  --grid-minor: #eaeef2;
+}
+
+/* Ayu Light */
+[data-palette='ayu'] {
+  --font: 'Outfit', 'Segoe UI', system-ui, sans-serif;
+  --bg: #fafafa;
+  --surface: #f0f2f4;
+  --surface2: #e7e8ea;
+  --border: #e6e6e6;
+  --border-md: #d4d5d6;
+  --text: #575f66;
+  --text-mu: #8a9199;
+  --text-lt: #abb0b6;
+  --accent: #399ee6;
+  --today: #f2ae49;
+  --danger: #f07171;
+  --slate-700: #6c7a86;
+  --slate-600: #828c96;
+  --green-800: #86b300;
+  --green-900: #6a8d00;
+  --green-old: #86b300;
+  --gray-500: #8a9199;
+  --gray-600: #6c7580;
+
+  /* Status */
+  --status-done: #86b300;
+  --status-on-track: #399ee6;
+  --status-behind: #f07171;
+  --status-waiting: #f2ae49;
+  --status-on-hold: #8a9199;
+  --pill-text: #ffffff;
+  --pill-text-active: #ffffff;
+
+  /* Categories */
+  --cat-1: #f07171;
+  --cat-2: #ff8f40;
+  --cat-3: #a37acc;
+  --cat-4: #f2ae49;
+  --cat-5: #86b300;
+  --cat-6: #4cbf99;
+  --cat-7: #399ee6;
+  --cat-8: #e6ba7e;
+  --cat-9: #55b4d4;
+  --cat-10: #fa8d3e;
+
+  --header-bg: #6c7a86;
+  --header-text: #fafafa;
+  --pill-date-bg: #86b300;
+  --pill-date-hover: #6a8d00;
+  --btn-active-bg: #6c7a86;
+  --btn-hover-bg: #e7e8ea;
+  --row-phase-bg: #6c7a86;
+  --row-phase-text: #fafafa;
+  --row-task-hover: #f0f2f4;
+  --tooltip-bg: #ffffff;
+  --modal-header-bg: var(--surface2);
+  --chart-prog: #d4eeab;
+  --grid-minor: #e7e8ea;
+}
+
+/* Ayu Dark (Mirage) */
+[data-theme='dark'][data-palette='ayu'] {
+  --bg: #1f2430;
+  --surface: #191e2a;
+  --surface2: #15191f;
+  --border: #323944;
+  --border-md: #3d4751;
+  --text: #cbccc6;
+  --text-mu: #6c7e8d;
+  --text-lt: #4d5566;
+  --accent: #5ccfe6;
+  --today: #ffd173;
+  --danger: #ff6666;
+  --slate-700: #191e2a;
+  --slate-600: #232a38;
+  --green-800: #bae67e;
+  --green-900: #9acd57;
+  --green-old: #bae67e;
+  --gray-500: #6c7e8d;
+  --gray-600: #8695a5;
+
+  /* Status */
+  --status-done: #bae67e;
+  --status-on-track: #5ccfe6;
+  --status-behind: #ff6666;
+  --status-waiting: #ffd173;
+  --status-on-hold: #6c7e8d;
+  --pill-text: #1f2430;
+  --pill-text-active: #1f2430;
+
+  /* Categories */
+  --cat-1: #ff6666;
+  --cat-2: #ffad66;
+  --cat-3: #d4bfff;
+  --cat-4: #ffd173;
+  --cat-5: #bae67e;
+  --cat-6: #95e6cb;
+  --cat-7: #5ccfe6;
+  --cat-8: #f09e5a;
+  --cat-9: #73d0ff;
+  --cat-10: #ffa759;
+
+  --header-bg: #191e2a;
+  --header-text: #cbccc6;
+  --pill-date-bg: #bae67e;
+  --pill-date-hover: #9acd57;
+  --btn-active-bg: #323944;
+  --btn-hover-bg: #191e2a;
+  --row-phase-bg: #191e2a;
+  --row-phase-text: #cbccc6;
+  --row-task-hover: #191e2a;
+  --tooltip-bg: #15191f;
+  --modal-header-bg: var(--surface2);
+  --chart-prog: #1f4a20;
+  --grid-minor: #15191f;
+  --shadow: rgba(0,0,0,0.45);
+  --glow: rgba(255, 102, 102, 0.5);
+}
+
+/* Monokai (dark mode only) */
+[data-palette='monokai'] {
+  --font: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --bg: #272822;
+  --surface: #383830;
+  --surface2: #49483e;
+  --border: #3d3d30;
+  --border-md: #75715e;
+  --text: #f8f8f2;
+  --text-mu: #948d80;
+  --text-lt: #75715e;
+  --accent: #66d9e8;
+  --today: #fd971f;
+  --danger: #f92672;
+  --slate-700: #383830;
+  --slate-600: #49483e;
+  --green-800: #a6e22e;
+  --green-900: #8bc21d;
+  --green-old: #a6e22e;
+  --gray-500: #75715e;
+  --gray-600: #948d80;
+
+  /* Status */
+  --status-done: #a6e22e;
+  --status-on-track: #66d9e8;
+  --status-behind: #f92672;
+  --status-waiting: #fd971f;
+  --status-on-hold: #75715e;
+  --pill-text: #272822;
+  --pill-text-active: #272822;
+
+  /* Categories */
+  --cat-1: #f92672;
+  --cat-2: #fd971f;
+  --cat-3: #ae81ff;
+  --cat-4: #e6db74;
+  --cat-5: #a6e22e;
+  --cat-6: #66d9e8;
+  --cat-7: #e69c40;
+  --cat-8: #f4bf75;
+  --cat-9: #75dff2;
+  --cat-10: #cc6633;
+
+  --header-bg: #383830;
+  --header-text: #f8f8f2;
+  --pill-date-bg: #a6e22e;
+  --pill-date-hover: #8bc21d;
+  --btn-active-bg: #49483e;
+  --btn-hover-bg: #383830;
+  --row-phase-bg: #383830;
+  --row-phase-text: #f8f8f2;
+  --row-task-hover: #383830;
+  --tooltip-bg: #49483e;
+  --modal-header-bg: var(--surface2);
+  --chart-prog: #3a4a1a;
+  --grid-minor: #2d2d21;
+  --shadow: rgba(0,0,0,0.45);
+  --glow: rgba(249, 38, 114, 0.5);
+}
+
+/* Dracula (dark mode only) */
+[data-palette='dracula'] {
+  --font: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --bg: #282a36;
+  --surface: #21222c;
+  --surface2: #1e1f28;
+  --border: #44475a;
+  --border-md: #6272a4;
+  --text: #f8f8f2;
+  --text-mu: #6272a4;
+  --text-lt: #44475a;
+  --accent: #bd93f9;
+  --today: #ffb86c;
+  --danger: #ff5555;
+  --slate-700: #21222c;
+  --slate-600: #1e1f28;
+  --green-800: #50fa7b;
+  --green-900: #33e860;
+  --green-old: #50fa7b;
+  --gray-500: #6272a4;
+  --gray-600: #8492b8;
+
+  /* Status */
+  --status-done: #50fa7b;
+  --status-on-track: #8be9fd;
+  --status-behind: #ff5555;
+  --status-waiting: #ffb86c;
+  --status-on-hold: #6272a4;
+  --pill-text: #282a36;
+  --pill-text-active: #282a36;
+
+  /* Categories */
+  --cat-1: #ff5555;
+  --cat-2: #ffb86c;
+  --cat-3: #bd93f9;
+  --cat-4: #ff79c6;
+  --cat-5: #50fa7b;
+  --cat-6: #f1fa8c;
+  --cat-7: #8be9fd;
+  --cat-8: #6272a4;
+  --cat-9: #caa9fa;
+  --cat-10: #ff6e6e;
+
+  --header-bg: #21222c;
+  --header-text: #f8f8f2;
+  --pill-date-bg: #50fa7b;
+  --pill-date-hover: #33e860;
+  --btn-active-bg: #44475a;
+  --btn-hover-bg: #21222c;
+  --row-phase-bg: #21222c;
+  --row-phase-text: #f8f8f2;
+  --row-task-hover: #21222c;
+  --tooltip-bg: #1e1f28;
+  --modal-header-bg: var(--surface2);
+  --chart-prog: #1a4a2a;
+  --grid-minor: #1e1f28;
+  --shadow: rgba(0,0,0,0.45);
+  --glow: rgba(255, 85, 85, 0.5);
+}
+
+/* Kanagawa (Lotus for Light, Wave for Dark) */
+[data-palette='kanagawa'] {
+  --font: 'Lora', 'Georgia', serif;
+  --bg: #f2ecbc;
+  --surface: #eee6ba;
+  --surface2: #e5dca5;
+  --border: #d5cea3;
+  --border-md: #c5c0a2;
+  --text: #545464;
+  --text-mu: #43436c;
+  --text-lt: #716e61;
+  --accent: #4d699b;
+  --today: #77713f;
+  --danger: #c84053;
+  --slate-700: #c5c0a2;
+  --slate-600: #d5cea3;
+  --green-800: #6f894e;
+  --green-900: #586d3d;
+  --green-old: #6f894e;
+  --gray-500: #545464;
+  --gray-600: #43436c;
+
+  /* Status */
+  --status-done: #6f894e;
+  --status-on-track: #4d699b;
+  --status-behind: #c84053;
+  --status-waiting: #77713f;
+  --status-on-hold: #716e61;
+  --pill-text: #ffffff;
+
+  /* Categories */
+  --cat-1: #c84053;
+  --cat-2: #D27E99;
+  --cat-3: #957FB8;
+  --cat-4: #938AA9;
+  --cat-5: #E6C384;
+  --cat-6: #C0A36E;
+  --cat-7: #98BB6C;
+  --cat-8: #76946A;
+  --cat-9: #7E9CD8;
+  --cat-10: #7FB4CA;
+
+  --header-bg: #d5cea3;
+  --header-text: #43436c;
+  --pill-date-bg: #6f894e;
+  --pill-date-hover: #586d3d;
+  --btn-active-bg: #c5c0a2;
+  --btn-hover-bg: #e5dca5;
+  --row-phase-bg: #d5cea3;
+  --row-phase-text: #43436c;
+  --row-task-hover: #eee6ba;
+  --tooltip-bg: #eee6ba;
+  --chart-prog: #c5d4b5;
+  --grid-minor: #e5dca5;
+}
+[data-theme='dark'][data-palette='kanagawa'] {
+  --bg: #1f1f28;
+  --surface: #16161D;
+  --surface2: #2A2A37;
+  --border: #363646;
+  --border-md: #54546D;
+  --text: #dcd7ba;
+  --text-mu: #727169;
+  --text-lt: #54546d;
+  --accent: #7e9cd8;
+  --today: #e6c384;
+  --danger: #c34043;
+  --slate-700: #16161d;
+  --slate-600: #1f1f28;
+  --green-800: #76946a;
+  --green-900: #98bb6c;
+  --green-old: #98bb6c;
+  --gray-500: #727169;
+  --gray-600: #54546d;
+
+  /* Status */
+  --status-done: #98bb6c;
+  --status-on-track: #7e9cd8;
+  --status-behind: #e82424;
+  --status-waiting: #e6c384;
+  --status-on-hold: #727169;
+  --pill-text: #1f1f28;
+
+  /* Categories */
+  --cat-1: #c34043;
+  --cat-2: #D27E99;
+  --cat-3: #957FB8;
+  --cat-4: #938AA9;
+  --cat-5: #E6C384;
+  --cat-6: #C0A36E;
+  --cat-7: #98BB6C;
+  --cat-8: #76946A;
+  --cat-9: #7E9CD8;
+  --cat-10: #7FB4CA;
+
+  --header-bg: #16161D;
+  --header-text: #dcd7ba;
+  --pill-date-bg: #76946a;
+  --pill-date-hover: #586d3d;
+  --btn-active-bg: #2A2A37;
+  --btn-hover-bg: #16161D;
+  --row-phase-bg: #16161D;
+  --row-phase-text: #dcd7ba;
+  --row-task-hover: #16161D;
+  --tooltip-bg: #2A2A37;
+  --chart-prog: #274730;
+  --grid-minor: #16161d;
 }
 
 [data-theme='dark'] .left-row.category-row {
@@ -323,7 +914,7 @@ body {
 }
 
 .today-btn:hover {
-  background: #eff6ff
+  background: color-mix(in srgb, var(--accent) 15%, var(--bg))
 }
 
 .toolbar-center .btn {
@@ -694,92 +1285,92 @@ select#compare-sel {
 
 /* Status chip colors */
 .filter-chip[data-prop="status"][data-value="done"] {
-  color: #22c55e;
-  border-color: #22c55e
+  color: var(--status-done);
+  border-color: var(--status-done)
 }
 
 .filter-chip[data-prop="status"][data-value="done"].active {
-  background: #22c55e;
-  color: #fff;
-  border-color: #22c55e
+  background: var(--status-done);
+  color: var(--pill-text-active);
+  border-color: var(--status-done)
 }
 
 .filter-chip[data-prop="status"][data-value="on track"] {
-  color: #3b82f6;
-  border-color: #3b82f6
+  color: var(--status-on-track);
+  border-color: var(--status-on-track)
 }
 
 .filter-chip[data-prop="status"][data-value="on track"].active {
-  background: #3b82f6;
-  color: #fff;
-  border-color: #3b82f6
+  background: var(--status-on-track);
+  color: var(--pill-text-active);
+  border-color: var(--status-on-track)
 }
 
 .filter-chip[data-prop="status"][data-value="behind"] {
-  color: #ef4444;
-  border-color: #ef4444
+  color: var(--status-behind);
+  border-color: var(--status-behind)
 }
 
 .filter-chip[data-prop="status"][data-value="behind"].active {
-  background: #ef4444;
-  color: #fff;
-  border-color: #ef4444
+  background: var(--status-behind);
+  color: var(--pill-text-active);
+  border-color: var(--status-behind)
 }
 
 .filter-chip[data-prop="status"][data-value="waiting"] {
-  color: #eab308;
-  border-color: #eab308
+  color: var(--status-waiting);
+  border-color: var(--status-waiting)
 }
 
 .filter-chip[data-prop="status"][data-value="waiting"].active {
-  background: #eab308;
-  color: #fff;
-  border-color: #eab308
+  background: var(--status-waiting);
+  color: var(--pill-text-active);
+  border-color: var(--status-waiting)
 }
 
 .filter-chip[data-prop="status"][data-value="on hold"] {
-  color: #6b7280;
-  border-color: #6b7280
+  color: var(--status-on-hold);
+  border-color: var(--status-on-hold)
 }
 
 .filter-chip[data-prop="status"][data-value="on hold"].active {
-  background: #6b7280;
-  color: #fff;
-  border-color: #6b7280
+  background: var(--status-on-hold);
+  color: var(--pill-text-active);
+  border-color: var(--status-on-hold)
 }
 
 /* Priority chip colors */
 .filter-chip[data-prop="priority"][data-value="High"] {
-  color: #ef4444;
-  border-color: #ef4444
+  color: var(--status-behind);
+  border-color: var(--status-behind)
 }
 
 .filter-chip[data-prop="priority"][data-value="High"].active {
-  background: #ef4444;
-  color: #fff;
-  border-color: #ef4444
+  background: var(--status-behind);
+  color: var(--pill-text-active);
+  border-color: var(--status-behind)
 }
 
 .filter-chip[data-prop="priority"][data-value="Medium"] {
-  color: #f97316;
-  border-color: #f97316
+  color: var(--status-waiting);
+  border-color: var(--status-waiting)
 }
 
 .filter-chip[data-prop="priority"][data-value="Medium"].active {
-  background: #f97316;
-  color: #fff;
-  border-color: #f97316
+  background: var(--status-waiting);
+  color: var(--pill-text-active);
+  border-color: var(--status-waiting)
 }
 
 .filter-chip[data-prop="priority"][data-value="Low"] {
-  color: #22c55e;
-  border-color: #22c55e
+  color: var(--status-done);
+  border-color: var(--status-done)
 }
 
 .filter-chip[data-prop="priority"][data-value="Low"].active {
-  background: #22c55e;
-  color: #fff;
-  border-color: #22c55e
+  background: var(--status-done);
+  color: var(--pill-text-active);
+  border-color: var(--status-done)
 }
 
 #filter-summary {
@@ -831,89 +1422,85 @@ select#compare-sel {
 
 /* Summary chip colors matching filter-chip colors */
 .filter-summary-chip[data-prop="status"][data-value="done"] {
-  background: rgba(34, 197, 94, .12);
-  color: #22c55e;
-  border-color: rgba(34, 197, 94, .35)
+  background: color-mix(in srgb, var(--status-done) 12%, transparent);
+  color: var(--status-done);
+  border-color: color-mix(in srgb, var(--status-done) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="done"]:hover {
-  background: rgba(34, 197, 94, .25)
+  background: color-mix(in srgb, var(--status-done) 25%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="on track"] {
-  background: rgba(59, 130, 246, .12);
-  color: #3b82f6;
-  border-color: rgba(59, 130, 246, .35)
+  background: color-mix(in srgb, var(--status-on-track) 12%, transparent);
+  color: var(--status-on-track);
+  border-color: color-mix(in srgb, var(--status-on-track) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="on track"]:hover {
-  background: rgba(59, 130, 246, .25)
+  background: color-mix(in srgb, var(--status-on-track) 25%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="behind"] {
-  background: rgba(239, 68, 68, .12);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, .35)
+  background: color-mix(in srgb, var(--status-behind) 12%, transparent);
+  color: var(--status-behind);
+  border-color: color-mix(in srgb, var(--status-behind) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="behind"]:hover {
-  background: rgba(239, 68, 68, .25)
+  background: color-mix(in srgb, var(--status-behind) 25%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="waiting"] {
-  background: rgba(234, 179, 8, .12);
-  color: #eab308;
-  border-color: rgba(234, 179, 8, .35)
+  background: color-mix(in srgb, var(--status-waiting) 12%, transparent);
+  color: var(--status-waiting);
+  border-color: color-mix(in srgb, var(--status-waiting) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="waiting"]:hover {
-  background: rgba(234, 179, 8, .25)
+  background: color-mix(in srgb, var(--status-waiting) 25%, transparent)
 }
 
-.filter-summary-chip[data-prop="status"][data-value="on hold"] {
-  background: rgba(107, 114, 128, .12);
-  color: #6b7280;
-  border-color: rgba(107, 114, 128, .35)
-}
-
-.filter-summary-chip[data-prop="status"][data-value="on hold"]:hover {
-  background: rgba(107, 114, 128, .25)
-}
-
+.filter-summary-chip[data-prop="status"][data-value="on hold"],
 .filter-summary-chip[data-prop="status"][data-value=""] {
-  background: rgba(107, 114, 128, .12);
-  color: #6b7280;
-  border-color: rgba(107, 114, 128, .35)
+  background: color-mix(in srgb, var(--status-on-hold) 12%, transparent);
+  color: var(--status-on-hold);
+  border-color: color-mix(in srgb, var(--status-on-hold) 35%, transparent)
+}
+
+.filter-summary-chip[data-prop="status"][data-value="on hold"]:hover,
+.filter-summary-chip[data-prop="status"][data-value=""]:hover {
+  background: color-mix(in srgb, var(--status-on-hold) 25%, transparent)
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="High"] {
-  background: rgba(239, 68, 68, .12);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, .35)
+  background: color-mix(in srgb, var(--status-behind) 12%, transparent);
+  color: var(--status-behind);
+  border-color: color-mix(in srgb, var(--status-behind) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="High"]:hover {
-  background: rgba(239, 68, 68, .25)
+  background: color-mix(in srgb, var(--status-behind) 25%, transparent)
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="Medium"] {
-  background: rgba(249, 115, 22, .12);
-  color: #f97316;
-  border-color: rgba(249, 115, 22, .35)
+  background: color-mix(in srgb, var(--status-waiting) 12%, transparent);
+  color: var(--status-waiting);
+  border-color: color-mix(in srgb, var(--status-waiting) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="Medium"]:hover {
-  background: rgba(249, 115, 22, .25)
+  background: color-mix(in srgb, var(--status-waiting) 25%, transparent)
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="Low"] {
-  background: rgba(34, 197, 94, .12);
-  color: #22c55e;
-  border-color: rgba(34, 197, 94, .35)
+  background: color-mix(in srgb, var(--status-done) 12%, transparent);
+  color: var(--status-done);
+  border-color: color-mix(in srgb, var(--status-done) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="Low"]:hover {
-  background: rgba(34, 197, 94, .25)
+  background: color-mix(in srgb, var(--status-done) 25%, transparent)
 }
 
 #left-rows {
@@ -1004,11 +1591,12 @@ select#compare-sel {
   font-size: .72rem;
   text-transform: uppercase;
   letter-spacing: .4px;
-  color: #f8fafc
+  color: inherit
 }
 
 .left-row.phase-row .chevron {
-  color: #94a3b8
+  color: inherit;
+  opacity: 0.7;
 }
 
 .left-row.category-row {
@@ -1278,6 +1866,75 @@ select#compare-sel {
     max-width: 140px;
     font-size: .7rem
   }
+}
+
+/* Responsive tweaks for Info Modal */
+@media (max-width: 650px) {
+  #info-panel {
+    width: 90%;
+    margin-top: 10px;
+  }
+}
+
+/* Floating Button Group (theme + dark mode toggle) */
+.floating-btn-group {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  z-index: 10000;
+}
+
+.floating-dark-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 23px;
+  background: var(--surface2);
+  border: 1px solid var(--border-md);
+  color: var(--text);
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.floating-dark-btn:hover {
+  transform: scale(1.08);
+  background: var(--btn-hover-bg);
+}
+
+.floating-theme-btn {
+  width: auto;
+  min-width: 46px;
+  padding: 0 16px;
+  height: 46px;
+  border-radius: 23px;
+  background: var(--surface2);
+  border: 1px solid var(--border-md);
+  color: var(--text);
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.floating-theme-btn:hover {
+  transform: scale(1.08);
+  background: var(--btn-hover-bg);
+}
+
+[data-theme='dark'] .floating-dark-btn,
+[data-theme='dark'] .floating-theme-btn {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
 @media(max-width:720px) {
@@ -1958,44 +2615,23 @@ details.info-section[open] .info-section-heading::after {
 
 .btn-primary {
   background: var(--accent);
-  color: white;
+  color: var(--bg);
   border-color: var(--accent);
 }
 
 .btn-primary:hover {
-  background: #0369a1;
-}
-
-[data-theme='dark'] .btn-primary {
-  background: #0c4a6e;
-  border-color: #38bdf8;
-  color: #e0f2fe;
-}
-
-[data-theme='dark'] .btn-primary:hover {
-  background: #164e63;
+  background: color-mix(in srgb, var(--accent) 80%, black);
 }
 
 .btn-delete {
-  color: #dc2626;
-  border-color: #fca5a5;
-  background: #fef2f2;
+  color: #fff;
+  border-color: var(--danger);
+  background: var(--danger);
 }
 
 .btn-delete:hover {
-  background: #fee2e2;
-  border-color: #f87171;
-}
-
-[data-theme='dark'] .btn-delete {
-  color: #fca5a5;
-  border-color: #7f1d1d;
-  background: #1c0606;
-}
-
-[data-theme='dark'] .btn-delete:hover {
-  background: #2d0a0a;
-  border-color: #f87171;
+  background: color-mix(in srgb, var(--danger) 85%, black);
+  border-color: color-mix(in srgb, var(--danger) 85%, black);
 }
 
 .add-task-btn {
@@ -2477,23 +3113,20 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <div class="toolbar-right">
       <span id="unsaved-warning" class="unsaved-warning" style="display:none;"><span class="txt-full">Unsaved
           Changes</span><span class="txt-short">Unsaved</span></span>
-      <button class="btn" id="darkmode-btn" data-action="toggleDarkMode"
-        style="margin-right:12px; border-color:#64748b; color:#64748b;"
-        data-tooltip="Toggle dark/light mode">&#9789;</button>
       <label id="autosave-wrapper"
         style="display:none; align-items:center; gap:6px; margin-right:12px; font-size:0.8rem; color:var(--text-mu); cursor:pointer;"
         data-tooltip="Automatically save changes to Excel">
         <input type="checkbox" id="autosave-toggle" data-action="toggleAutoSave"> Auto-save
       </label>
       <button class="btn" id="save-btn" data-action="saveSnapshot"
-        style="margin-right:12px; border-color:#16a34a; color:#16a34a;"
+        style="margin-right:12px; border-color:var(--status-done); color:var(--status-done);"
         data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file."
         data-shortcut="s: save">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short txt-min"> S</span></button>
       <button class="btn" id="export-btn" data-action="exportChart"
-        style="margin-right:12px; border-color:#2563eb; color:#2563eb;"
+        style="margin-right:12px; border-color:var(--status-on-track); color:var(--status-on-track);"
         data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart.">&#128228;<span
           class="txt-full"> Export Chart</span><span class="txt-short txt-min"> E</span></button>
-      <button class="btn" id="info-btn" data-action="toggleInfoPanel" style="border-color:#d97706; color:#d97706;"
+      <button class="btn" id="info-btn" data-action="toggleInfoPanel" style="border-color:var(--status-waiting); color:var(--status-waiting);"
         data-tooltip="View application info and version">&#10067;<span class="txt-full"> Info</span><span class="txt-short txt-min"> I</span></button>
     </div>
   </header>
@@ -2728,8 +3361,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <details class="info-section">
         <summary class="info-section-heading">Icon Legend</summary>
         <ul style="list-style-type:none; padding-left:0; line-height:1.9;">
-          <li><span style="font-size:0.85rem;">&#x1F6A9;</span> &ensp;Open Phase Milestone</li>
-          <li><span style="font-size:0.85rem;">&#x1F3C6;</span> &ensp;Completed Phase Milestone</li>
+          <li><span style="color:var(--status-behind); font-size:0.85rem; font-weight:bold;">&#x2691;</span> &ensp;Open Phase Milestone (red flag)</li>
+          <li><span style="color:var(--status-done); font-size:0.85rem; font-weight:bold;">&#x2691;</span> &ensp;Completed Phase Milestone (green flag)</li>
           <li><span style="color:#16a34a; font-weight:bold;">&#x2713;</span> &ensp;Done items count (category row)</li>
           <li><span style="color:#dc2626; font-weight:bold;">&#x26A0;&#xFE0F;</span> &ensp;Overdue items count (category
             row)</li>
@@ -2946,7 +3579,6 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   </div>
 </div>
 
-<!-- Rename Modal -->
 <div id="rename-modal-overlay" class="modal-overlay" style="display:none;">
   <div class="modal" style="width:340px;">
     <div class="modal-header" style="display:flex; align-items:center;">
@@ -2969,13 +3601,20 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   </div>
 </div>
 
+<div class="floating-btn-group">
+  <button id="darkmode-btn" class="floating-dark-btn" data-tooltip="Toggle dark/light mode" data-action="toggleDarkMode">&#9789;</button>
+  <button id="theme-cycle-btn" class="floating-theme-btn" data-tooltip="Cycle Color Theme" data-action="cycleTheme">
+    &#127912; <span id="theme-cycle-label" style="font-size: 1rem; margin-left: 8px; font-weight: 700;">Default</span>
+  </button>
+</div>
+
 <div id="toast-container" class="toast-container"></div>
 <script>
 
 window.IS_EXPORTED = false;
 let DATA = /*__GANTT_DATA__*/{ tasks: [], snapshots: {}, meta: { source_file: 'None' } };
-const STATUS_COLORS = {"done": "#22c55e", "on track": "#3b82f6", "behind": "#ef4444", "waiting": "#eab308", "on hold": "#6b7280"};
-const CAT_COLORS    = ["#0d9488", "#d97706", "#0284c7", "#e11d48", "#65a30d", "#ea580c", "#0891b2", "#db2777", "#059669", "#4338ca"];
+const STATUS_COLORS = {"done": "var(--status-done)", "on track": "var(--status-on-track)", "behind": "var(--status-behind)", "waiting": "var(--status-waiting)", "on hold": "var(--status-on-hold)"};
+const CAT_COLORS    = ["var(--cat-1)", "var(--cat-2)", "var(--cat-3)", "var(--cat-4)", "var(--cat-5)", "var(--cat-6)", "var(--cat-7)", "var(--cat-8)", "var(--cat-9)", "var(--cat-10)"];
 
 function getExampleData() {
     const today = new Date();
@@ -3270,7 +3909,7 @@ function overdueInfo(task, today) {
   if (!end || end >= today) return null;
   const days = dayDiff(end, today);
   const label = days < 7 ? `${days}d late` : days < 30 ? `${Math.round(days/7)}w late` : `${Math.round(days/30)}mo late`;
-  const color = days < 7 ? '#92400e' : days < 30 ? '#c2410c' : '#b91c1c';
+  const color = days < 7 ? 'var(--overdue-recent)' : days < 30 ? 'var(--overdue-mid)' : 'var(--overdue-old)';
   return { days, label, color };
 }
 function hasCustomFilters() {
@@ -4297,7 +4936,37 @@ function toggleDarkMode() {
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('gantt-theme', next);
   _updateDarkmodeBtn(next === 'dark');
+  // Apply the palette saved for the new mode
+  const modeKey = next === 'dark' ? 'gantt_palette_dark' : 'gantt_palette_light';
+  const palette = localStorage.getItem(modeKey) || 'default';
+  document.documentElement.setAttribute('data-palette', palette);
+  _updateThemeLabel(palette);
   render();
+}
+
+const THEME_PALETTES_LIGHT = ['default', 'catppuccin', 'github-light', 'ayu', 'kanagawa'];
+const THEME_PALETTES_DARK  = ['default', 'catppuccin', 'frappe', 'monokai', 'dracula', 'ayu', 'kanagawa'];
+function cycleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const modeKey = isDark ? 'gantt_palette_dark' : 'gantt_palette_light';
+  const palettes = isDark ? THEME_PALETTES_DARK : THEME_PALETTES_LIGHT;
+  let current = document.documentElement.getAttribute('data-palette') || 'default';
+  // If current palette isn't valid for this mode, reset to start
+  let idx = palettes.indexOf(current);
+  if (idx === -1) idx = 0;
+  const next = palettes[(idx + 1) % palettes.length];
+  document.documentElement.setAttribute('data-palette', next);
+  localStorage.setItem(modeKey, next);
+  localStorage.setItem('gantt_palette', next);
+  _updateThemeLabel(next);
+  render();
+}
+
+function _updateThemeLabel(palette) {
+  const labelTag = document.getElementById('theme-cycle-label');
+  if (!labelTag) return;
+  const labels = { default: 'Default', catppuccin: 'Catppuccin', frappe: 'Frappé', 'github-light': 'GitHub Light', ayu: 'Ayu', monokai: 'Monokai', dracula: 'Dracula', kanagawa: 'Kanagawa' };
+  labelTag.textContent = labels[palette] || (palette.charAt(0).toUpperCase() + palette.slice(1));
 }
 
 function _updateDarkmodeBtn(isDark) {
@@ -4309,16 +4978,27 @@ function _updateDarkmodeBtn(isDark) {
 }
 
 function initTheme() {
-  const stored = localStorage.getItem('gantt-theme');
+  const storedTheme = localStorage.getItem('gantt-theme');
   let theme = '';
-  if (stored !== null) {
-    theme = stored;
+  if (storedTheme !== null) {
+    theme = storedTheme;
   } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     theme = 'dark';
   }
   document.documentElement.setAttribute('data-theme', theme);
   _updateDarkmodeBtn(theme === 'dark');
+
+  // Load per-mode palette; fall back to legacy 'gantt_palette' for existing users
+  const modeKey = theme === 'dark' ? 'gantt_palette_dark' : 'gantt_palette_light';
+  const legacyPalette = localStorage.getItem('gantt_palette') || 'default';
+  let palette = localStorage.getItem(modeKey) || legacyPalette;
+  // Guard: reject legacy palette if it's incompatible with the current mode (e.g. dark-only theme loaded in light mode)
+  const _validPalettes = theme === 'dark' ? THEME_PALETTES_DARK : THEME_PALETTES_LIGHT;
+  if (!_validPalettes.includes(palette)) palette = 'default';
+  document.documentElement.setAttribute('data-palette', palette);
+  _updateThemeLabel(palette);
 }
+
 
 initTheme();
 
@@ -4611,16 +5291,16 @@ function renderLeft(visible, today, statsMap) {
         msBadges.style.cssText = 'display:inline-flex;align-items:center;gap:5px;margin-left:auto;padding-right:4px;flex-shrink:0;';
         if (openMilestones.length > 0) {
           const badge = document.createElement('span');
-          badge.style.cssText = 'font-size:.7rem;font-weight:700;color:#b45309;background:#fef3c7;border:1px solid #fbbf24;border-radius:10px;padding:1px 6px;white-space:nowrap;cursor:pointer;';
-          badge.innerHTML = '\uD83D\uDEA9\u2009' + openMilestones.length; // 🚩 N
+          badge.style.cssText = 'font-size:.75rem;font-weight:700;color:var(--row-phase-text);padding:0 2px;white-space:nowrap;cursor:pointer;';
+          badge.innerHTML = `<span style="color:var(--status-behind)">\u2691</span>\u2009${openMilestones.length}`; // ⚑ N (closed flag, red; count in phase text)
           badge.addEventListener('mousemove', e => showFlyoutTooltip(e, openMilestones, openMilestones.length + ' open milestone' + (openMilestones.length > 1 ? 's' : '')));
           badge.addEventListener('mouseleave', hideTooltip);
           msBadges.appendChild(badge);
         }
         if (doneMilestones.length > 0) {
           const badge = document.createElement('span');
-          badge.style.cssText = 'font-size:.7rem;font-weight:700;color:#15803d;background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:1px 6px;white-space:nowrap;cursor:pointer;';
-          badge.innerHTML = '\uD83C\uDFC6\u2009' + doneMilestones.length; // 🏆 N
+          badge.style.cssText = 'font-size:.75rem;font-weight:700;color:var(--row-phase-text);padding:0 2px;white-space:nowrap;cursor:pointer;';
+          badge.innerHTML = `<span style="color:var(--status-done)">\u2691</span>\u2009${doneMilestones.length}`; // ⚑ N (closed flag, green; count in phase text)
           badge.addEventListener('mousemove', e => showFlyoutTooltip(e, doneMilestones, doneMilestones.length + ' completed milestone' + (doneMilestones.length > 1 ? 's' : '')));
           badge.addEventListener('mouseleave', hideTooltip);
           msBadges.appendChild(badge);
@@ -4644,8 +5324,8 @@ function renderLeft(visible, today, statsMap) {
         const doneMs = phaseTasks.filter(t => isDoneTask(t)).length;
         const openMs = phaseTasks.filter(t => !isDoneTask(t)).length;
         let htmlContext = `<b>${escHtml(r.phase)}</b>`;
-        if (openMs > 0) htmlContext += `<br/><span style="color:#b45309;font-weight:700">\uD83D\uDEA9\u2009${openMs}</span> open milestone${openMs>1?'s':''}`;
-        if (doneMs > 0) htmlContext += `<br/><span style="color:#15803d;font-weight:700">\uD83C\uDFC6\u2009${doneMs}</span> completed milestone${doneMs>1?'s':''}`;
+        if (openMs > 0) htmlContext += `<br/><span style="color:var(--status-behind);font-weight:700">\u2691</span>\u2009${openMs} open milestone${openMs>1?'s':''}`;
+        if (doneMs > 0) htmlContext += `<br/><span style="color:var(--status-done);font-weight:700">\u2691</span>\u2009${doneMs} completed milestone${doneMs>1?'s':''}`;
         div.onmousemove = e => showHTMLTooltip(e, htmlContext);
         div.onmouseleave = hideTooltip;
       }
@@ -4653,7 +5333,7 @@ function renderLeft(visible, today, statsMap) {
     div.onclick = () => togglePhase(r.phase);
   } else if (r.type==='category') {
       div.classList.add(r.ghost ? 'ghost-cat' : 'category-row');
-      const catColorStr = r.ghost ? '#ccc' : r.color;
+      const catColorStr = r.ghost ? 'var(--border-md)' : r.color;
       div.style.borderLeft = '4px solid ' + catColorStr;
       div.style.borderTop = '2px solid ' + catColorStr;
       div.style.paddingLeft = '12px';
@@ -4668,10 +5348,10 @@ function renderLeft(visible, today, statsMap) {
         stats.dataset.tooltip = `${st.total} total | ${st.active} active | ${st.overdue} overdue | ${st.done} done`;
         const parts = [];
         if (!AppState.compactMode) {
-            if (st.active  > 0) parts.push(`<span style="color:#2563eb">\u25cf\u202f${st.active}</span>`);
-            if (st.done    > 0) parts.push(`<span style="color:#16a34a">\u2713\u202f${st.done}</span>`);
+            if (st.active  > 0) parts.push(`<span style="color:var(--status-on-track)">\u25cf\u202f${st.active}</span>`);
+            if (st.done    > 0) parts.push(`<span style="color:var(--status-done)">\u2713\u202f${st.done}</span>`);
         }
-        if (st.overdue > 0) parts.push(`<span style="color:#dc2626">\u26a0\ufe0f\u202f${st.overdue}</span>`);
+        if (st.overdue > 0) parts.push(`<span style="color:var(--status-behind)">\u26a0\ufe0f\u202f${st.overdue}</span>`);
         if (parts.length) { stats.innerHTML = parts.join('\u2009'); lbl.appendChild(stats); }
     }
     div.appendChild(lbl);
@@ -4690,9 +5370,9 @@ function renderLeft(visible, today, statsMap) {
         const catColorStr = r.color;
         let htmlContext = `<div style="margin-bottom:4px;"><b>${escHtml(r.phase)} \xBB <span style="color:${catColorStr};">${escHtml(r.cat)}</span></b></div>`;
         htmlContext += `${st.total} total`;
-        if (st.active > 0) htmlContext += ` | <span style="color:#2563eb">\u25cf\u202f${st.active}</span> active`;
-        if (st.overdue > 0) htmlContext += ` | <span style="color:#dc2626">\u26a0\ufe0f\u202f${st.overdue}</span> overdue`;
-        if (st.done > 0) htmlContext += ` | <span style="color:#16a34a">\u2713\u202f${st.done}</span> done`;
+        if (st.active > 0) htmlContext += ` | <span style="color:var(--status-on-track)">\u25cf\u202f${st.active}</span> active`;
+        if (st.overdue > 0) htmlContext += ` | <span style="color:var(--status-behind)">\u26a0\ufe0f\u202f${st.overdue}</span> overdue`;
+        if (st.done > 0) htmlContext += ` | <span style="color:var(--status-done)">\u2713\u202f${st.done}</span> done`;
         div.onmousemove = e => showHTMLTooltip(e, htmlContext);
         div.onmouseleave = hideTooltip;
       }
@@ -4701,7 +5381,7 @@ function renderLeft(visible, today, statsMap) {
   } else {
       div.classList.add('task-row');
       if (r.ghost) div.classList.add('ghost-row');
-      const taskColorStr = r.ghost ? '#ccc' : r.color;
+      const taskColorStr = r.ghost ? 'var(--border-md)' : r.color;
       div.style.borderLeft = '2px solid ' + taskColorStr;
       div.style.paddingLeft = '26px';
       const lbl = document.createElement('div'); lbl.className='row-label';
@@ -4710,8 +5390,8 @@ function renderLeft(visible, today, statsMap) {
       const dispTaskTitle = rawTaskTitle.replace(/\(milestone\)/gi,'').trim();
       titleSpan.textContent = (r.ghost?'\u27f3 ':'')+trimTitle(dispTaskTitle, AppState.compactMode, 7);
       titleSpan.dataset.tooltip = rawTaskTitle;
-      titleSpan.style.background = _leftDark ? '#000' : '#fff';
-      titleSpan.style.color = _leftDark ? '#f1f5f9' : '#000';
+      titleSpan.style.background = 'var(--bg)';
+      titleSpan.style.color = 'var(--text)';
       titleSpan.style.border = '1px solid ' + taskColorStr;
       titleSpan.style.borderRadius = '8px';
       titleSpan.style.padding = '1px 7px';
@@ -4730,18 +5410,16 @@ function renderLeft(visible, today, statsMap) {
         if (ov) {
           const tag = document.createElement('span'); tag.className = 'overdue-tag';
           // Use brighter colors in dark mode so the tag is legible on dark backgrounds
-          tag.style.color = _leftDark
-            ? (ov.days < 7 ? '#fbbf24' : ov.days < 30 ? '#fb923c' : '#f87171')
-            : ov.color;
+          tag.style.color = ov.color;
           tag.textContent = `(${ov.label})`; lbl.appendChild(tag);
         }
 
         const rawTaskTitle = r.task.Title || '';
         let htmlContext = `<b>${escHtml(rawTaskTitle)}</b>`;
         if (/\(milestone\)/i.test(rawTaskTitle)) {
-           htmlContext += ` <span style="background:#b45309;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;font-size:10px;font-weight:bold;margin-left:4px;vertical-align:text-bottom;">M</span>`;
+           htmlContext += ` <span style="background:var(--status-waiting);color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;font-size:10px;font-weight:bold;margin-left:4px;vertical-align:text-bottom;">M</span>`;
         }
-        if (r.task.Status) htmlContext += `<br/><span style="display:inline-block;padding:2px 8px;border-radius:10px;color:#fff;background:${sc};font-size:0.65rem;font-weight:bold;margin-top:6px;margin-bottom:2px;">${escHtml(r.task.Status)}</span>`;
+        if (r.task.Status) htmlContext += `<br/><span style="display:inline-block;padding:2px 8px;border-radius:10px;color:var(--pill-text);background:${sc};font-size:0.65rem;font-weight:bold;margin-top:6px;margin-bottom:2px;">${escHtml(r.task.Status)}</span>`;
         if (ov) { htmlContext += ` <span style="color:${ov.color};font-weight:bold;font-size:0.65rem;">(${ov.label})</span>`; }
         htmlContext += `<div style="color:var(--text-mu); font-size:0.85em; margin-top:3px; border-top:1px solid var(--border); padding-top:2px;">e: edit  \u2022  c: comments  \u2022  d: dependent  \u2022  n: duplicate</div>`;
         titleSpan.dataset.shortcut = 'e: edit  \u2022  c: comments  \u2022  d: dependent  \u2022  n: duplicate';
@@ -4790,7 +5468,7 @@ function _buildDepOptions(depSel, excludeId) {
 // ── Bar hover overlay helpers ─────────────────────────────────────────
 function _clearDepArrowHighlight() {
   if (AppState._highlightedDepArrow) {
-    AppState._highlightedDepArrow.setAttribute('stroke', '#94a3b8');
+    AppState._highlightedDepArrow.setAttribute('stroke', 'var(--text-lt)');
     AppState._highlightedDepArrow.setAttribute('stroke-width', '1.5');
     AppState._highlightedDepArrow.setAttribute('marker-end', 'url(#arr)');
     AppState._highlightedDepArrow = null;
@@ -4825,7 +5503,7 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
       const allArrows = svg.querySelectorAll('[data-dep-child-id]');
       allArrows.forEach(a => {
         if (a.getAttribute('data-dep-child-id') === childId) {
-          a.setAttribute('stroke', '#f59e0b');
+          a.setAttribute('stroke', 'var(--status-waiting)');
           a.setAttribute('stroke-width', '2.5');
           a.setAttribute('marker-end', 'url(#arr-hi)');
           a.parentNode.appendChild(a); // bring to front
@@ -4903,26 +5581,26 @@ function renderChart(visible, today) {
 
   // Dark mode color palette for SVG elements
   const _dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const _barBg      = _dark ? '#000000' : '#ffffff';
-  const _ghostBg    = _dark ? '#0a0a0a' : '#f8fafc';
-  const _ghostProg  = _dark ? '#2a2a2a' : '#cbd5e1';
-  const _normProg   = _dark ? '#134e2a' : '#bbf7d0';
-  const _barText    = _dark ? '#f1f5f9' : '#1e293b';
-  const _gridMajor  = _dark ? '#1c1c1c' : '#e2e8f0';
-  const _gridMinor  = _dark ? '#0d0d0d' : '#f1f5f9';
-  const _gridWeek   = _dark ? '#181818' : '#cbd5e1';
-  const _rowSep     = _dark ? '#181818' : '#cbd5e1';
-  const _headMinor  = _dark ? '#1a1a1a' : '#f1f5f9';
+  const _barBg      = 'var(--bg)';
+  const _ghostBg    = 'var(--surface)';
+  const _ghostProg  = 'var(--border-md)';
+  const _normProg   = 'var(--chart-prog)';
+  const _barText    = 'var(--text)';
+  const _gridMajor  = 'var(--border-md)';
+  const _gridMinor  = 'var(--grid-minor)';
+  const _gridWeek   = 'var(--border-md)';
+  const _rowSep     = 'var(--border)';
+  const _headMinor  = 'var(--border-md)';
 
   const defs = svgEl('defs');
   const mk = svgEl('marker',{id:'arr',markerWidth:6,markerHeight:6,refX:6,refY:3,orient:'auto'});
-  mk.appendChild(svgEl('path',{d:'M0,0 L6,3 L0,6 Z',fill:'#94a3b8'}));
+  mk.appendChild(svgEl('path',{d:'M0,0 L6,3 L0,6 Z',fill:'var(--text-lt)'}));
   defs.appendChild(mk);
 
   // The highlighted stroke-width is 2.5, while normal is 1.5. 
   // We scale the marker coordinates down by 1.5 / 2.5 = 0.6 so the arrowhead size stays exactly the same on screen.
   const mkHi = svgEl('marker',{id:'arr-hi',markerWidth:3.6,markerHeight:3.6,refX:3.6,refY:1.8,orient:'auto'});
-  mkHi.appendChild(svgEl('path',{d:'M0,0 L3.6,1.8 L0,3.6 Z',fill:'#f59e0b'}));
+  mkHi.appendChild(svgEl('path',{d:'M0,0 L3.6,1.8 L0,3.6 Z',fill:'var(--status-waiting)'}));
   defs.appendChild(mkHi);
   svg.appendChild(defs);
 
@@ -4968,7 +5646,7 @@ function renderChart(visible, today) {
       const isoW=getISOWeek(wkStart);
       const monName=MONTH_ABBR[wkStart.getMonth()];
       // Row 1: Month Year · Wk# header
-      hSvg.appendChild(svgEl('text',{x:x+7*cw/2,y:13,'text-anchor':'middle',fill:'#0284c7','font-size':11,'font-weight':'700'},`${monName} ${wkStart.getFullYear()} \u00b7 W${isoW}`));
+      hSvg.appendChild(svgEl('text',{x:x+7*cw/2,y:13,'text-anchor':'middle',fill:'var(--accent)','font-size':11,'font-weight':'700'},`${monName} ${wkStart.getFullYear()} \u00b7 W${isoW}`));
       // Week separator line
       if(wk>0){
         svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridWeek,'stroke-width':2}));
@@ -4980,22 +5658,22 @@ function renderChart(visible, today) {
         const dd=addDays(AppState.renderStart,wk*7+d);
         const dx=x+d*cw;
         hSvg.appendChild(svgEl('line',{x1:dx,y1:16,x2:dx,y2:HEAD_H,stroke:_headMinor,'stroke-width':1}));
-        hSvg.appendChild(svgEl('text',{x:dx+cw/2,y:27,'text-anchor':'middle',fill:'#94a3b8','font-size':9},dayNames[dd.getDay()]));
-        hSvg.appendChild(svgEl('text',{x:dx+cw/2,y:40,'text-anchor':'middle',fill:'#475569','font-size':10},String(dd.getDate())));
+        hSvg.appendChild(svgEl('text',{x:dx+cw/2,y:27,'text-anchor':'middle',fill:'var(--text-lt)','font-size':9},dayNames[dd.getDay()]));
+        hSvg.appendChild(svgEl('text',{x:dx+cw/2,y:40,'text-anchor':'middle',fill:'var(--text-mu)','font-size':10},String(dd.getDate())));
         svg.appendChild(svgEl('line',{x1:dx,y1:0,x2:dx,y2:totalH,stroke:_gridMinor,'stroke-width':1}));
       }
     }
   } else if (AppState.view==='year') {
     cols.forEach((col,ci) => {
       const x=ci*cw; const mon=col.date;
-      hSvg.appendChild(svgEl('text',{x:x+cw/2,y:16,'text-anchor':'middle',fill:'#0284c7','font-size':11,'font-weight':'700'},`${MONTH_ABBR[mon.getMonth()]} ${mon.getFullYear()}`));
+      hSvg.appendChild(svgEl('text',{x:x+cw/2,y:16,'text-anchor':'middle',fill:'var(--accent)','font-size':11,'font-weight':'700'},`${MONTH_ABBR[mon.getMonth()]} ${mon.getFullYear()}`));
       const dim=daysInMonth(mon.getFullYear(),mon.getMonth());
       for(let d=1;d<=dim;d++){
         const dd=new Date(mon.getFullYear(),mon.getMonth(),d);
         if(dd.getDay()===1){
           const wx=x+(d-1)/dim*cw;
           svg.appendChild(svgEl('line',{x1:wx,y1:0,x2:wx,y2:totalH,stroke:_gridMinor,'stroke-width':1}));
-          hSvg.appendChild(svgEl('text',{x:wx+1,y:40,fill:'#94a3b8','font-size':8},`W${getISOWeek(dd)}`));
+          hSvg.appendChild(svgEl('text',{x:wx+1,y:40,fill:'var(--text-lt)','font-size':8},`W${getISOWeek(dd)}`));
         }
       }
       if(ci>0){
@@ -5010,20 +5688,20 @@ function renderChart(visible, today) {
       svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridMinor,'stroke-width':1}));
       if(AppState.view==='week'){
         const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-        hSvg.appendChild(svgEl('text',{x:x+cw/2,y:15,'text-anchor':'middle',fill:'#94a3b8','font-size':9},days[col.date.getDay()]));
-        hSvg.appendChild(svgEl('text',{x:x+cw/2,y:32,'text-anchor':'middle',fill:'#475569','font-size':10},String(col.date.getDate())));
+        hSvg.appendChild(svgEl('text',{x:x+cw/2,y:15,'text-anchor':'middle',fill:'var(--text-lt)','font-size':9},days[col.date.getDay()]));
+        hSvg.appendChild(svgEl('text',{x:x+cw/2,y:32,'text-anchor':'middle',fill:'var(--text-mu)','font-size':10},String(col.date.getDate())));
       } else {
         const ml=`${MONTH_ABBR[col.date.getMonth()]} ${col.date.getFullYear()}`;
         if(ml!==prevMonth){
           prevMonth=ml;
-          hSvg.appendChild(svgEl('text',{x:x+2,y:16,fill:'#0284c7','font-size':11,'font-weight':'700'},ml));
+          hSvg.appendChild(svgEl('text',{x:x+2,y:16,fill:'var(--accent)','font-size':11,'font-weight':'700'},ml));
           if(ci>0){
             svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridMajor,'stroke-width':1.5}));
             hSvg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:HEAD_H,stroke:_gridMajor,'stroke-width':1.5}));
           }
         }
         if(col.date.getDate()%5===0||col.date.getDate()===1)
-          hSvg.appendChild(svgEl('text',{x:x+1,y:34,fill:'#94a3b8','font-size':9},String(col.date.getDate())));
+          hSvg.appendChild(svgEl('text',{x:x+1,y:34,fill:'var(--text-lt)','font-size':9},String(col.date.getDate())));
       }
     });
   }
@@ -5040,13 +5718,13 @@ function renderChart(visible, today) {
   // ── Today line ──
   const todayX=dateToX(today);
   if(todayX>=0&&todayX<=totalW){
-    svg.appendChild(svgEl('line',{x1:todayX,y1:0,x2:todayX,y2:totalH,stroke:'#f59e0b','stroke-width':1.5,'stroke-dasharray':'5,4',opacity:.85}));
+    svg.appendChild(svgEl('line',{x1:todayX,y1:0,x2:todayX,y2:totalH,stroke:'var(--status-waiting)','stroke-width':1.5,'stroke-dasharray':'5,4',opacity:.85}));
     // Small amber triangle in header pointing down to today
-    hSvg.appendChild(svgEl('polygon',{points:`${todayX-4},${HEAD_H} ${todayX+4},${HEAD_H} ${todayX},${HEAD_H-6}`,fill:'#f59e0b'}));
+    hSvg.appendChild(svgEl('polygon',{points:`${todayX-4},${HEAD_H} ${todayX+4},${HEAD_H} ${todayX},${HEAD_H-6}`,fill:'var(--status-waiting)'}));
     // Today label in chart area (below header, top of chart) - not in header to avoid overlap with date labels
     const todayLbl=`Today \u00b7 ${MONTH_ABBR[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
-    svg.appendChild(svgEl('text',{x:todayX+4,y:18,fill:'#374151','font-size':11,'font-weight':'700',
-      'font-family':'Segoe UI,system-ui,sans-serif',style:'pointer-events:none'},todayLbl));
+    svg.appendChild(svgEl('text',{x:todayX+4,y:18,fill:'var(--text)','font-size':11,'font-weight':'700',
+      'font-family':'var(--font)',style:'pointer-events:none'},todayLbl));
   }
 
   // ── Dependency arrows ──
@@ -5068,7 +5746,7 @@ function renderChart(visible, today) {
       const gY = y1 + (y2 > y1 ? 16 : -16);
       d = `M${x1},${y1} H${x1+6} V${gY} H${x2-12} V${y2} H${x2}`;
     }
-    const arrPath = svgEl('path',{d, fill:'none',stroke:'#94a3b8','stroke-width':1.5,'marker-end':'url(#arr)',style:'pointer-events:none'});
+    const arrPath = svgEl('path',{d, fill:'none',stroke:'var(--text-lt)','stroke-width':1.5,'marker-end':'url(#arr)',style:'pointer-events:none'});
     arrPath.dataset.depChildId = getTaskId(r.task);
     arrG.appendChild(arrPath);
   });
@@ -5078,15 +5756,15 @@ function renderChart(visible, today) {
   
   // Load More Past (Left)
   const leftG = svgEl('g', {style: 'cursor:pointer;'});
-  leftG.appendChild(svgEl('rect', {x: 10, y: totalH / 2 - btnH/2, width: btnW, height: btnH, rx: 15, fill: '#fff', stroke: '#eab308', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))'}));
-  leftG.appendChild(svgEl('text', {x: 10 + btnW/2, y: totalH / 2 + 4, 'text-anchor': 'middle', fill: '#475569', 'font-size': 12, 'font-weight': '600', style: 'pointer-events:none;'}, '« Load More Past'));
+  leftG.appendChild(svgEl('rect', {x: 10, y: totalH / 2 - btnH/2, width: btnW, height: btnH, rx: 15, fill: 'var(--bg)', stroke: 'var(--today)', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))'}));
+  leftG.appendChild(svgEl('text', {x: 10 + btnW/2, y: totalH / 2 + 4, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 12, 'font-weight': '600', style: 'pointer-events:none;'}, '« Load More Past'));
   leftG.onmousedown = (e) => { e.stopPropagation(); loadMore('past'); };
   svg.appendChild(leftG);
 
   // Load More Future (Right)
   const rightG = svgEl('g', {style: 'cursor:pointer;'});
-  rightG.appendChild(svgEl('rect', {x: totalW - btnW - 10, y: totalH / 2 - btnH/2, width: btnW, height: btnH, rx: 15, fill: '#fff', stroke: '#eab308', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))'}));
-  rightG.appendChild(svgEl('text', {x: totalW - btnW/2 - 10, y: totalH / 2 + 4, 'text-anchor': 'middle', fill: '#475569', 'font-size': 12, 'font-weight': '600', style: 'pointer-events:none;'}, 'Load More Future »'));
+  rightG.appendChild(svgEl('rect', {x: totalW - btnW - 10, y: totalH / 2 - btnH/2, width: btnW, height: btnH, rx: 15, fill: 'var(--bg)', stroke: 'var(--today)', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))'}));
+  rightG.appendChild(svgEl('text', {x: totalW - btnW/2 - 10, y: totalH / 2 + 4, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 12, 'font-weight': '600', style: 'pointer-events:none;'}, 'Load More Future »'));
   rightG.onmousedown = (e) => { e.stopPropagation(); loadMore('future'); };
   svg.appendChild(rightG);
 
@@ -5111,16 +5789,16 @@ function renderChart(visible, today) {
 
     if(ghost){
       const gg=svgEl('g',{opacity:'0.7'});
-      gg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:_ghostBg,stroke:'#94a3b8','stroke-width':1.5,'stroke-dasharray':'4,3'}));
+      gg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:_ghostBg,stroke:'var(--text-lt)','stroke-width':1.5,'stroke-dasharray':'4,3'}));
       if(pct>0)gg.appendChild(svgEl('rect',{x:x+1.5,y:y+1.5,width:Math.max((drawW-3)*pct/100,0),height:h-3,fill:_ghostProg,'clip-path':`url(#${clipId})`}));
       if(drawW>12){
-        const gt=svgEl('text',{x:x+5,y:y+h/2+4,fill:'#94a3b8','font-size':12,'font-weight':'500',
-          'font-family':'Segoe UI,system-ui,sans-serif','clip-path':`url(#${clipId})`,style:'pointer-events:none'});
+        const gt=svgEl('text',{x:x+5,y:y+h/2+4,fill:'var(--text-lt)','font-size':12,'font-weight':'500',
+          'font-family':'var(--font)','clip-path':`url(#${clipId})`,style:'pointer-events:none'});
         gt.textContent=t.Title||''; gg.appendChild(gt);
       }
       svg.appendChild(gg);
     } else {
-      if(isOverdue)svg.appendChild(svgEl('rect',{x:x-3,y:y-3,width:drawW+6,height:h+6,rx:rx+2,fill:'none',stroke:'#f59e0b','stroke-width':2,opacity:'0.5'}));
+      if(isOverdue)svg.appendChild(svgEl('rect',{x:x-3,y:y-3,width:drawW+6,height:h+6,rx:rx+2,fill:'none',stroke:'var(--today)','stroke-width':2,opacity:'0.5'}));
       svg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:_barBg}));
       if(pct>0)svg.appendChild(svgEl('rect',{x:x+1.5,y:y+1.5,width:Math.max((drawW-3)*pct/100,0),height:h-3,fill:_normProg,'clip-path':`url(#${clipId})`}));
       svg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:'none',stroke:color,'stroke-width':2}));
@@ -5136,7 +5814,7 @@ function renderChart(visible, today) {
       const maxChars=Math.max(3,Math.floor(availW/CHAR_W));
       const displayTitle=dispTitle.length>maxChars?dispTitle.slice(0,maxChars-1)+'\u2026':dispTitle;
       const tx=svgEl('text',{x:x+5,y:y+h/2+4,fill:_barText,'font-size':12,'font-weight':'600',
-        'font-family':'Segoe UI,system-ui,sans-serif','clip-path':`url(#${clipId})`,style:'pointer-events:none'});
+        'font-family':'var(--font)','clip-path':`url(#${clipId})`,style:'pointer-events:none'});
       tx.textContent=displayTitle; svg.appendChild(tx);
       // Milestone marker: gold diamond with white M, to the right of the bar
       if(/\(milestone\)/i.test(rawTitle)){
@@ -5144,12 +5822,12 @@ function renderChart(visible, today) {
         const mx=x+drawW+ms+4, my=y+h/2;
         // Diamond = rotated square: top, right, bottom, left vertices
         const pts=`${mx},${my-ms} ${mx+ms},${my} ${mx},${my+ms} ${mx-ms},${my}`;
-        const diamond=svgEl('polygon',{points:pts,fill:'#d97706',stroke:'#92400e','stroke-width':1.5,style:'cursor:default'});
+        const diamond=svgEl('polygon',{points:pts,fill:'var(--status-waiting)',stroke:'var(--status-waiting)','stroke-width':1.5,style:'cursor:default'});
         diamond.addEventListener('mousemove', e=>showSimpleTooltip(e,'Milestone Task'));
         diamond.addEventListener('mouseleave', hideTooltip);
         svg.appendChild(diamond);
         const mt=svgEl('text',{x:mx,y:my+4,'text-anchor':'middle',fill:'#fff','font-size':12,'font-weight':'700',
-          'font-family':'Segoe UI,system-ui,sans-serif',style:'pointer-events:none'},'M');
+          'font-family':'var(--font)',style:'pointer-events:none'},'M');
         svg.appendChild(mt);
       }
       
@@ -6335,6 +7013,7 @@ function initEvents() {
                 case 'toggleAll': toggleAll(); break;
                 case 'toggleCompact': toggleCompact(); break;
                 case 'toggleDarkMode': toggleDarkMode(); break;
+                case 'cycleTheme': cycleTheme(); break;
                 case 'browseFile': openFilePicker(); break;
                 case 'toggleAutoSave': toggleAutoSave(actionEl); break;
                 // Task modal actions
@@ -6770,7 +7449,7 @@ function renderPills(containerId, options, currentValue) {
         if (c.dataset.value === optLower) {
             pill.classList.add('active');
             pill.style.background = optLower === 'none' ? '#94a3b8' : (STATUS_COLORS[optLower] || '#3b82f6');
-            pill.style.color = '#fff';
+            pill.style.color = 'var(--pill-text)';
         } else {
             pill.style.background = 'transparent';
             pill.style.color = optLower === 'none' ? '#94a3b8' : (STATUS_COLORS[optLower] || '#3b82f6');
