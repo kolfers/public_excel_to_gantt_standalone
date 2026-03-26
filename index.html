@@ -4938,7 +4938,7 @@ function toggleDarkMode() {
   _updateDarkmodeBtn(next === 'dark');
   // Apply the palette saved for the new mode
   const modeKey = next === 'dark' ? 'gantt_palette_dark' : 'gantt_palette_light';
-  const palette = localStorage.getItem(modeKey) || 'default';
+  const palette = localStorage.getItem(modeKey) || (next === 'dark' ? 'frappe' : 'ayu');
   document.documentElement.setAttribute('data-palette', palette);
   _updateThemeLabel(palette);
   render();
@@ -4965,7 +4965,7 @@ function cycleTheme() {
 function _updateThemeLabel(palette) {
   const labelTag = document.getElementById('theme-cycle-label');
   if (!labelTag) return;
-  const labels = { default: 'Default', catppuccin: 'Catppuccin', frappe: 'Frappé', 'github-light': 'GitHub Light', ayu: 'Ayu', monokai: 'Monokai', dracula: 'Dracula', kanagawa: 'Kanagawa' };
+  const labels = { default: 'High Contrast', catppuccin: 'Catppuccin', frappe: 'Frappé', 'github-light': 'GitHub Light', ayu: 'Ayu', monokai: 'Monokai', dracula: 'Dracula', kanagawa: 'Kanagawa' };
   labelTag.textContent = labels[palette] || (palette.charAt(0).toUpperCase() + palette.slice(1));
 }
 
@@ -4988,9 +4988,10 @@ function initTheme() {
   document.documentElement.setAttribute('data-theme', theme);
   _updateDarkmodeBtn(theme === 'dark');
 
-  // Load per-mode palette; fall back to legacy 'gantt_palette' for existing users
+  // Load per-mode palette; fall back to legacy 'gantt_palette' for existing users, or mode-appropriate default for new sessions
   const modeKey = theme === 'dark' ? 'gantt_palette_dark' : 'gantt_palette_light';
-  const legacyPalette = localStorage.getItem('gantt_palette') || 'default';
+  const defaultPalette = theme === 'dark' ? 'frappe' : 'ayu';
+  const legacyPalette = localStorage.getItem('gantt_palette') || defaultPalette;
   let palette = localStorage.getItem(modeKey) || legacyPalette;
   // Guard: reject legacy palette if it's incompatible with the current mode (e.g. dark-only theme loaded in light mode)
   const _validPalettes = theme === 'dark' ? THEME_PALETTES_DARK : THEME_PALETTES_LIGHT;
@@ -5437,9 +5438,12 @@ function renderLeft(visible, today, statsMap) {
     }
     c.appendChild(div);
   });
-  // Extra bottom padding matching the chart area so left and right panels stay aligned
+  // Spacer: ensure the left panel fills to at least the chart area height so rows align with gridlines.
+  const _caH = document.getElementById('chart-area').clientHeight || 0;
+  const _filledH = visible.length * ROW_H;
+  const _spacerH = Math.max(Math.floor(window.innerHeight / 2), _caH - _filledH);
   const _leftSpacer = document.createElement('div');
-  _leftSpacer.style.cssText = `height:${Math.floor(window.innerHeight/2)}px;flex-shrink:0;pointer-events:none;`;
+  _leftSpacer.style.cssText = `height:${_spacerH}px;flex-shrink:0;pointer-events:none;`;
   c.appendChild(_leftSpacer);
 }
 
@@ -5572,9 +5576,11 @@ function renderChart(visible, today) {
   
   // Note: previously year AppState.view was clamped to exactly rightW, preventing scrolling
   const totalW = Math.max(cols.length*cw, rightW);
-  // Extra bottom padding so the user can scroll the last item bar into view comfortably
+  // Extra bottom padding so the user can scroll the last item bar into view comfortably.
+  // Also ensure the SVG fills the full chart area so gridlines reach the bottom even when few rows are visible.
   const extraBottomPad = Math.floor(window.innerHeight / 2);
-  const totalH = Math.max(visible.length*ROW_H + extraBottomPad, 400);
+  const chartAreaH = document.getElementById('chart-area').clientHeight || 0;
+  const totalH = Math.max(visible.length*ROW_H + extraBottomPad, chartAreaH, 400);
 
   svg.setAttribute('width', totalW); svg.setAttribute('height', totalH);
   while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -5840,7 +5846,7 @@ function renderChart(visible, today) {
             const iconX = x - 13;
             const iconY = y + h/2;
             const attG = svgEl('g', {style: 'cursor:pointer'});
-            attG.appendChild(svgEl('circle', {cx: iconX, cy: iconY, r: 10, fill: '#ef4444'}));
+            attG.appendChild(svgEl('circle', {cx: iconX, cy: iconY, r: 10, fill: 'var(--status-behind)'}));
             const ex = svgEl('text', {x: iconX, y: iconY + 4, 'text-anchor':'middle', fill:'#fff', 'font-size': 10, 'font-weight': 'bold'});
             ex.textContent = '!';
             attG.appendChild(ex);
@@ -5852,7 +5858,7 @@ function renderChart(visible, today) {
               setTimeout(() => scrollToTask(realParent), 60);
             };
             const _depPColor = catColor(realParent.Category||'');
-            const _depHtml = `Hidden dependency:<br/><span style="color:#64748b;font-size:0.7rem;">${escHtml(realParent.Phase)} \u203A <span style="color:${_depPColor};font-weight:600;">${escHtml(realParent.Category)}</span> \u203A </span><b>${escHtml(realParent.Title)}</b>`;
+            const _depHtml = `Hidden dependency:<br/><span style="color:var(--text-lt);font-size:0.7rem;">${escHtml(realParent.Phase)} \u203A <span style="color:${_depPColor};font-weight:600;">${escHtml(realParent.Category)}</span> \u203A </span><b>${escHtml(realParent.Title)}</b>`;
             attG.onmousemove = (e) => showHTMLTooltip(e, _depHtml);
             attG.onmouseleave = hideTooltip;
             svg.appendChild(attG);
@@ -6437,47 +6443,9 @@ function goToday(){
 // ── Collapse / expand ─────────────────────────────────────────────────
 function togglePhase(ph){AppState.collapsed['p:'+ph]=!AppState.collapsed['p:'+ph];render();}
 function toggleCategory(ph, ca) {
-  const wasCollapsed = AppState.collapsed['c:' + ph + ':' + ca];
-  AppState.collapsed['c:' + ph + ':' + ca] = !wasCollapsed;
-  if (wasCollapsed) {
-    // Expanding: highlight category row and scroll chart to it
-    AppState._highlightCat = { phase: ph, cat: ca };
-    if (AppState._highlightTimer) clearTimeout(AppState._highlightTimer);
-    AppState._highlightTimer = setTimeout(() => { AppState._highlightCat = null; render(); }, HIGHLIGHT_DURATION_MS);
-    render();
-    setTimeout(() => {
-      const today2 = new Date(); today2.setHours(0,0,0,0);
-      const cmpT = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
-      const allR = buildAllRows(AppState.currentTasks, cmpT, AppState.compareLabel, today2);
-      const vis = getVisibleRows(allR, today2);
-      const rowIdx = vis.findIndex(r => r.type === 'category' && r.phase === ph && r.cat === ca);
-      if (rowIdx >= 0) {
-        const chartArea = document.getElementById('chart-area');
-        const lr = document.getElementById('left-rows');
-        chartArea.scrollTop = rowIdx * ROW_H;
-        lr.scrollTop = rowIdx * ROW_H;
-      }
-      // Scroll horizontally to the task in this category whose end date is closest to today
-      const catTasks = AppState.currentTasks.filter(t => t.Phase === ph && t.Category === ca);
-      if (catTasks.length > 0) {
-        const closest = catTasks.reduce((best, t) => {
-          const s = parseDate(t['Start Date']);
-          if (!s) return best;
-          const diff = Math.abs(s - today2);
-          if (!best || diff < best.diff) return { task: t, diff };
-          return best;
-        }, null);
-        if (closest) {
-          const targetDate = parseDate(closest.task['Start Date']);
-          const chartArea = document.getElementById('chart-area');
-          chartArea.scrollLeft = Math.max(0, dateToX(targetDate) - chartArea.clientWidth / 2);
-        }
-      }
-    }, 60);
-  } else {
-    AppState._highlightCat = null;
-    render();
-  }
+  AppState.collapsed['c:' + ph + ':' + ca] = !AppState.collapsed['c:' + ph + ':' + ca];
+  AppState._highlightCat = null;
+  render();
 }
 function expandAll(){AppState.collapsed={};render();}
 function collapseAll(){
