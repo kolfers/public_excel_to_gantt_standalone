@@ -2969,6 +2969,17 @@ details.info-section[open] .info-section-heading::after {
   overflow-y: auto;
 }
 
+.modal-body::-webkit-scrollbar,
+.comments-list::-webkit-scrollbar {
+  width: 4px
+}
+
+.modal-body::-webkit-scrollbar-thumb,
+.comments-list::-webkit-scrollbar-thumb {
+  background: var(--border-md);
+  border-radius: 2px
+}
+
 #modal-edit-panel .modal-header,
 #modal-comments-panel .modal-header {
   border-radius: 0;
@@ -4977,7 +4988,7 @@ function toggleDarkMode() {
 }
 
 const THEME_PALETTES_LIGHT = ['default', 'catppuccin', 'github-light', 'ayu', 'kanagawa'];
-const THEME_PALETTES_DARK  = ['default', 'catppuccin', 'frappe', 'monokai', 'dracula', 'ayu', 'kanagawa'];
+const THEME_PALETTES_DARK = ['default', 'catppuccin', 'frappe', 'monokai', 'dracula', 'ayu', 'kanagawa'];
 function cycleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const modeKey = isDark ? 'gantt_palette_dark' : 'gantt_palette_light';
@@ -5128,13 +5139,13 @@ function _setCompareUI(label) {
       btn.style.display = 'inline-flex';
       btn.classList.toggle('active', AppState.changesOnly);
     }
-    
+
     // Trigger blink if changesOnly was forced on
     if (AppState.changesOnly && btn) {
-        btn.classList.remove('blink-twice');
-        void btn.offsetWidth;
-        btn.classList.add('blink-twice');
-        setTimeout(() => btn.classList.remove('blink-twice'), 1200);
+      btn.classList.remove('blink-twice');
+      void btn.offsetWidth;
+      btn.classList.add('blink-twice');
+      setTimeout(() => btn.classList.remove('blink-twice'), 1200);
     }
   }
 }
@@ -5147,7 +5158,7 @@ function onCompareChange(label) {
     AppState.changesOnly = true; // Force Changes AppState.view on by default
   }
   _setCompareUI(label);
-  
+
   if (label) {
     const pane = document.getElementById('flyout-pane');
     if (pane && !pane.classList.contains('open')) {
@@ -5155,26 +5166,26 @@ function onCompareChange(label) {
     }
   }
   render();
-  
+
   if (label) {
     setTimeout(() => {
-        const changesBtn = document.getElementById('flyout-changes-btn');
-        if (changesBtn) {
-            changesBtn.classList.add('blink-animation');
-            setTimeout(() => {
-                if (changesBtn) changesBtn.classList.remove('blink-animation');
-            }, 2000);
-        }
-        
-        const changesOnlyBtn = document.getElementById('changes-only-btn');
-        if (changesOnlyBtn) {
-            changesOnlyBtn.classList.remove('blink-twice');
-            void changesOnlyBtn.offsetWidth; // trigger reflow
-            changesOnlyBtn.classList.add('blink-twice');
-            setTimeout(() => {
-                if (changesOnlyBtn) changesOnlyBtn.classList.remove('blink-twice');
-            }, 1200);
-        }
+      const changesBtn = document.getElementById('flyout-changes-btn');
+      if (changesBtn) {
+        changesBtn.classList.add('blink-animation');
+        setTimeout(() => {
+          if (changesBtn) changesBtn.classList.remove('blink-animation');
+        }, 2000);
+      }
+
+      const changesOnlyBtn = document.getElementById('changes-only-btn');
+      if (changesOnlyBtn) {
+        changesOnlyBtn.classList.remove('blink-twice');
+        void changesOnlyBtn.offsetWidth; // trigger reflow
+        changesOnlyBtn.classList.add('blink-twice');
+        setTimeout(() => {
+          if (changesOnlyBtn) changesOnlyBtn.classList.remove('blink-twice');
+        }, 1200);
+      }
     }, 50); // slight delay to allow dom/flyout rendering
   }
 }
@@ -5209,19 +5220,19 @@ function restoreFromSnapshot() {
   render();
 }
 
-function getTaskId(t) { return String(t.ID||t.Title||'').trim(); }
+function getTaskId(t) { return String(t.ID || t.Title || '').trim(); }
 
 
 // ── Columns & positioning ─────────────────────────────────────────────────
 function getColumns() {
-  if (AppState.view==='year') { const c=[]; for(let i=0;i<AppState.viewPadLeft+AppState.viewPadRight;i++) c.push({date:addMonths(AppState.renderStart,i)}); return c; }
-  if (AppState.view==='week') { const c=[]; for(let i=0;i<AppState.viewPadLeft+AppState.viewPadRight;i++) c.push({date:addDays(AppState.renderStart,i)}); return c; }
-  const c = []; for(let i=0;i<AppState.viewPadLeft+AppState.viewPadRight;i++) c.push({date:addDays(AppState.renderStart,i)}); return c;
+  if (AppState.view === 'year') { const c = []; for (let i = 0; i < AppState.viewPadLeft + AppState.viewPadRight; i++) c.push({ date: addMonths(AppState.renderStart, i) }); return c; }
+  if (AppState.view === 'week') { const c = []; for (let i = 0; i < AppState.viewPadLeft + AppState.viewPadRight; i++) c.push({ date: addDays(AppState.renderStart, i) }); return c; }
+  const c = []; for (let i = 0; i < AppState.viewPadLeft + AppState.viewPadRight; i++) c.push({ date: addDays(AppState.renderStart, i) }); return c;
 }
 function getColWidth() {
-  const rw = document.getElementById('right-panel').offsetWidth||960;
-  if (AppState.view === 'year') return Math.max(60,Math.floor(rw/12));
-  if (AppState.view === 'week') return Math.max(42,Math.floor(rw/14));
+  const rw = document.getElementById('right-panel').offsetWidth || 960;
+  if (AppState.view === 'year') return Math.max(60, Math.floor(rw / 12));
+  if (AppState.view === 'week') return Math.max(42, Math.floor(rw / 14));
   return COL_W[AppState.view];
 }
 
@@ -5231,13 +5242,13 @@ function getVisibleRows(rows, today) {
   if (AppState.changesOnly && AppState.compareLabel) {
     changedIds = new Set();
     const taskMap = {};
-    rows.filter(r=>r.type==='task').forEach(r => {
+    rows.filter(r => r.type === 'task').forEach(r => {
       const id = getTaskId(r.task);
       if (!taskMap[id]) taskMap[id] = {};
-      if (r.ghost) taskMap[id].ghost  = r.task;
-      else         taskMap[id].current = r.task;
+      if (r.ghost) taskMap[id].ghost = r.task;
+      else taskMap[id].current = r.task;
     });
-    Object.entries(taskMap).forEach(([id,p]) => {
+    Object.entries(taskMap).forEach(([id, p]) => {
       // Show: changed tasks (both exist, fields differ), added tasks (current only), removed tasks (ghost only)
       if (!p.current || !p.ghost || hasDifferences(p.current, p.ghost)) changedIds.add(id);
     });
@@ -5269,13 +5280,13 @@ function getVisibleRows(rows, today) {
       if (changedIds !== null || AppState.filterMode !== 'all' || hasCustomFilters()) return validPhases.has(r.phase);
       return true;
     }
-    if (AppState.collapsed['p:'+r.phase]) return false;
+    if (AppState.collapsed['p:' + r.phase]) return false;
 
     if (r.type === 'category') {
-      if (changedIds !== null || AppState.filterMode !== 'all' || hasCustomFilters()) return validCats.has(r.phase+'||'+r.cat);
+      if (changedIds !== null || AppState.filterMode !== 'all' || hasCustomFilters()) return validCats.has(r.phase + '||' + r.cat);
       return true;
     }
-    if (AppState.collapsed['c:'+r.phase+':'+r.cat]) return false;
+    if (AppState.collapsed['c:' + r.phase + ':' + r.cat]) return false;
 
     // Remaining must be task
     if (changedIds !== null) {
@@ -5289,9 +5300,9 @@ function getVisibleRows(rows, today) {
 // ── Columns & positioning ─────────────────────────────────────────────
 function dateToX(d) {
   const cw = getColWidth(); if (!d) return -9999;
-  if (AppState.view==='year') {
-    const mo = (d.getFullYear()-AppState.renderStart.getFullYear())*12+(d.getMonth()-AppState.renderStart.getMonth());
-    return (mo + ((d.getDate()-1)/daysInMonth(d.getFullYear(),d.getMonth()))) * cw;
+  if (AppState.view === 'year') {
+    const mo = (d.getFullYear() - AppState.renderStart.getFullYear()) * 12 + (d.getMonth() - AppState.renderStart.getMonth());
+    return (mo + ((d.getDate() - 1) / daysInMonth(d.getFullYear(), d.getMonth()))) * cw;
   }
   return dayDiff(AppState.renderStart, d) * cw;
 }
@@ -5310,9 +5321,9 @@ function xToDate(x) {
 // ── SVG helper ────────────────────────────────────────────────────────
 
 
-function svgEl(tag, attrs={}, text='') {
+function svgEl(tag, attrs = {}, text = '') {
   const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
   if (text) el.textContent = text;
   return el;
 }
@@ -5324,28 +5335,28 @@ function renderLeft(visible, today, statsMap) {
   // Empty state when filter gives no results
   let taskCount = 0;
   if (AppState.filterMode === 'all' && !hasCustomFilters()) {
-    taskCount = visible.filter(r=>r.type==='task'&&!r.ghost).length;
+    taskCount = visible.filter(r => r.type === 'task' && !r.ghost).length;
   } else {
-    taskCount = AppState.currentTasks.filter(t=>isTaskVisible(t, today)).length;
+    taskCount = AppState.currentTasks.filter(t => isTaskVisible(t, today)).length;
   }
   if (taskCount === 0 && (AppState.filterMode !== 'all' || hasCustomFilters())) {
-    const msg = document.createElement('div'); msg.className='empty-state';
+    const msg = document.createElement('div'); msg.className = 'empty-state';
     if (hasCustomFilters()) {
       msg.innerHTML = '\uD83D\uDD0D No items match the active filters';
     } else {
-      msg.innerHTML = AppState.filterMode==='overdue' ? '\uD83C\uDF89 No overdue items!' : '\uD83D\uDCCB No active items';
+      msg.innerHTML = AppState.filterMode === 'overdue' ? '\uD83C\uDF89 No overdue items!' : '\uD83D\uDCCB No active items';
     }
     c.appendChild(msg); return;
   }
   visible.forEach(r => {
     const div = document.createElement('div'); div.className = 'left-row';
-    if (r.type==='phase') {
+    if (r.type === 'phase') {
       div.classList.add(r.ghost ? 'ghost-phase' : 'phase-row');
       div.style.display = 'flex'; div.style.alignItems = 'center';
-      const chev = document.createElement('span'); chev.className='chevron';
-      chev.textContent = AppState.collapsed['p:'+r.phase] ? '\u25b6' : '\u25bc'; div.appendChild(chev);
-      const lbl = document.createElement('div'); lbl.className='row-label'; lbl.style.flex='1';
-      lbl.textContent = (r.ghost?'\u27f3 ':'')+trimTitle(r.phase, AppState.compactMode, 11); div.appendChild(lbl);
+      const chev = document.createElement('span'); chev.className = 'chevron';
+      chev.textContent = AppState.collapsed['p:' + r.phase] ? '\u25b6' : '\u25bc'; div.appendChild(chev);
+      const lbl = document.createElement('div'); lbl.className = 'row-label'; lbl.style.flex = '1';
+      lbl.textContent = (r.ghost ? '\u27f3 ' : '') + trimTitle(r.phase, AppState.compactMode, 11); div.appendChild(lbl);
       // Milestone indicators (only for real, non-ghost phase rows)
       if (!r.ghost && !AppState.compactMode) {
         const phaseTasks = AppState.currentTasks.filter(t => t.Phase === r.phase && isMilestoneTask(t));
@@ -5373,86 +5384,86 @@ function renderLeft(visible, today, statsMap) {
           div.appendChild(msBadges);
         }
       }
-    if (!r.ghost) {
-      div.addEventListener('mouseenter', () => { AppState._hoveredPhase = r.phase; AppState._hoveredCatInfo = null; });
-      div.addEventListener('mouseleave', () => { AppState._hoveredPhase = null; });
-      const editP = document.createElement('span'); editP.className='rename-btn'; editP.dataset.tooltip='Rename or Delete Phase'; editP.dataset.shortcut='e / r: rename / delete'; editP.textContent='\u270F';
-      editP.onclick = (e) => { e.stopPropagation(); openRenameModal('phase', r.phase); };
-      div.appendChild(editP);
-      const addP = document.createElement('span'); addP.className='add-task-btn'; addP.dataset.tooltip='Add Task'; addP.dataset.shortcut='n: new'; addP.textContent='+';
-      addP.onclick = (e) => { e.stopPropagation(); openTaskModal(null, 'add', r.phase, null); };
-      div.appendChild(addP);
+      if (!r.ghost) {
+        div.addEventListener('mouseenter', () => { AppState._hoveredPhase = r.phase; AppState._hoveredCatInfo = null; });
+        div.addEventListener('mouseleave', () => { AppState._hoveredPhase = null; });
+        const editP = document.createElement('span'); editP.className = 'rename-btn'; editP.dataset.tooltip = 'Rename or Delete Phase'; editP.dataset.shortcut = 'e / r: rename / delete'; editP.textContent = '\u270F';
+        editP.onclick = (e) => { e.stopPropagation(); openRenameModal('phase', r.phase); };
+        div.appendChild(editP);
+        const addP = document.createElement('span'); addP.className = 'add-task-btn'; addP.dataset.tooltip = 'Add Task'; addP.dataset.shortcut = 'n: new'; addP.textContent = '+';
+        addP.onclick = (e) => { e.stopPropagation(); openTaskModal(null, 'add', r.phase, null); };
+        div.appendChild(addP);
 
-      if (AppState.compactMode) {
-        const phaseTasks = AppState.currentTasks.filter(t => t.Phase === r.phase && isMilestoneTask(t));
-        const doneMs = phaseTasks.filter(t => isDoneTask(t)).length;
-        const openMs = phaseTasks.filter(t => !isDoneTask(t)).length;
-        let htmlContext = `<b>${escHtml(r.phase)}</b>`;
-        if (openMs > 0) htmlContext += `<br/><span style="color:var(--status-behind);font-weight:700">\u2691</span>\u2009${openMs} open milestone${openMs>1?'s':''}`;
-        if (doneMs > 0) htmlContext += `<br/><span style="color:var(--status-done);font-weight:700">\u2691</span>\u2009${doneMs} completed milestone${doneMs>1?'s':''}`;
-        div.onmousemove = e => showHTMLTooltip(e, htmlContext);
-        div.onmouseleave = hideTooltip;
+        if (AppState.compactMode) {
+          const phaseTasks = AppState.currentTasks.filter(t => t.Phase === r.phase && isMilestoneTask(t));
+          const doneMs = phaseTasks.filter(t => isDoneTask(t)).length;
+          const openMs = phaseTasks.filter(t => !isDoneTask(t)).length;
+          let htmlContext = `<b>${escHtml(r.phase)}</b>`;
+          if (openMs > 0) htmlContext += `<br/><span style="color:var(--status-behind);font-weight:700">\u2691</span>\u2009${openMs} open milestone${openMs > 1 ? 's' : ''}`;
+          if (doneMs > 0) htmlContext += `<br/><span style="color:var(--status-done);font-weight:700">\u2691</span>\u2009${doneMs} completed milestone${doneMs > 1 ? 's' : ''}`;
+          div.onmousemove = e => showHTMLTooltip(e, htmlContext);
+          div.onmouseleave = hideTooltip;
+        }
       }
-    }
-    div.onclick = () => togglePhase(r.phase);
-  } else if (r.type==='category') {
+      div.onclick = () => togglePhase(r.phase);
+    } else if (r.type === 'category') {
       div.classList.add(r.ghost ? 'ghost-cat' : 'category-row');
       const catColorStr = r.ghost ? 'var(--border-md)' : r.color;
       div.style.borderLeft = '4px solid ' + catColorStr;
       div.style.borderTop = '2px solid ' + catColorStr;
       div.style.paddingLeft = '12px';
-      const chev = document.createElement('span'); chev.className='chevron';
-      chev.textContent = AppState.collapsed['c:'+r.phase+':'+r.cat] ? '\u25b6' : '\u25bc'; div.appendChild(chev);
-      const lbl = document.createElement('div'); lbl.className='row-label'; lbl.style.overflow='hidden';
-      const lblText = document.createElement('span'); lblText.className='row-label-text';
-      lblText.textContent=trimTitle(r.cat, AppState.compactMode, 9); lbl.appendChild(lblText);
+      const chev = document.createElement('span'); chev.className = 'chevron';
+      chev.textContent = AppState.collapsed['c:' + r.phase + ':' + r.cat] ? '\u25b6' : '\u25bc'; div.appendChild(chev);
+      const lbl = document.createElement('div'); lbl.className = 'row-label'; lbl.style.overflow = 'hidden';
+      const lblText = document.createElement('span'); lblText.className = 'row-label-text';
+      lblText.textContent = trimTitle(r.cat, AppState.compactMode, 9); lbl.appendChild(lblText);
       if (!r.ghost) {
-        const sk = r.phase+'||'+r.cat; const st = statsMap[sk]||{total:0,active:0,overdue:0,done:0};
-        const stats = document.createElement('span'); stats.className='cat-stats';
+        const sk = r.phase + '||' + r.cat; const st = statsMap[sk] || { total: 0, active: 0, overdue: 0, done: 0 };
+        const stats = document.createElement('span'); stats.className = 'cat-stats';
         stats.dataset.tooltip = `${st.total} total | ${st.active} active | ${st.overdue} overdue | ${st.done} done`;
         const parts = [];
         if (!AppState.compactMode) {
-            if (st.active  > 0) parts.push(`<span style="color:var(--status-on-track)">\u25cf\u202f${st.active}</span>`);
-            if (st.done    > 0) parts.push(`<span style="color:var(--status-done)">\u2713\u202f${st.done}</span>`);
+          if (st.active > 0) parts.push(`<span style="color:var(--status-on-track)">\u25cf\u202f${st.active}</span>`);
+          if (st.done > 0) parts.push(`<span style="color:var(--status-done)">\u2713\u202f${st.done}</span>`);
         }
         if (st.overdue > 0) parts.push(`<span style="color:var(--status-behind)">\u26a0\ufe0f\u202f${st.overdue}</span>`);
         if (parts.length) { stats.innerHTML = parts.join('\u2009'); lbl.appendChild(stats); }
-    }
-    div.appendChild(lbl);
-    if (!r.ghost) {
-      div.addEventListener('mouseenter', () => { AppState._hoveredCatInfo = {phase: r.phase, cat: r.cat}; AppState._hoveredPhase = null; });
-      div.addEventListener('mouseleave', () => { AppState._hoveredCatInfo = null; });
-      const editC = document.createElement('span'); editC.className='rename-btn'; editC.dataset.tooltip='Rename or Delete Category'; editC.dataset.shortcut='e / r: rename / delete'; editC.textContent='\u270F';
-      editC.onclick = (e) => { e.stopPropagation(); openRenameModal('category', r.cat, r.phase); };
-      div.appendChild(editC);
-      const addC = document.createElement('span'); addC.className='add-task-btn'; addC.dataset.tooltip='Add Task'; addC.dataset.shortcut='n: new'; addC.textContent='+';
-      addC.onclick = (e) => { e.stopPropagation(); openTaskModal(null, 'add', r.phase, r.cat); };
-      div.appendChild(addC);
-
-      if (AppState.compactMode) {
-        const sk = r.phase+'||'+r.cat; const st = statsMap[sk]||{total:0,active:0,overdue:0,done:0};
-        const catColorStr = r.color;
-        let htmlContext = `<div style="margin-bottom:4px;"><b>${escHtml(r.phase)} \xBB <span style="color:${catColorStr};">${escHtml(r.cat)}</span></b></div>`;
-        htmlContext += `${st.total} total`;
-        if (st.active > 0) htmlContext += ` | <span style="color:var(--status-on-track)">\u25cf\u202f${st.active}</span> active`;
-        if (st.overdue > 0) htmlContext += ` | <span style="color:var(--status-behind)">\u26a0\ufe0f\u202f${st.overdue}</span> overdue`;
-        if (st.done > 0) htmlContext += ` | <span style="color:var(--status-done)">\u2713\u202f${st.done}</span> done`;
-        div.onmousemove = e => showHTMLTooltip(e, htmlContext);
-        div.onmouseleave = hideTooltip;
       }
-    }
-    div.onclick = () => toggleCategory(r.phase, r.cat);
-  } else {
+      div.appendChild(lbl);
+      if (!r.ghost) {
+        div.addEventListener('mouseenter', () => { AppState._hoveredCatInfo = { phase: r.phase, cat: r.cat }; AppState._hoveredPhase = null; });
+        div.addEventListener('mouseleave', () => { AppState._hoveredCatInfo = null; });
+        const editC = document.createElement('span'); editC.className = 'rename-btn'; editC.dataset.tooltip = 'Rename or Delete Category'; editC.dataset.shortcut = 'e / r: rename / delete'; editC.textContent = '\u270F';
+        editC.onclick = (e) => { e.stopPropagation(); openRenameModal('category', r.cat, r.phase); };
+        div.appendChild(editC);
+        const addC = document.createElement('span'); addC.className = 'add-task-btn'; addC.dataset.tooltip = 'Add Task'; addC.dataset.shortcut = 'n: new'; addC.textContent = '+';
+        addC.onclick = (e) => { e.stopPropagation(); openTaskModal(null, 'add', r.phase, r.cat); };
+        div.appendChild(addC);
+
+        if (AppState.compactMode) {
+          const sk = r.phase + '||' + r.cat; const st = statsMap[sk] || { total: 0, active: 0, overdue: 0, done: 0 };
+          const catColorStr = r.color;
+          let htmlContext = `<div style="margin-bottom:4px;"><b>${escHtml(r.phase)} \xBB <span style="color:${catColorStr};">${escHtml(r.cat)}</span></b></div>`;
+          htmlContext += `${st.total} total`;
+          if (st.active > 0) htmlContext += ` | <span style="color:var(--status-on-track)">\u25cf\u202f${st.active}</span> active`;
+          if (st.overdue > 0) htmlContext += ` | <span style="color:var(--status-behind)">\u26a0\ufe0f\u202f${st.overdue}</span> overdue`;
+          if (st.done > 0) htmlContext += ` | <span style="color:var(--status-done)">\u2713\u202f${st.done}</span> done`;
+          div.onmousemove = e => showHTMLTooltip(e, htmlContext);
+          div.onmouseleave = hideTooltip;
+        }
+      }
+      div.onclick = () => toggleCategory(r.phase, r.cat);
+    } else {
       div.classList.add('task-row');
       if (r.ghost) div.classList.add('ghost-row');
       const taskColorStr = r.ghost ? 'var(--border-md)' : r.color;
       div.style.borderLeft = '2px solid ' + taskColorStr;
       div.style.paddingLeft = '26px';
-      const lbl = document.createElement('div'); lbl.className='row-label';
-      const titleSpan = document.createElement('span'); titleSpan.className='row-label-text';
+      const lbl = document.createElement('div'); lbl.className = 'row-label';
+      const titleSpan = document.createElement('span'); titleSpan.className = 'row-label-text';
       const rawTaskTitle = r.task.Title || '';
-      const dispTaskTitle = rawTaskTitle.replace(/\(milestone\)/gi,'').trim();
-      titleSpan.textContent = (r.ghost?'\u27f3 ':'')+trimTitle(dispTaskTitle, AppState.compactMode, 7);
+      const dispTaskTitle = rawTaskTitle.replace(/\(milestone\)/gi, '').trim();
+      titleSpan.textContent = (r.ghost ? '\u27f3 ' : '') + trimTitle(dispTaskTitle, AppState.compactMode, 7);
       titleSpan.dataset.tooltip = rawTaskTitle;
       titleSpan.style.background = 'var(--bg)';
       titleSpan.style.color = 'var(--text)';
@@ -5463,7 +5474,7 @@ function renderLeft(visible, today, statsMap) {
       titleSpan.style.flexShrink = '0';
       lbl.appendChild(titleSpan);
       if (!r.ghost) {
-        const statusKey = (r.task.Status||'').toLowerCase();
+        const statusKey = (r.task.Status || '').toLowerCase();
         const sc = STATUS_COLORS[statusKey] || '#94a3b8';
         const circ = document.createElement('span');
         circ.style.display = 'inline-block'; circ.style.width = '8px'; circ.style.height = '8px';
@@ -5481,7 +5492,7 @@ function renderLeft(visible, today, statsMap) {
         const rawTaskTitle = r.task.Title || '';
         let htmlContext = `<b>${escHtml(rawTaskTitle)}</b>`;
         if (/\(milestone\)/i.test(rawTaskTitle)) {
-           htmlContext += ` <span style="background:var(--status-waiting);color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;font-size:10px;font-weight:bold;margin-left:4px;vertical-align:text-bottom;">M</span>`;
+          htmlContext += ` <span style="background:var(--status-waiting);color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;font-size:10px;font-weight:bold;margin-left:4px;vertical-align:text-bottom;">M</span>`;
         }
         if (r.task.Status) htmlContext += `<br/><span style="display:inline-block;padding:2px 8px;border-radius:10px;color:var(--pill-text);background:${sc};font-size:0.65rem;font-weight:bold;margin-top:6px;margin-bottom:2px;">${escHtml(r.task.Status)}</span>`;
         if (ov) { htmlContext += ` <span style="color:${ov.color};font-weight:bold;font-size:0.65rem;">(${ov.label})</span>`; }
@@ -5517,11 +5528,11 @@ function _buildDepOptions(depSel, excludeId) {
     .filter(t => !excludeId || getTaskId(t) !== excludeId)
     .slice()
     .sort((a, b) => {
-      const pa = (a.Phase||'').toLowerCase(), pb = (b.Phase||'').toLowerCase();
+      const pa = (a.Phase || '').toLowerCase(), pb = (b.Phase || '').toLowerCase();
       if (pa !== pb) return pa < pb ? -1 : 1;
-      const ca = (a.Category||'').toLowerCase(), cb = (b.Category||'').toLowerCase();
+      const ca = (a.Category || '').toLowerCase(), cb = (b.Category || '').toLowerCase();
       if (ca !== cb) return ca < cb ? -1 : 1;
-      return (a.Title||'').toLowerCase() < (b.Title||'').toLowerCase() ? -1 : 1;
+      return (a.Title || '').toLowerCase() < (b.Title || '').toLowerCase() ? -1 : 1;
     });
   sorted.forEach(t => {
     const op = document.createElement('option');
@@ -5585,7 +5596,7 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
   if (!chartArea) return;
   const caRect = chartArea.getBoundingClientRect();
   const relLeft = hitClientRect.left - caRect.left + chartArea.scrollLeft;
-  const relTop  = hitClientRect.top  - caRect.top  + chartArea.scrollTop;
+  const relTop = hitClientRect.top - caRect.top + chartArea.scrollTop;
 
   let ov = document.getElementById('bar-hover-overlay');
   if (!ov) {
@@ -5593,16 +5604,16 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
     ov.className = 'bar-hover-overlay';
     chartArea.appendChild(ov);
   }
-  ov.style.left   = relLeft + 'px';
-  ov.style.top    = relTop  + 'px';
-  ov.style.width  = hitClientRect.width  + 'px';
+  ov.style.left = relLeft + 'px';
+  ov.style.top = relTop + 'px';
+  ov.style.width = hitClientRect.width + 'px';
   ov.style.height = hitClientRect.height + 'px';
 
   // Always place buttons to the right of the cursor (clear zone = cursorGap).
   // If that overflows the right edge, float the group just past the right edge.
   const cursorInBar = cursorClientX - hitClientRect.left;
-  const btnGroupW   = BAR_HOVER_BTN_W;    // approx total width: 2 buttons + 4px gap
-  const cursorGap   = BAR_HOVER_CURSOR_GAP; // small clear zone so cursor doesn't cover buttons
+  const btnGroupW = BAR_HOVER_BTN_W;    // approx total width: 2 buttons + 4px gap
+  const cursorGap = BAR_HOVER_CURSOR_GAP; // small clear zone so cursor doesn't cover buttons
 
   let btnLeft = cursorInBar + cursorGap;
   if (btnLeft + btnGroupW > hitClientRect.width) {
@@ -5614,7 +5625,7 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
   ov.innerHTML = '';
   const actions = document.createElement('div'); actions.className = 'bar-hover-actions';
   actions.style.left = btnLeft + 'px';
-  actions.style.top  = btnTop  + 'px';
+  actions.style.top = btnTop + 'px';
 
   // Edit button (✎) is leftmost, Comments (💬) is to the right
   const btnE = document.createElement('button'); btnE.textContent = '\u270E'; btnE.dataset.tooltip = 'Edit task'; btnE.dataset.shortcut = 'e: edit';
@@ -5633,43 +5644,43 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
 
 // ── Render SVG chart ──────────────────────────────────────────────────
 function renderChart(visible, today) {
-  const cw    = getColWidth(); const cols  = getColumns();
-  const svg   = document.getElementById('gantt-svg');
-  const rightW = document.getElementById('right-panel').offsetWidth||960;
-  
+  const cw = getColWidth(); const cols = getColumns();
+  const svg = document.getElementById('gantt-svg');
+  const rightW = document.getElementById('right-panel').offsetWidth || 960;
+
   // Note: previously year AppState.view was clamped to exactly rightW, preventing scrolling
-  const totalW = Math.max(cols.length*cw, rightW);
+  const totalW = Math.max(cols.length * cw, rightW);
   // Extra bottom padding so the user can scroll the last item bar into view comfortably.
   // Also ensure the SVG fills the full chart area so gridlines reach the bottom even when few rows are visible.
   const extraBottomPad = Math.floor(window.innerHeight / 2);
   const chartAreaH = document.getElementById('chart-area').clientHeight || 0;
-  const totalH = Math.max(visible.length*ROW_H + extraBottomPad, chartAreaH, 400);
+  const totalH = Math.max(visible.length * ROW_H + extraBottomPad, chartAreaH, 400);
 
   svg.setAttribute('width', totalW); svg.setAttribute('height', totalH);
   while (svg.firstChild) svg.removeChild(svg.firstChild);
 
   // Dark mode color palette for SVG elements
   const _dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const _barBg      = 'var(--bg)';
-  const _ghostBg    = 'var(--surface)';
-  const _ghostProg  = 'var(--border-md)';
-  const _normProg   = 'var(--chart-prog)';
-  const _barText    = 'var(--text)';
-  const _gridMajor  = 'var(--border-md)';
-  const _gridMinor  = 'var(--grid-minor)';
-  const _gridWeek   = 'var(--border-md)';
-  const _rowSep     = 'var(--border)';
-  const _headMinor  = 'var(--border-md)';
+  const _barBg = 'var(--bg)';
+  const _ghostBg = 'var(--surface)';
+  const _ghostProg = 'var(--border-md)';
+  const _normProg = 'var(--chart-prog)';
+  const _barText = 'var(--text)';
+  const _gridMajor = 'var(--border-md)';
+  const _gridMinor = 'var(--grid-minor)';
+  const _gridWeek = 'var(--border-md)';
+  const _rowSep = 'var(--border)';
+  const _headMinor = 'var(--border-md)';
 
   const defs = svgEl('defs');
-  const mk = svgEl('marker',{id:'arr',markerWidth:6,markerHeight:6,refX:6,refY:3,orient:'auto'});
-  mk.appendChild(svgEl('path',{d:'M0,0 L6,3 L0,6 Z',fill:'var(--text-lt)'}));
+  const mk = svgEl('marker', { id: 'arr', markerWidth: 6, markerHeight: 6, refX: 6, refY: 3, orient: 'auto' });
+  mk.appendChild(svgEl('path', { d: 'M0,0 L6,3 L0,6 Z', fill: 'var(--text-lt)' }));
   defs.appendChild(mk);
 
   // The highlighted stroke-width is 2.5, while normal is 1.5. 
   // We scale the marker coordinates down by 1.5 / 2.5 = 0.6 so the arrowhead size stays exactly the same on screen.
-  const mkHi = svgEl('marker',{id:'arr-hi',markerWidth:3.6,markerHeight:3.6,refX:3.6,refY:1.8,orient:'auto'});
-  mkHi.appendChild(svgEl('path',{d:'M0,0 L3.6,1.8 L0,3.6 Z',fill:'var(--status-waiting)'}));
+  const mkHi = svgEl('marker', { id: 'arr-hi', markerWidth: 3.6, markerHeight: 3.6, refX: 3.6, refY: 1.8, orient: 'auto' });
+  mkHi.appendChild(svgEl('path', { d: 'M0,0 L3.6,1.8 L0,3.6 Z', fill: 'var(--status-waiting)' }));
   defs.appendChild(mkHi);
   svg.appendChild(defs);
 
@@ -5684,243 +5695,251 @@ function renderChart(visible, today) {
 
   // Pre-compute highlight row index (rect drawn after grid lines so it covers them)
   const _highlightRi = AppState._highlightId
-    ? visible.findIndex(r => r.type==='task' && !r.ghost && getTaskId(r.task) === AppState._highlightId)
+    ? visible.findIndex(r => r.type === 'task' && !r.ghost && getTaskId(r.task) === AppState._highlightId)
     : -1;
   const _highlightCatRi = AppState._highlightCat
-    ? visible.findIndex(r => r.type==='category' && r.phase === AppState._highlightCat.phase && r.cat === AppState._highlightCat.cat)
+    ? visible.findIndex(r => r.type === 'category' && r.phase === AppState._highlightCat.phase && r.cat === AppState._highlightCat.cat)
     : -1;
 
   // Row backgrounds
-  visible.forEach((r,ri) => {
-    if (r.ghost && r.type==='task')
-      svg.appendChild(svgEl('rect',{x:0,y:ri*ROW_H,width:totalW,height:ROW_H,fill:_ghostBg}));
-    if (r.type==='phase' && ri>0)
-      svg.appendChild(svgEl('line',{x1:0,y1:ri*ROW_H,x2:totalW,y2:ri*ROW_H,stroke:_rowSep,'stroke-width':1.5}));
+  visible.forEach((r, ri) => {
+    if (r.ghost && r.type === 'task')
+      svg.appendChild(svgEl('rect', { x: 0, y: ri * ROW_H, width: totalW, height: ROW_H, fill: _ghostBg }));
+    if (r.type === 'phase' && ri > 0)
+      svg.appendChild(svgEl('line', { x1: 0, y1: ri * ROW_H, x2: totalW, y2: ri * ROW_H, stroke: _rowSep, 'stroke-width': 1.5 }));
   });
 
   // ── Timeline header ──
   const hdr = document.getElementById('timeline-header'); hdr.innerHTML = '';
   if (AppState.changesOnly && AppState.compareLabel) hdr.classList.add('changes-glow');
   else hdr.classList.remove('changes-glow');
-  
-  const hSvg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-  hSvg.setAttribute('width',totalW); hSvg.setAttribute('height',HEAD_H);
-  hSvg.style.display='block'; hdr.appendChild(hSvg);
 
-  if (AppState.view==='week') {
+  const hSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  hSvg.setAttribute('width', totalW); hSvg.setAttribute('height', HEAD_H);
+  hSvg.style.display = 'block'; hdr.appendChild(hSvg);
+
+  if (AppState.view === 'week') {
     // Header for weeks: row1=Month+Week#, row2=Day abbr, row3=Day number
-    for (let wk=0; wk<(cols.length/7); wk++) {
-      const wkStart=addDays(AppState.renderStart,wk*7);
-      const x=wk*7*cw;
-      const isoW=getISOWeek(wkStart);
-      const monName=MONTH_ABBR[wkStart.getMonth()];
+    for (let wk = 0; wk < (cols.length / 7); wk++) {
+      const wkStart = addDays(AppState.renderStart, wk * 7);
+      const x = wk * 7 * cw;
+      const isoW = getISOWeek(wkStart);
+      const monName = MONTH_ABBR[wkStart.getMonth()];
       // Row 1: Month Year · Wk# header
-      hSvg.appendChild(svgEl('text',{x:x+7*cw/2,y:13,'text-anchor':'middle',fill:'var(--accent)','font-size':11,'font-weight':'700'},`${monName} ${wkStart.getFullYear()} \u00b7 W${isoW}`));
+      hSvg.appendChild(svgEl('text', { x: x + 7 * cw / 2, y: 13, 'text-anchor': 'middle', fill: 'var(--accent)', 'font-size': 11, 'font-weight': '700' }, `${monName} ${wkStart.getFullYear()} \u00b7 W${isoW}`));
       // Week separator line
-      if(wk>0){
-        svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridWeek,'stroke-width':2}));
-        hSvg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:HEAD_H,stroke:_gridWeek,'stroke-width':2}));
+      if (wk > 0) {
+        svg.appendChild(svgEl('line', { x1: x, y1: 0, x2: x, y2: totalH, stroke: _gridWeek, 'stroke-width': 2 }));
+        hSvg.appendChild(svgEl('line', { x1: x, y1: 0, x2: x, y2: HEAD_H, stroke: _gridWeek, 'stroke-width': 2 }));
       }
       // Row 2: day abbr, Row 3: day number
-      const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      for(let d=0;d<7;d++){
-        const dd=addDays(AppState.renderStart,wk*7+d);
-        const dx=x+d*cw;
-        hSvg.appendChild(svgEl('line',{x1:dx,y1:16,x2:dx,y2:HEAD_H,stroke:_headMinor,'stroke-width':1}));
-        hSvg.appendChild(svgEl('text',{x:dx+cw/2,y:27,'text-anchor':'middle',fill:'var(--text-lt)','font-size':9},dayNames[dd.getDay()]));
-        hSvg.appendChild(svgEl('text',{x:dx+cw/2,y:40,'text-anchor':'middle',fill:'var(--text-mu)','font-size':10},String(dd.getDate())));
-        svg.appendChild(svgEl('line',{x1:dx,y1:0,x2:dx,y2:totalH,stroke:_gridMinor,'stroke-width':1}));
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      for (let d = 0; d < 7; d++) {
+        const dd = addDays(AppState.renderStart, wk * 7 + d);
+        const dx = x + d * cw;
+        hSvg.appendChild(svgEl('line', { x1: dx, y1: 16, x2: dx, y2: HEAD_H, stroke: _headMinor, 'stroke-width': 1 }));
+        hSvg.appendChild(svgEl('text', { x: dx + cw / 2, y: 27, 'text-anchor': 'middle', fill: 'var(--text-lt)', 'font-size': 9 }, dayNames[dd.getDay()]));
+        hSvg.appendChild(svgEl('text', { x: dx + cw / 2, y: 40, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 10 }, String(dd.getDate())));
+        svg.appendChild(svgEl('line', { x1: dx, y1: 0, x2: dx, y2: totalH, stroke: _gridMinor, 'stroke-width': 1 }));
       }
     }
-  } else if (AppState.view==='year') {
-    cols.forEach((col,ci) => {
-      const x=ci*cw; const mon=col.date;
-      hSvg.appendChild(svgEl('text',{x:x+cw/2,y:16,'text-anchor':'middle',fill:'var(--accent)','font-size':11,'font-weight':'700'},`${MONTH_ABBR[mon.getMonth()]} ${mon.getFullYear()}`));
-      const dim=daysInMonth(mon.getFullYear(),mon.getMonth());
-      for(let d=1;d<=dim;d++){
-        const dd=new Date(mon.getFullYear(),mon.getMonth(),d);
-        if(dd.getDay()===1){
-          const wx=x+(d-1)/dim*cw;
-          svg.appendChild(svgEl('line',{x1:wx,y1:0,x2:wx,y2:totalH,stroke:_gridMinor,'stroke-width':1}));
-          hSvg.appendChild(svgEl('text',{x:wx+1,y:40,fill:'var(--text-lt)','font-size':8},`W${getISOWeek(dd)}`));
+  } else if (AppState.view === 'year') {
+    cols.forEach((col, ci) => {
+      const x = ci * cw; const mon = col.date;
+      hSvg.appendChild(svgEl('text', { x: x + cw / 2, y: 16, 'text-anchor': 'middle', fill: 'var(--accent)', 'font-size': 11, 'font-weight': '700' }, `${MONTH_ABBR[mon.getMonth()]} ${mon.getFullYear()}`));
+      const dim = daysInMonth(mon.getFullYear(), mon.getMonth());
+      for (let d = 1; d <= dim; d++) {
+        const dd = new Date(mon.getFullYear(), mon.getMonth(), d);
+        if (dd.getDay() === 1) {
+          const wx = x + (d - 1) / dim * cw;
+          svg.appendChild(svgEl('line', { x1: wx, y1: 0, x2: wx, y2: totalH, stroke: _gridMinor, 'stroke-width': 1 }));
+          hSvg.appendChild(svgEl('text', { x: wx + 1, y: 40, fill: 'var(--text-lt)', 'font-size': 8 }, `W${getISOWeek(dd)}`));
         }
       }
-      if(ci>0){
-        svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridMajor,'stroke-width':1.5}));
-        hSvg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:HEAD_H,stroke:_gridMajor,'stroke-width':1}));
+      if (ci > 0) {
+        svg.appendChild(svgEl('line', { x1: x, y1: 0, x2: x, y2: totalH, stroke: _gridMajor, 'stroke-width': 1.5 }));
+        hSvg.appendChild(svgEl('line', { x1: x, y1: 0, x2: x, y2: HEAD_H, stroke: _gridMajor, 'stroke-width': 1 }));
       }
     });
   } else {
-    let prevMonth='';
-    cols.forEach((col,ci) => {
-      const x=ci*cw;
-      svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridMinor,'stroke-width':1}));
-      if(AppState.view==='week'){
-        const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-        hSvg.appendChild(svgEl('text',{x:x+cw/2,y:15,'text-anchor':'middle',fill:'var(--text-lt)','font-size':9},days[col.date.getDay()]));
-        hSvg.appendChild(svgEl('text',{x:x+cw/2,y:32,'text-anchor':'middle',fill:'var(--text-mu)','font-size':10},String(col.date.getDate())));
+    let prevMonth = '';
+    cols.forEach((col, ci) => {
+      const x = ci * cw;
+      svg.appendChild(svgEl('line', { x1: x, y1: 0, x2: x, y2: totalH, stroke: _gridMinor, 'stroke-width': 1 }));
+      if (AppState.view === 'week') {
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        hSvg.appendChild(svgEl('text', { x: x + cw / 2, y: 15, 'text-anchor': 'middle', fill: 'var(--text-lt)', 'font-size': 9 }, days[col.date.getDay()]));
+        hSvg.appendChild(svgEl('text', { x: x + cw / 2, y: 32, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 10 }, String(col.date.getDate())));
       } else {
-        const ml=`${MONTH_ABBR[col.date.getMonth()]} ${col.date.getFullYear()}`;
-        if(ml!==prevMonth){
-          prevMonth=ml;
-          hSvg.appendChild(svgEl('text',{x:x+2,y:16,fill:'var(--accent)','font-size':11,'font-weight':'700'},ml));
-          if(ci>0){
-            svg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:totalH,stroke:_gridMajor,'stroke-width':1.5}));
-            hSvg.appendChild(svgEl('line',{x1:x,y1:0,x2:x,y2:HEAD_H,stroke:_gridMajor,'stroke-width':1.5}));
+        const ml = `${MONTH_ABBR[col.date.getMonth()]} ${col.date.getFullYear()}`;
+        if (ml !== prevMonth) {
+          prevMonth = ml;
+          hSvg.appendChild(svgEl('text', { x: x + 2, y: 16, fill: 'var(--accent)', 'font-size': 11, 'font-weight': '700' }, ml));
+          if (ci > 0) {
+            svg.appendChild(svgEl('line', { x1: x, y1: 0, x2: x, y2: totalH, stroke: _gridMajor, 'stroke-width': 1.5 }));
+            hSvg.appendChild(svgEl('line', { x1: x, y1: 0, x2: x, y2: HEAD_H, stroke: _gridMajor, 'stroke-width': 1.5 }));
           }
         }
-        if(col.date.getDate()%5===0||col.date.getDate()===1)
-          hSvg.appendChild(svgEl('text',{x:x+1,y:34,fill:'var(--text-lt)','font-size':9},String(col.date.getDate())));
+        if (col.date.getDate() % 5 === 0 || col.date.getDate() === 1)
+          hSvg.appendChild(svgEl('text', { x: x + 1, y: 34, fill: 'var(--text-lt)', 'font-size': 9 }, String(col.date.getDate())));
       }
     });
   }
 
   // ── Row highlight (drawn after grid lines so it covers minor lines) ──
   if (_highlightRi >= 0) {
-    svg.appendChild(svgEl('rect',{x:0,y:_highlightRi*ROW_H,width:totalW,height:ROW_H,fill:_barBg}));
-    svg.appendChild(svgEl('rect',{x:0,y:_highlightRi*ROW_H,width:totalW,height:ROW_H,fill:_dark?'rgba(251,191,36,0.18)':'rgba(239,68,68,0.10)'}));
+    svg.appendChild(svgEl('rect', { x: 0, y: _highlightRi * ROW_H, width: totalW, height: ROW_H, fill: _barBg }));
+    svg.appendChild(svgEl('rect', { x: 0, y: _highlightRi * ROW_H, width: totalW, height: ROW_H, fill: _dark ? 'rgba(251,191,36,0.18)' : 'rgba(239,68,68,0.10)' }));
   }
   if (_highlightCatRi >= 0) {
-    svg.appendChild(svgEl('rect',{x:0,y:_highlightCatRi*ROW_H,width:totalW,height:ROW_H,fill:_dark?'rgba(56,189,248,0.18)':'rgba(239,68,68,0.10)'}));
+    svg.appendChild(svgEl('rect', { x: 0, y: _highlightCatRi * ROW_H, width: totalW, height: ROW_H, fill: _dark ? 'rgba(56,189,248,0.18)' : 'rgba(239,68,68,0.10)' }));
   }
 
   // ── Today line ──
-  const todayX=dateToX(today);
-  if(todayX>=0&&todayX<=totalW){
-    svg.appendChild(svgEl('line',{x1:todayX,y1:0,x2:todayX,y2:totalH,stroke:'var(--status-waiting)','stroke-width':1.5,'stroke-dasharray':'5,4',opacity:.85}));
+  const todayX = dateToX(today);
+  if (todayX >= 0 && todayX <= totalW) {
+    svg.appendChild(svgEl('line', { x1: todayX, y1: 0, x2: todayX, y2: totalH, stroke: 'var(--status-waiting)', 'stroke-width': 1.5, 'stroke-dasharray': '5,4', opacity: .85 }));
     // Small amber triangle in header pointing down to today
-    hSvg.appendChild(svgEl('polygon',{points:`${todayX-4},${HEAD_H} ${todayX+4},${HEAD_H} ${todayX},${HEAD_H-6}`,fill:'var(--status-waiting)'}));
+    hSvg.appendChild(svgEl('polygon', { points: `${todayX - 4},${HEAD_H} ${todayX + 4},${HEAD_H} ${todayX},${HEAD_H - 6}`, fill: 'var(--status-waiting)' }));
     // Today label in chart area (below header, top of chart) - not in header to avoid overlap with date labels
-    const todayLbl=`Today \u00b7 ${MONTH_ABBR[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
-    svg.appendChild(svgEl('text',{x:todayX+4,y:18,fill:'var(--text)','font-size':11,'font-weight':'700',
-      'font-family':'var(--font)',style:'pointer-events:none'},todayLbl));
+    const todayLbl = `Today \u00b7 ${MONTH_ABBR[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+    svg.appendChild(svgEl('text', {
+      x: todayX + 4, y: 18, fill: 'var(--text)', 'font-size': 11, 'font-weight': '700',
+      'font-family': 'var(--font)', style: 'pointer-events:none'
+    }, todayLbl));
   }
 
   // ── Dependency arrows ──
-  const taskRows=visible.map((r,ri)=>({...r,ri})).filter(r=>r.type==='task'&&!r.ghost);
-  const idToRow={};
-  taskRows.forEach(r=>{ const id=getTaskId(r.task); if(id) idToRow[id]=r; });
-  const arrG=svgEl('g');
-  taskRows.forEach(r=>{
-    const dep=r.task.Dependency?String(r.task.Dependency).trim():''; if(!dep)return;
-    const parent=idToRow[dep]; if(!parent)return;
-    const pEnd=parseDate(parent.task['End Date']); const cStart=parseDate(r.task['Start Date']);
-    if(!pEnd||!cStart)return;
-    const x1=dateToX(addDays(pEnd,1)),y1=parent.ri*ROW_H+ROW_H/2;
-    const x2=dateToX(cStart),y2=r.ri*ROW_H+ROW_H/2;
+  const taskRows = visible.map((r, ri) => ({ ...r, ri })).filter(r => r.type === 'task' && !r.ghost);
+  const idToRow = {};
+  taskRows.forEach(r => { const id = getTaskId(r.task); if (id) idToRow[id] = r; });
+  const arrG = svgEl('g');
+  taskRows.forEach(r => {
+    const dep = r.task.Dependency ? String(r.task.Dependency).trim() : ''; if (!dep) return;
+    const parent = idToRow[dep]; if (!parent) return;
+    const pEnd = parseDate(parent.task['End Date']); const cStart = parseDate(r.task['Start Date']);
+    if (!pEnd || !cStart) return;
+    const x1 = dateToX(addDays(pEnd, 1)), y1 = parent.ri * ROW_H + ROW_H / 2;
+    const x2 = dateToX(cStart), y2 = r.ri * ROW_H + ROW_H / 2;
     let d = '';
     if (x1 < x2 - 12) {
-      d = `M${x1},${y1} H${(x1+x2)/2} V${y2} H${x2}`;
+      d = `M${x1},${y1} H${(x1 + x2) / 2} V${y2} H${x2}`;
     } else {
       const gY = y1 + (y2 > y1 ? 16 : -16);
-      d = `M${x1},${y1} H${x1+6} V${gY} H${x2-12} V${y2} H${x2}`;
+      d = `M${x1},${y1} H${x1 + 6} V${gY} H${x2 - 12} V${y2} H${x2}`;
     }
-    const arrPath = svgEl('path',{d, fill:'none',stroke:'var(--text-lt)','stroke-width':1.5,'marker-end':'url(#arr)',style:'pointer-events:none'});
+    const arrPath = svgEl('path', { d, fill: 'none', stroke: 'var(--text-lt)', 'stroke-width': 1.5, 'marker-end': 'url(#arr)', style: 'pointer-events:none' });
     arrPath.dataset.depChildId = getTaskId(r.task);
     arrG.appendChild(arrPath);
   });
-  
+
   // ── Load More Buttons ──
   const btnW = 120, btnH = 30;
-  
+
   // Load More Past (Left)
-  const leftG = svgEl('g', {style: 'cursor:pointer;'});
-  leftG.appendChild(svgEl('rect', {x: 10, y: totalH / 2 - btnH/2, width: btnW, height: btnH, rx: 15, fill: 'var(--bg)', stroke: 'var(--today)', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))'}));
-  leftG.appendChild(svgEl('text', {x: 10 + btnW/2, y: totalH / 2 + 4, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 12, 'font-weight': '600', style: 'pointer-events:none;'}, '« Load More Past'));
+  const leftG = svgEl('g', { style: 'cursor:pointer;' });
+  leftG.appendChild(svgEl('rect', { x: 10, y: totalH / 2 - btnH / 2, width: btnW, height: btnH, rx: 15, fill: 'var(--bg)', stroke: 'var(--today)', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))' }));
+  leftG.appendChild(svgEl('text', { x: 10 + btnW / 2, y: totalH / 2 + 4, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 12, 'font-weight': '600', style: 'pointer-events:none;' }, '« Load More Past'));
   leftG.onmousedown = (e) => { e.stopPropagation(); loadMore('past'); };
   svg.appendChild(leftG);
 
   // Load More Future (Right)
-  const rightG = svgEl('g', {style: 'cursor:pointer;'});
-  rightG.appendChild(svgEl('rect', {x: totalW - btnW - 10, y: totalH / 2 - btnH/2, width: btnW, height: btnH, rx: 15, fill: 'var(--bg)', stroke: 'var(--today)', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))'}));
-  rightG.appendChild(svgEl('text', {x: totalW - btnW/2 - 10, y: totalH / 2 + 4, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 12, 'font-weight': '600', style: 'pointer-events:none;'}, 'Load More Future »'));
+  const rightG = svgEl('g', { style: 'cursor:pointer;' });
+  rightG.appendChild(svgEl('rect', { x: totalW - btnW - 10, y: totalH / 2 - btnH / 2, width: btnW, height: btnH, rx: 15, fill: 'var(--bg)', stroke: 'var(--today)', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))' }));
+  rightG.appendChild(svgEl('text', { x: totalW - btnW / 2 - 10, y: totalH / 2 + 4, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 12, 'font-weight': '600', style: 'pointer-events:none;' }, 'Load More Future »'));
   rightG.onmousedown = (e) => { e.stopPropagation(); loadMore('future'); };
   svg.appendChild(rightG);
 
   svg.appendChild(arrG); // Append dependencies behind bars
 
   // ── Bars ──
-  visible.forEach((r,ri) => {
-    if(r.type!=='task')return;
-    const t=r.task; const ghost=r.ghost; const color=r.color;
-    const start=parseDate(t['Start Date']); const end=parseDate(t['End Date']);
-    if(!start||!end)return;
-    const logicW=Math.max(dateToX(addDays(end,1))-dateToX(start),4);
-    const drawW=Math.max(logicW,MIN_BAR_W);
-    const x=dateToX(start); const y=ri*ROW_H+5; const h=ROW_H-10; const rx=8;
-    const pct=Math.max(0,Math.min(100,Number(t.Progress)||0));
-    const isOverdue=!ghost&&end<today&&pct<100;
+  visible.forEach((r, ri) => {
+    if (r.type !== 'task') return;
+    const t = r.task; const ghost = r.ghost; const color = r.color;
+    const start = parseDate(t['Start Date']); const end = parseDate(t['End Date']);
+    if (!start || !end) return;
+    const logicW = Math.max(dateToX(addDays(end, 1)) - dateToX(start), 4);
+    const drawW = Math.max(logicW, MIN_BAR_W);
+    const x = dateToX(start); const y = ri * ROW_H + 5; const h = ROW_H - 10; const rx = 8;
+    const pct = Math.max(0, Math.min(100, Number(t.Progress) || 0));
+    const isOverdue = !ghost && end < today && pct < 100;
 
-    const clipId=`clip${ri}`;
-    const cp=svgEl('clipPath',{id:clipId});
-    cp.appendChild(svgEl('rect',{x:x+1.5,y:y+1.5,width:Math.max(drawW-3,0),height:h-3,rx:Math.max(rx-1,0)}));
+    const clipId = `clip${ri}`;
+    const cp = svgEl('clipPath', { id: clipId });
+    cp.appendChild(svgEl('rect', { x: x + 1.5, y: y + 1.5, width: Math.max(drawW - 3, 0), height: h - 3, rx: Math.max(rx - 1, 0) }));
     defs.appendChild(cp);
 
-    if(ghost){
-      const gg=svgEl('g',{opacity:'0.7'});
-      gg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:_ghostBg,stroke:'var(--text-lt)','stroke-width':1.5,'stroke-dasharray':'4,3'}));
-      if(pct>0)gg.appendChild(svgEl('rect',{x:x+1.5,y:y+1.5,width:Math.max((drawW-3)*pct/100,0),height:h-3,fill:_ghostProg,'clip-path':`url(#${clipId})`}));
-      if(drawW>12){
-        const gt=svgEl('text',{x:x+5,y:y+h/2+4,fill:'var(--text-lt)','font-size':12,'font-weight':'500',
-          'font-family':'var(--font)','clip-path':`url(#${clipId})`,style:'pointer-events:none'});
-        gt.textContent=t.Title||''; gg.appendChild(gt);
+    if (ghost) {
+      const gg = svgEl('g', { opacity: '0.7' });
+      gg.appendChild(svgEl('rect', { x, y, width: drawW, height: h, rx, fill: _ghostBg, stroke: 'var(--text-lt)', 'stroke-width': 1.5, 'stroke-dasharray': '4,3' }));
+      if (pct > 0) gg.appendChild(svgEl('rect', { x: x + 1.5, y: y + 1.5, width: Math.max((drawW - 3) * pct / 100, 0), height: h - 3, fill: _ghostProg, 'clip-path': `url(#${clipId})` }));
+      if (drawW > 12) {
+        const gt = svgEl('text', {
+          x: x + 5, y: y + h / 2 + 4, fill: 'var(--text-lt)', 'font-size': 12, 'font-weight': '500',
+          'font-family': 'var(--font)', 'clip-path': `url(#${clipId})`, style: 'pointer-events:none'
+        });
+        gt.textContent = t.Title || ''; gg.appendChild(gt);
       }
       svg.appendChild(gg);
     } else {
-      if(isOverdue)svg.appendChild(svgEl('rect',{x:x-3,y:y-3,width:drawW+6,height:h+6,rx:rx+2,fill:'none',stroke:'var(--today)','stroke-width':2,opacity:'0.5'}));
-      svg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:_barBg}));
-      if(pct>0)svg.appendChild(svgEl('rect',{x:x+1.5,y:y+1.5,width:Math.max((drawW-3)*pct/100,0),height:h-3,fill:_normProg,'clip-path':`url(#${clipId})`}));
-      svg.appendChild(svgEl('rect',{x,y,width:drawW,height:h,rx,fill:'none',stroke:color,'stroke-width':2}));
+      if (isOverdue) svg.appendChild(svgEl('rect', { x: x - 3, y: y - 3, width: drawW + 6, height: h + 6, rx: rx + 2, fill: 'none', stroke: 'var(--today)', 'stroke-width': 2, opacity: '0.5' }));
+      svg.appendChild(svgEl('rect', { x, y, width: drawW, height: h, rx, fill: _barBg }));
+      if (pct > 0) svg.appendChild(svgEl('rect', { x: x + 1.5, y: y + 1.5, width: Math.max((drawW - 3) * pct / 100, 0), height: h - 3, fill: _normProg, 'clip-path': `url(#${clipId})` }));
+      svg.appendChild(svgEl('rect', { x, y, width: drawW, height: h, rx, fill: 'none', stroke: color, 'stroke-width': 2 }));
       // Status circle (always shown since MIN_BAR_W guarantees space)
-      const sc=STATUS_COLORS[(t.Status||'').toLowerCase()]||'#94a3b8';
-      const circX=x+drawW-9;
-      svg.appendChild(svgEl('circle',{cx:circX,cy:y+h/2,r:4.5,fill:sc}));
+      const sc = STATUS_COLORS[(t.Status || '').toLowerCase()] || '#94a3b8';
+      const circX = x + drawW - 9;
+      svg.appendChild(svgEl('circle', { cx: circX, cy: y + h / 2, r: 4.5, fill: sc }));
       // Title text — strip (milestone), then trim to avoid overlapping status circle
-      const CHAR_W=6.3;
-      const availW=drawW-5-18; // 5px left pad, 18px circle area right
-      const rawTitle=t.Title||'';
-      const dispTitle=rawTitle.replace(/\(milestone\)/gi,'').trim();
-      const maxChars=Math.max(3,Math.floor(availW/CHAR_W));
-      const displayTitle=dispTitle.length>maxChars?dispTitle.slice(0,maxChars-1)+'\u2026':dispTitle;
-      const tx=svgEl('text',{x:x+5,y:y+h/2+4,fill:_barText,'font-size':12,'font-weight':'600',
-        'font-family':'var(--font)','clip-path':`url(#${clipId})`,style:'pointer-events:none'});
-      tx.textContent=displayTitle; svg.appendChild(tx);
+      const CHAR_W = 6.3;
+      const availW = drawW - 5 - 18; // 5px left pad, 18px circle area right
+      const rawTitle = t.Title || '';
+      const dispTitle = rawTitle.replace(/\(milestone\)/gi, '').trim();
+      const maxChars = Math.max(3, Math.floor(availW / CHAR_W));
+      const displayTitle = dispTitle.length > maxChars ? dispTitle.slice(0, maxChars - 1) + '\u2026' : dispTitle;
+      const tx = svgEl('text', {
+        x: x + 5, y: y + h / 2 + 4, fill: _barText, 'font-size': 12, 'font-weight': '600',
+        'font-family': 'var(--font)', 'clip-path': `url(#${clipId})`, style: 'pointer-events:none'
+      });
+      tx.textContent = displayTitle; svg.appendChild(tx);
       // Milestone marker: gold diamond with white M, to the right of the bar
-      if(/\(milestone\)/i.test(rawTitle)){
-        const ms=h/2;  // half-size of diamond = half bar height
-        const mx=x+drawW+ms+4, my=y+h/2;
+      if (/\(milestone\)/i.test(rawTitle)) {
+        const ms = h / 2;  // half-size of diamond = half bar height
+        const mx = x + drawW + ms + 4, my = y + h / 2;
         // Diamond = rotated square: top, right, bottom, left vertices
-        const pts=`${mx},${my-ms} ${mx+ms},${my} ${mx},${my+ms} ${mx-ms},${my}`;
-        const diamond=svgEl('polygon',{points:pts,fill:'var(--status-waiting)',stroke:'var(--status-waiting)','stroke-width':1.5,style:'cursor:default'});
-        diamond.addEventListener('mousemove', e=>showSimpleTooltip(e,'Milestone Task'));
+        const pts = `${mx},${my - ms} ${mx + ms},${my} ${mx},${my + ms} ${mx - ms},${my}`;
+        const diamond = svgEl('polygon', { points: pts, fill: 'var(--status-waiting)', stroke: 'var(--status-waiting)', 'stroke-width': 1.5, style: 'cursor:default' });
+        diamond.addEventListener('mousemove', e => showSimpleTooltip(e, 'Milestone Task'));
         diamond.addEventListener('mouseleave', hideTooltip);
         svg.appendChild(diamond);
-        const mt=svgEl('text',{x:mx,y:my+4,'text-anchor':'middle',fill:'#fff','font-size':12,'font-weight':'700',
-          'font-family':'var(--font)',style:'pointer-events:none'},'M');
+        const mt = svgEl('text', {
+          x: mx, y: my + 4, 'text-anchor': 'middle', fill: '#fff', 'font-size': 12, 'font-weight': '700',
+          'font-family': 'var(--font)', style: 'pointer-events:none'
+        }, 'M');
         svg.appendChild(mt);
       }
-      
+
       // Closed Dependency Attention Icon
-      if(t.Dependency) {
+      if (t.Dependency) {
         const depId = String(t.Dependency).trim();
-        if(!idToRow[depId] && !isDoneTask(t)) {
+        if (!idToRow[depId] && !isDoneTask(t)) {
           const realParent = AppState.currentTasks.find(pt => getTaskId(pt) === depId);
-          if(realParent && (AppState.collapsed['p:'+realParent.Phase] || AppState.collapsed['c:'+realParent.Phase+':'+realParent.Category])) {
+          if (realParent && (AppState.collapsed['p:' + realParent.Phase] || AppState.collapsed['c:' + realParent.Phase + ':' + realParent.Category])) {
             const iconX = x - 13;
-            const iconY = y + h/2;
-            const attG = svgEl('g', {style: 'cursor:pointer'});
-            attG.appendChild(svgEl('circle', {cx: iconX, cy: iconY, r: 10, fill: 'var(--status-behind)'}));
-            const ex = svgEl('text', {x: iconX, y: iconY + 4, 'text-anchor':'middle', fill:'#fff', 'font-size': 10, 'font-weight': 'bold'});
+            const iconY = y + h / 2;
+            const attG = svgEl('g', { style: 'cursor:pointer' });
+            attG.appendChild(svgEl('circle', { cx: iconX, cy: iconY, r: 10, fill: 'var(--status-behind)' }));
+            const ex = svgEl('text', { x: iconX, y: iconY + 4, 'text-anchor': 'middle', fill: '#fff', 'font-size': 10, 'font-weight': 'bold' });
             ex.textContent = '!';
             attG.appendChild(ex);
-            
+
             attG.onclick = () => {
-              AppState.collapsed['p:'+realParent.Phase] = false;
-              AppState.collapsed['c:'+realParent.Phase+':'+realParent.Category] = false;
+              AppState.collapsed['p:' + realParent.Phase] = false;
+              AppState.collapsed['c:' + realParent.Phase + ':' + realParent.Category] = false;
               render();
               setTimeout(() => scrollToTask(realParent), 60);
             };
-            const _depPColor = catColor(realParent.Category||'');
+            const _depPColor = catColor(realParent.Category || '');
             const _depHtml = `Hidden dependency:<br/><span style="color:var(--text-lt);font-size:0.7rem;">${escHtml(realParent.Phase)} \u203A <span style="color:${_depPColor};font-weight:600;">${escHtml(realParent.Category)}</span> \u203A </span><b>${escHtml(realParent.Title)}</b>`;
             attG.onmousemove = (e) => showHTMLTooltip(e, _depHtml);
             attG.onmouseleave = hideTooltip;
@@ -5931,16 +5950,16 @@ function renderChart(visible, today) {
     }
 
     // Partner for diff tooltip
-    const myId=getTaskId(t);
-    const partner=ghost?currById[myId]:(AppState.compareLabel?ghostById[myId]:null);
+    const myId = getTaskId(t);
+    const partner = ghost ? currById[myId] : (AppState.compareLabel ? ghostById[myId] : null);
 
-    const hit=svgEl('rect',{x,y,width:drawW,height:h,fill:'transparent',rx,style:'cursor:pointer'});
-    hit.addEventListener('mousemove', e=>showTooltip(e,t,r.snapshotLabel,partner,ghost));
+    const hit = svgEl('rect', { x, y, width: drawW, height: h, fill: 'transparent', rx, style: 'cursor:pointer' });
+    hit.addEventListener('mousemove', e => showTooltip(e, t, r.snapshotLabel, partner, ghost));
     hit.addEventListener('mouseleave', hideTooltip);
     if (!ghost) {
-        hit.addEventListener('click', (e) => { e.stopPropagation(); hideTooltip(); openTaskModal(t, 'edit'); });
-        hit.addEventListener('mouseenter', (e) => { _showBarHoverOverlay(t, e.clientX, hit.getBoundingClientRect()); });
-        hit.addEventListener('mouseleave', _scheduleHideBarHover);
+      hit.addEventListener('click', (e) => { e.stopPropagation(); hideTooltip(); openTaskModal(t, 'edit'); });
+      hit.addEventListener('mouseenter', (e) => { _showBarHoverOverlay(t, e.clientX, hit.getBoundingClientRect()); });
+      hit.addEventListener('mouseleave', _scheduleHideBarHover);
     }
     svg.appendChild(hit);
   });
@@ -5965,7 +5984,7 @@ function _getVal(task, key) {
   if (key === 'Start Date' || key === 'End Date') {
     const d = typeof parseDate === 'function' ? parseDate(v) : null;
     if (d && !isNaN(d)) {
-      const moFull = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const moFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       return String(d.getDate()).padStart(2, '0') + ' ' + moFull[d.getMonth()] + ' ' + d.getFullYear();
     }
   }
@@ -5978,7 +5997,7 @@ function _getVal(task, key) {
 
 function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
   const tt = document.getElementById('tooltip');
-  const sc = STATUS_COLORS[(t.Status||'').toLowerCase()]||'#94a3b8';
+  const sc = STATUS_COLORS[(t.Status || '').toLowerCase()] || '#94a3b8';
   const snap = snapLabel ? `<div class="tt-snap">Snapshot: ${escHtml(snapLabel)}</div>` : '';
 
   const myPhase = t.Phase || '(No Phase)';
@@ -5988,26 +6007,26 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
 
   // Fields to render in the tooltip (Description moved to top)
   const fields = [
-    {label:'Description',key:'Description', skip_diff:true},
-    {label:'Status',     key:'Status', is_status:true},
-    {label:'Start',      key:'Start Date'},
-    {label:'End',        key:'End Date'},
-    {label:'Progress',   key:'Progress'},
-    {label:'Priority',   key:'Priority'},
-    {label:'Dependency', key:'Dependency'},
+    { label: 'Description', key: 'Description', skip_diff: true },
+    { label: 'Status', key: 'Status', is_status: true },
+    { label: 'Start', key: 'Start Date' },
+    { label: 'End', key: 'End Date' },
+    { label: 'Progress', key: 'Progress' },
+    { label: 'Priority', key: 'Priority' },
+    { label: 'Dependency', key: 'Dependency' },
   ];
 
   const currentList = AppState.currentTasks || [];
   const snapList = (snapLabel && DATA.snapshots[snapLabel]) ? DATA.snapshots[snapLabel] : [];
 
   let rows = '';
-  fields.forEach(({label,key,skip_diff,is_status}) => {
-    const myVal  = _getVal(t, key);
+  fields.forEach(({ label, key, skip_diff, is_status }) => {
+    const myVal = _getVal(t, key);
     let diffHtml = '';
     if (!skip_diff && partnerTask) {
       const partVal = _getVal(partnerTask, key);
       if (myVal !== partVal) {
-        const cls   = isGhost ? 'tt-diff-curr' : 'tt-diff-snap';
+        const cls = isGhost ? 'tt-diff-curr' : 'tt-diff-snap';
         diffHtml = `<span class="${cls}">${escHtml(partVal)}</span>`;
       }
     }
@@ -6017,7 +6036,7 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
       const ctxList = isGhost ? snapList : currentList;
       const parent = ctxList.find(pt => getTaskId(pt) === myVal);
       if (parent) {
-        const pColor = catColor(parent.Category||'');
+        const pColor = catColor(parent.Category || '');
         valHtml = `${escHtml(parent.Phase)} \u203A <span style="color:${pColor};font-weight:600;">${escHtml(parent.Category)}</span> \u203A ${escHtml(parent.Title)} <span style="color:#94a3b8;font-size:0.7em;">(${escHtml(myVal)})</span>`;
       } else {
         valHtml = escHtml(myVal);
@@ -6048,12 +6067,12 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
   }
   rows += `</div>`;
   if (ttComments.length > 0) {
-    const latest = ttComments.slice().sort((a,b)=>{ const da=parseDate(a.date),db=parseDate(b.date); return (da&&db)?db-da:0; })[0];
+    const latest = ttComments.slice().sort((a, b) => { const da = parseDate(a.date), db = parseDate(b.date); return (da && db) ? db - da : 0; })[0];
     const cColor = commenterColor(latest.name);
     // Truncate at ~400 chars to avoid runaway tooltips (10 lines at ~40 chars each)
     const shortText = latest.text.length > 400 ? latest.text.slice(0, 400) + '\u2026' : latest.text;
     rows += `<div class="tt-row" style="flex-direction:column;align-items:flex-start;gap:2px;">` +
-      `<div style="display:flex;align-items:center;"><span class="tt-label">Latest note</span><span style="color:${cColor};font-weight:700">${escHtml(latest.name)}</span>&nbsp;<span style="color:var(--text-mu);font-size:0.75em;">${escHtml(latest.date)}</span></div>` +
+      `<div style="display:flex;align-items:center;"><span class="tt-label">Latest</span><span style="color:${cColor};font-weight:700">${escHtml(latest.name)}</span>&nbsp;<span style="color:var(--text-mu);font-size:0.75em;">${escHtml(latest.date)}</span></div>` +
       `<div style="padding-left:78px;white-space:pre-wrap;word-break:break-word;line-height:1.5;max-height:calc(10 * 1.5em);overflow:hidden;">${escHtml(shortText)}</div>` +
       `</div>`;
   }
@@ -6061,7 +6080,7 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
   if (partnerTask) {
     const partnerComments = partnerTask.Comments || [];
     if (partnerComments.length > 0) {
-      const snapLatest = partnerComments.slice().sort((a,b)=>{ const da=parseDate(a.date),db=parseDate(b.date); return (da&&db)?db-da:0; })[0];
+      const snapLatest = partnerComments.slice().sort((a, b) => { const da = parseDate(a.date), db = parseDate(b.date); return (da && db) ? db - da : 0; })[0];
       const spColor = commenterColor(snapLatest.name);
       const snapShort = snapLatest.text.length > 45 ? snapLatest.text.slice(0, 45) + '\u2026' : snapLatest.text;
       rows += `<div class="tt-row"><span class="tt-label">Snap note</span><span style="color:${spColor};font-weight:700">${escHtml(snapLatest.name)}</span> <span style="color:var(--text-mu);font-size:0.75em;">${escHtml(snapLatest.date)}</span>: ${escHtml(snapShort)}</div>`;
@@ -6074,8 +6093,8 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
     hotkeyHtml = `<div style="color:var(--text-mu); font-size:0.85em; margin-top:3px; border-top:1px solid var(--border); padding-top:2px;">e: edit  \u2022  c: comments  \u2022  d: add dependent  \u2022  n: duplicate</div>`;
   }
 
-  tt.innerHTML = `${snap}<div class="tt-title">${escHtml(t.Title||'')}</div>${phaseCatHtml}${rows}${hotkeyHtml}`;
-  tt.style.display='block'; moveTooltip(e);
+  tt.innerHTML = `${snap}<div class="tt-title">${escHtml(t.Title || '')}</div>${phaseCatHtml}${rows}${hotkeyHtml}`;
+  tt.style.display = 'block'; moveTooltip(e);
 }
 function showSimpleTooltip(e, text, shortcut) {
   if (e) e.stopPropagation();
@@ -6095,15 +6114,15 @@ function showHTMLTooltip(e, htmlContent) {
   tt.style.display = 'block';
   moveTooltip(e);
 }
-function moveTooltip(e){
-  const tt=document.getElementById('tooltip'); const px=12;
-  let lx=e.clientX+px, ly=e.clientY+px;
-  if(lx+350>window.innerWidth)       lx=e.clientX-350-px;
-  if(ly+tt.offsetHeight>window.innerHeight) ly=e.clientY-tt.offsetHeight-px;
-  tt.style.left=lx+'px'; tt.style.top=ly+'px';
+function moveTooltip(e) {
+  const tt = document.getElementById('tooltip'); const px = 12;
+  let lx = e.clientX + px, ly = e.clientY + px;
+  if (lx + 350 > window.innerWidth) lx = e.clientX - 350 - px;
+  if (ly + tt.offsetHeight > window.innerHeight) ly = e.clientY - tt.offsetHeight - px;
+  tt.style.left = lx + 'px'; tt.style.top = ly + 'px';
 }
-document.addEventListener('mousemove',e=>{if(document.getElementById('tooltip').style.display==='block')moveTooltip(e);});
-function hideTooltip(){document.getElementById('tooltip').style.display='none';}
+document.addEventListener('mousemove', e => { if (document.getElementById('tooltip').style.display === 'block') moveTooltip(e); });
+function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
 
 // ── Toolbar Hover Tooltip ─────────────────────────────────────────────
 const UNSAVED_WARNING_HTML = '<div style="max-width:250px; white-space:normal;"><b>Unsaved changes are active</b><br/><br/>You have modified the Gantt chart in memory.<br/>&bull; Click <b>Save Excel</b> to commit changes.<br/>&bull; Click the <b>green date indicator on the top left</b> to discard and reload.</div>';
@@ -6123,9 +6142,9 @@ function onToolbarMove(e) {
   if (!AppState.unsavedChanges) return;
 
   if (!AppState._toolbarTimer) {
-     AppState._toolbarTimer = setTimeout(() => {
-         showHTMLTooltip({clientX: AppState._toolbarHoverX, clientY: AppState._toolbarHoverY, stopPropagation:()=>{}}, UNSAVED_WARNING_HTML);
-     }, 600);
+    AppState._toolbarTimer = setTimeout(() => {
+      showHTMLTooltip({ clientX: AppState._toolbarHoverX, clientY: AppState._toolbarHoverY, stopPropagation: () => { } }, UNSAVED_WARNING_HTML);
+    }, 600);
   }
 }
 
@@ -6134,37 +6153,37 @@ function onToolbarOut(_e) {
   AppState._toolbarTimer = null;
   hideTooltip();
 }
-function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
 // ── Jump to task ──────────────────────────────────────────────────
-function scrollToTask(task){
-  const start=parseDate(task['Start Date']); if(!start) return;
-  AppState._highlightId=getTaskId(task);
-  if(AppState._highlightTimer) clearTimeout(AppState._highlightTimer);
-  AppState._highlightTimer=setTimeout(()=>{ AppState._highlightId=null; render(); },HIGHLIGHT_DURATION_MS);
-  if(AppState.view==='year'){
-    AppState.viewportStart=new Date(start.getFullYear(),Math.max(start.getMonth()-1,0),1);
+function scrollToTask(task) {
+  const start = parseDate(task['Start Date']); if (!start) return;
+  AppState._highlightId = getTaskId(task);
+  if (AppState._highlightTimer) clearTimeout(AppState._highlightTimer);
+  AppState._highlightTimer = setTimeout(() => { AppState._highlightId = null; render(); }, HIGHLIGHT_DURATION_MS);
+  if (AppState.view === 'year') {
+    AppState.viewportStart = new Date(start.getFullYear(), Math.max(start.getMonth() - 1, 0), 1);
   } else {
-    if(AppState.view==='month') AppState.viewportStart=addDays(new Date(start.getFullYear(),start.getMonth(),1),-7);
-    else AppState.viewportStart=addDays(start,-7);
+    if (AppState.view === 'month') AppState.viewportStart = addDays(new Date(start.getFullYear(), start.getMonth(), 1), -7);
+    else AppState.viewportStart = addDays(start, -7);
   }
   render();
-  setTimeout(()=>{
-    const ca=document.getElementById('chart-area');
-    const lr=document.getElementById('left-rows');
-    ca.scrollLeft=Math.max(0,dateToX(start)-ca.clientWidth/2);
-    const today2=new Date(); today2.setHours(0,0,0,0);
-    const cmpT=AppState.compareLabel&&DATA.snapshots[AppState.compareLabel]?DATA.snapshots[AppState.compareLabel]:[];
-    const allR=buildAllRows(AppState.currentTasks,cmpT,AppState.compareLabel,today2);
-    const vis=getVisibleRows(allR,today2);
-    const rowIdx=vis.findIndex(r=>r.type==='task'&&!r.ghost&&
-      getTaskId(r.task)===AppState._highlightId);
-    if(rowIdx>=0){
-      const targetY=rowIdx*ROW_H+ROW_H/2;
-      ca.scrollTop=Math.max(0,targetY-ca.offsetHeight/2);
-      lr.scrollTop=ca.scrollTop;
+  setTimeout(() => {
+    const ca = document.getElementById('chart-area');
+    const lr = document.getElementById('left-rows');
+    ca.scrollLeft = Math.max(0, dateToX(start) - ca.clientWidth / 2);
+    const today2 = new Date(); today2.setHours(0, 0, 0, 0);
+    const cmpT = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
+    const allR = buildAllRows(AppState.currentTasks, cmpT, AppState.compareLabel, today2);
+    const vis = getVisibleRows(allR, today2);
+    const rowIdx = vis.findIndex(r => r.type === 'task' && !r.ghost &&
+      getTaskId(r.task) === AppState._highlightId);
+    if (rowIdx >= 0) {
+      const targetY = rowIdx * ROW_H + ROW_H / 2;
+      ca.scrollTop = Math.max(0, targetY - ca.offsetHeight / 2);
+      lr.scrollTop = ca.scrollTop;
     }
-  },60);
+  }, 60);
 }
 
 function updateScrollAnchoring() {
@@ -6173,98 +6192,98 @@ function updateScrollAnchoring() {
     // Determine target anchoring date, but explicitly zero out fractional days on scroll focus
     const targetDate = new Date(AppState.viewportStart);
     if (AppState.view === 'year') {
-        targetDate.setDate(1); 
+      targetDate.setDate(1);
     }
     ca.scrollLeft = Math.max(0, dateToX(targetDate));
   }
 }
 
 // ── Flyout comparison pane & Info panel ──────────────────────────────────
-function isMilestoneTask(t) { return /\(milestone\)/i.test(t.Title||''); }
-function isDoneTask(t) { return Number(t.Progress||0)>=100 || (t.Status||'').trim().toLowerCase()==='done'; }
-function isOverdueNow(t,today) {
-  if(isDoneTask(t)) return false;
-  const e=parseDate(t['End Date']); return e&&e<today;
+function isMilestoneTask(t) { return /\(milestone\)/i.test(t.Title || ''); }
+function isDoneTask(t) { return Number(t.Progress || 0) >= 100 || (t.Status || '').trim().toLowerCase() === 'done'; }
+function isOverdueNow(t, today) {
+  if (isDoneTask(t)) return false;
+  const e = parseDate(t['End Date']); return e && e < today;
 }
 
-function toggleFlyout(){
-  if(AppState._infoPanelOpen) toggleInfoPanel();
+function toggleFlyout() {
+  if (AppState._infoPanelOpen) toggleInfoPanel();
   AppState._flyoutOpen = !AppState._flyoutOpen;
-  const pane=document.getElementById('flyout-pane');
-  const btn=document.getElementById('stats-btn');
-  if(pane) pane.classList.toggle('open',AppState._flyoutOpen);
-  if(btn) btn.classList.toggle('active', AppState._flyoutOpen);
+  const pane = document.getElementById('flyout-pane');
+  const btn = document.getElementById('stats-btn');
+  if (pane) pane.classList.toggle('open', AppState._flyoutOpen);
+  if (btn) btn.classList.toggle('active', AppState._flyoutOpen);
 }
 
-function toggleInfoPanel(){
-  if(AppState._flyoutOpen && document.getElementById('flyout-pane').classList.contains('open')) toggleFlyout();
+function toggleInfoPanel() {
+  if (AppState._flyoutOpen && document.getElementById('flyout-pane').classList.contains('open')) toggleFlyout();
   AppState._infoPanelOpen = !AppState._infoPanelOpen;
-  const pane=document.getElementById('info-panel');
-  if(pane) pane.classList.toggle('open',AppState._infoPanelOpen);
+  const pane = document.getElementById('info-panel');
+  if (pane) pane.classList.toggle('open', AppState._infoPanelOpen);
 }
 
-function updateFlyout(){
-  const statsBtn=document.getElementById('stats-btn');
-  const pane=document.getElementById('flyout-pane');
-  if(!AppState.compareLabel){
-    if(statsBtn) statsBtn.style.display='none';
-    if(pane){ pane.classList.remove('open'); AppState._flyoutOpen=false; }
-    const sb=document.getElementById('stats-btn'); if(sb) sb.classList.remove('active');
+function updateFlyout() {
+  const statsBtn = document.getElementById('stats-btn');
+  const pane = document.getElementById('flyout-pane');
+  if (!AppState.compareLabel) {
+    if (statsBtn) statsBtn.style.display = 'none';
+    if (pane) { pane.classList.remove('open'); AppState._flyoutOpen = false; }
+    const sb = document.getElementById('stats-btn'); if (sb) sb.classList.remove('active');
     return;
   }
   // Show stats button
-  if(statsBtn) statsBtn.style.display='inline-flex';
-  const today=new Date(); today.setHours(0,0,0,0);
-  const snapTasks=DATA.snapshots[AppState.compareLabel]||[];
-  const snapById={};
-  snapTasks.forEach(t=>{ const id=getTaskId(t); if(id) snapById[id]=t; });
-  const currIds=new Set(AppState.currentTasks.map(t=>getTaskId(t)).filter(Boolean));
-  const snapIds=new Set(Object.keys(snapById));
+  if (statsBtn) statsBtn.style.display = 'inline-flex';
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const snapTasks = DATA.snapshots[AppState.compareLabel] || [];
+  const snapById = {};
+  snapTasks.forEach(t => { const id = getTaskId(t); if (id) snapById[id] = t; });
+  const currIds = new Set(AppState.currentTasks.map(t => getTaskId(t)).filter(Boolean));
+  const snapIds = new Set(Object.keys(snapById));
 
-  let milestonesAchieved=[], itemsCompleted=[], itemsProgressed=[],
-      itemsOverdue=[], itemsAdded=[], itemsOnHold=[], itemsRemoved=[];
+  let milestonesAchieved = [], itemsCompleted = [], itemsProgressed = [],
+    itemsOverdue = [], itemsAdded = [], itemsOnHold = [], itemsRemoved = [];
 
-  AppState.currentTasks.forEach(t=>{
-    const id=getTaskId(t);
-    const snap=snapById[id];
-    if(!snap){ itemsAdded.push(t); return; }
-    const wasDone=isDoneTask(snap);
-    const nowDone=isDoneTask(t);
-    if(!wasDone&&nowDone){
+  AppState.currentTasks.forEach(t => {
+    const id = getTaskId(t);
+    const snap = snapById[id];
+    if (!snap) { itemsAdded.push(t); return; }
+    const wasDone = isDoneTask(snap);
+    const nowDone = isDoneTask(t);
+    if (!wasDone && nowDone) {
       itemsCompleted.push(t);
-      if(isMilestoneTask(t)) milestonesAchieved.push(t);
-    } else if(!nowDone){
-      const cp=Number(t.Progress||0), sp=Number(snap.Progress||0);
-      if(cp>sp) itemsProgressed.push(t);
+      if (isMilestoneTask(t)) milestonesAchieved.push(t);
+    } else if (!nowDone) {
+      const cp = Number(t.Progress || 0), sp = Number(snap.Progress || 0);
+      if (cp > sp) itemsProgressed.push(t);
     }
-    if(isOverdueNow(t,today)&&!isOverdueNow(snap,today)) itemsOverdue.push(t);
+    if (isOverdueNow(t, today) && !isOverdueNow(snap, today)) itemsOverdue.push(t);
     // On hold: status is now 'on hold' but wasn't before
-    const wasOnHold=(snap.Status||'').toLowerCase()==='on hold';
-    const nowOnHold=(t.Status||'').toLowerCase()==='on hold';
-    if(nowOnHold&&!wasOnHold) itemsOnHold.push(t);
+    const wasOnHold = (snap.Status || '').toLowerCase() === 'on hold';
+    const nowOnHold = (t.Status || '').toLowerCase() === 'on hold';
+    if (nowOnHold && !wasOnHold) itemsOnHold.push(t);
   });
-  snapIds.forEach(id=>{ if(!currIds.has(id)) itemsRemoved.push(snapById[id]); });
+  snapIds.forEach(id => { if (!currIds.has(id)) itemsRemoved.push(snapById[id]); });
 
-  document.getElementById('flyout-date').textContent=formatSnapKey(AppState.compareLabel);
+  document.getElementById('flyout-date').textContent = formatSnapKey(AppState.compareLabel);
 
-  const statsEl=document.getElementById('flyout-stats'); statsEl.innerHTML='';
-  const rows=[
-    {label:'Milestones achieved', items:milestonesAchieved, color:'#b45309', icon:'M'},
-    {label:'Items completed',     items:itemsCompleted,     color:'#16a34a', icon:'\u2713'},
-    {label:'Items progressed',    items:itemsProgressed,    color:'#0284c7', icon:'\u2191'},
-    {label:'Items overdue',       items:itemsOverdue,       color:'#dc2626', icon:'\u26a0'},
-    {label:'Items added',         items:itemsAdded,         color:'#7c3aed', icon:'+'},
-    {label:'Items on hold',       items:itemsOnHold,        color:'#6b7280', icon:'\u23f8'},
-    {label:'Items removed',       items:itemsRemoved,       color:'#64748b', icon:'\u2212'},
+  const statsEl = document.getElementById('flyout-stats'); statsEl.innerHTML = '';
+  const rows = [
+    { label: 'Milestones achieved', items: milestonesAchieved, color: '#b45309', icon: 'M' },
+    { label: 'Items completed', items: itemsCompleted, color: '#16a34a', icon: '\u2713' },
+    { label: 'Items progressed', items: itemsProgressed, color: '#0284c7', icon: '\u2191' },
+    { label: 'Items overdue', items: itemsOverdue, color: '#dc2626', icon: '\u26a0' },
+    { label: 'Items added', items: itemsAdded, color: '#7c3aed', icon: '+' },
+    { label: 'Items on hold', items: itemsOnHold, color: '#6b7280', icon: '\u23f8' },
+    { label: 'Items removed', items: itemsRemoved, color: '#64748b', icon: '\u2212' },
   ];
-  rows.forEach(s=>{
-    const row=document.createElement('div'); row.className='flyout-stat-row';
-    row.innerHTML=`<span class="flyout-icon" style="background:${s.color}">${s.icon}</span>`+
-      `<span class="flyout-stat-label">${s.label}</span>`+
+  rows.forEach(s => {
+    const row = document.createElement('div'); row.className = 'flyout-stat-row';
+    row.innerHTML = `<span class="flyout-icon" style="background:${s.color}">${s.icon}</span>` +
+      `<span class="flyout-stat-label">${s.label}</span>` +
       `<span class="flyout-stat-val" style="color:${s.color}">${s.items.length}</span>`;
-    if(s.items.length > 0){
-      row.style.cursor='pointer';
-      row.addEventListener('mousemove', e=>showFlyoutTooltip(e, s.items, s.label));
+    if (s.items.length > 0) {
+      row.style.cursor = 'pointer';
+      row.addEventListener('mousemove', e => showFlyoutTooltip(e, s.items, s.label));
       row.addEventListener('mouseleave', hideTooltip);
     }
     statsEl.appendChild(row);
@@ -6272,39 +6291,39 @@ function updateFlyout(){
 }
 
 function showFlyoutTooltip(e, items, statLabel) {
-  const tt=document.getElementById('tooltip');
-  const byCat={};
-  items.forEach(t=>{
-    const c=t.Category||'(No Category)';
-    if(!byCat[c]) byCat[c]=[];
+  const tt = document.getElementById('tooltip');
+  const byCat = {};
+  items.forEach(t => {
+    const c = t.Category || '(No Category)';
+    if (!byCat[c]) byCat[c] = [];
     byCat[c].push(t);
   });
-  let html=`<div class="tt-title">${escHtml(statLabel)}</div>`;
-  const cats=Object.keys(byCat).sort();
-  cats.forEach(c=>{
-    html+=`<div style="font-weight:bold; margin-top:6px; font-size:0.75rem; color:#475569;">${escHtml(c)}</div>`;
-    byCat[c].forEach(t=>{
-      const rawTitle=t.Title||'';
-      const dispTitle=rawTitle.replace(/\(milestone\)/gi,'').trim();
-      const dot=`<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:${catColor(c)}; margin-right:5px; vertical-align:middle;"></span>`;
-      html+=`<div style="margin-left:4px; margin-top:2px;">${dot}${escHtml(dispTitle)}</div>`;
+  let html = `<div class="tt-title">${escHtml(statLabel)}</div>`;
+  const cats = Object.keys(byCat).sort();
+  cats.forEach(c => {
+    html += `<div style="font-weight:bold; margin-top:6px; font-size:0.75rem; color:#475569;">${escHtml(c)}</div>`;
+    byCat[c].forEach(t => {
+      const rawTitle = t.Title || '';
+      const dispTitle = rawTitle.replace(/\(milestone\)/gi, '').trim();
+      const dot = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:${catColor(c)}; margin-right:5px; vertical-align:middle;"></span>`;
+      html += `<div style="margin-left:4px; margin-top:2px;">${dot}${escHtml(dispTitle)}</div>`;
     });
   });
-  tt.innerHTML=html;
-  tt.style.display='block';
+  tt.innerHTML = html;
+  tt.style.display = 'block';
   moveTooltip(e);
 }
 
 function resetViewPadding() {
   if (AppState.view === 'year') {
-    AppState.viewPadLeft  = VIEW_PAD_YEAR_MONTHS_L;
+    AppState.viewPadLeft = VIEW_PAD_YEAR_MONTHS_L;
     AppState.viewPadRight = VIEW_PAD_YEAR_MONTHS_R;
   } else if (AppState.view === 'week') {
-    AppState.viewPadLeft  = VIEW_PAD_WEEK_DAYS_L;
+    AppState.viewPadLeft = VIEW_PAD_WEEK_DAYS_L;
     AppState.viewPadRight = VIEW_PAD_WEEK_DAYS_R;
   } else {
     // month
-    AppState.viewPadLeft  = VIEW_PAD_MONTH_DAYS;
+    AppState.viewPadLeft = VIEW_PAD_MONTH_DAYS;
     AppState.viewPadRight = VIEW_PAD_MONTH_DAYS + 60; // 6 months future + ~2 months current screen
   }
 }
@@ -6312,7 +6331,7 @@ function resetViewPadding() {
 function loadMore(dir) {
   const ca = document.getElementById('chart-area');
   const cw = getColWidth();
-  
+
   let addedWidth = 0;
   if (dir === 'past') {
     if (AppState.view === 'year') {
@@ -6334,7 +6353,7 @@ function loadMore(dir) {
       AppState.viewPadRight += VIEW_PAD_MONTH_DAYS; // 6 months
     }
   }
-  
+
   // Re-render, and if expanding past, we must instantly scroll to offset the prepended width
   const oldScrollLeft = ca.scrollLeft;
   render();
@@ -6376,59 +6395,59 @@ const _EGG_HAPPY_DOG = [
 ].join('\n');
 
 function _showEasterEggPopup(asciiArt, btnLabel) {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = [
-        'position:fixed', 'inset:0', 'display:flex', 'align-items:center',
-        'justify-content:center', 'z-index:9999', 'background:rgba(0,0,0,0.55)',
-        'cursor:default', 'animation:fadeIn 0.2s ease'
-    ].join(';');
-    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const container = document.createElement('div');
-    container.style.cssText = [
-        'display:flex', 'flex-direction:column', 'align-items:center', 'gap:20px',
-        'background:' + (dark ? '#1e293b' : '#f8fafc'),
-        'color:' + (dark ? '#e2e8f0' : '#1e293b'),
-        'border-radius:14px',
-        'padding:32px 40px',
-        'box-shadow:0 24px 64px rgba(0,0,0,0.45)',
-        'max-width:92vw',
-        'max-height:90vh',
-        'overflow:auto',
-        'border:2px solid ' + (dark ? '#334155' : '#cbd5e1')
-    ].join(';');
-    const box = document.createElement('pre');
-    box.style.cssText = [
-        'font-size:0.9rem', 'line-height:1.5', 'font-family:monospace',
-        'white-space:pre', 'text-align:center', 'margin:0'
-    ].join(';');
-    box.textContent = asciiArt;
-    const btn = document.createElement('button');
-    btn.textContent = btnLabel;
-    btn.style.cssText = [
-        'padding:10px 28px',
-        'border-radius:8px',
-        'border:none',
-        'cursor:pointer',
-        'font-size:1rem',
-        'font-weight:600',
-        'background:' + (dark ? '#334155' : '#1e293b'),
-        'color:' + (dark ? '#e2e8f0' : '#f8fafc'),
-        'transition:opacity 0.15s'
-    ].join(';');
-    btn.addEventListener('mouseenter', () => { btn.style.opacity = '0.8'; });
-    btn.addEventListener('mouseleave', () => { btn.style.opacity = '1'; });
-    container.appendChild(box);
-    container.appendChild(btn);
-    overlay.appendChild(container);
-    document.body.appendChild(overlay);
-    const _close = () => { overlay.remove(); };
-    btn.addEventListener('click', _close);
+  const overlay = document.createElement('div');
+  overlay.style.cssText = [
+    'position:fixed', 'inset:0', 'display:flex', 'align-items:center',
+    'justify-content:center', 'z-index:9999', 'background:rgba(0,0,0,0.55)',
+    'cursor:default', 'animation:fadeIn 0.2s ease'
+  ].join(';');
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const container = document.createElement('div');
+  container.style.cssText = [
+    'display:flex', 'flex-direction:column', 'align-items:center', 'gap:20px',
+    'background:' + (dark ? '#1e293b' : '#f8fafc'),
+    'color:' + (dark ? '#e2e8f0' : '#1e293b'),
+    'border-radius:14px',
+    'padding:32px 40px',
+    'box-shadow:0 24px 64px rgba(0,0,0,0.45)',
+    'max-width:92vw',
+    'max-height:90vh',
+    'overflow:auto',
+    'border:2px solid ' + (dark ? '#334155' : '#cbd5e1')
+  ].join(';');
+  const box = document.createElement('pre');
+  box.style.cssText = [
+    'font-size:0.9rem', 'line-height:1.5', 'font-family:monospace',
+    'white-space:pre', 'text-align:center', 'margin:0'
+  ].join(';');
+  box.textContent = asciiArt;
+  const btn = document.createElement('button');
+  btn.textContent = btnLabel;
+  btn.style.cssText = [
+    'padding:10px 28px',
+    'border-radius:8px',
+    'border:none',
+    'cursor:pointer',
+    'font-size:1rem',
+    'font-weight:600',
+    'background:' + (dark ? '#334155' : '#1e293b'),
+    'color:' + (dark ? '#e2e8f0' : '#f8fafc'),
+    'transition:opacity 0.15s'
+  ].join(';');
+  btn.addEventListener('mouseenter', () => { btn.style.opacity = '0.8'; });
+  btn.addEventListener('mouseleave', () => { btn.style.opacity = '1'; });
+  container.appendChild(box);
+  container.appendChild(btn);
+  overlay.appendChild(container);
+  document.body.appendChild(overlay);
+  const _close = () => { overlay.remove(); };
+  btn.addEventListener('click', _close);
 }
 
 // ── Master render ─────────────────────────────────────────────────────
-function render(){
+function render() {
   if (AppState.viewPadLeft === 0) resetViewPadding();
-  
+
   if (AppState.view === 'year') {
     AppState.renderStart = addMonths(AppState.viewportStart, -AppState.viewPadLeft);
   } else if (AppState.view === 'week') {
@@ -6436,14 +6455,14 @@ function render(){
   } else {
     AppState.renderStart = addDays(AppState.viewportStart, -AppState.viewPadLeft);
   }
-  
-  const today=new Date(); today.setHours(0,0,0,0);
-  const compareTasks=AppState.compareLabel&&DATA.snapshots[AppState.compareLabel]?DATA.snapshots[AppState.compareLabel]:[];
-  const allRows=buildAllRows(AppState.currentTasks,compareTasks,AppState.compareLabel,today);
-  const visible=getVisibleRows(allRows,today);
-  const statsMap=buildStatsMap(AppState.currentTasks,today);
-  renderLeft(visible,today,statsMap);
-  renderChart(visible,today);
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const compareTasks = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
+  const allRows = buildAllRows(AppState.currentTasks, compareTasks, AppState.compareLabel, today);
+  const visible = getVisibleRows(allRows, today);
+  const statsMap = buildStatsMap(AppState.currentTasks, today);
+  renderLeft(visible, today, statsMap);
+  renderChart(visible, today);
   updateToggleBtn();
   updateFlyout();
   // Easter egg: 42nd milestone
@@ -6457,19 +6476,19 @@ function render(){
   }
 }
 
-function setView(v){
+function setView(v) {
   // Capture the date at the horizontal center of the screen before switching views
   const ca = document.getElementById('chart-area');
   let centerDate = null;
   if (ca && AppState.renderStart) {
     centerDate = xToDate(ca.scrollLeft + ca.clientWidth / 2);
   }
-  AppState.view=v;
+  AppState.view = v;
   resetViewPadding();
-  document.querySelectorAll('#view-btns .btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('btn-'+v).classList.add('active');
+  document.querySelectorAll('#view-btns .btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + v).classList.add('active');
   const anchor = centerDate || AppState.viewportStart;
-  AppState.viewportStart=v==='year'?new Date(anchor.getFullYear(),anchor.getMonth(),1):startOf(anchor,v);
+  AppState.viewportStart = v === 'year' ? new Date(anchor.getFullYear(), anchor.getMonth(), 1) : startOf(anchor, v);
   render();
   // Scroll so the captured center date appears at the center of the screen in the new view
   if (ca && centerDate && AppState.renderStart) {
@@ -6478,47 +6497,47 @@ function setView(v){
     updateScrollAnchoring();
   }
 }
-function navigate(dir){
-  const d=AppState.viewportStart;
-  if(AppState.view==='week')       AppState.viewportStart=addDays(d,dir*7);
-  else if(AppState.view==='month') AppState.viewportStart=addDays(d,dir*30);
-  else                    AppState.viewportStart=addMonths(d,dir*3);
+function navigate(dir) {
+  const d = AppState.viewportStart;
+  if (AppState.view === 'week') AppState.viewportStart = addDays(d, dir * 7);
+  else if (AppState.view === 'month') AppState.viewportStart = addDays(d, dir * 30);
+  else AppState.viewportStart = addMonths(d, dir * 3);
   resetViewPadding();
   render();
   updateScrollAnchoring();
 }
-function goToday(){
-  const now=new Date();
-  AppState.viewportStart=AppState.view==='year'?new Date(now.getFullYear(),now.getMonth(),1):startOf(now,AppState.view);
-  if(AppState.view==='month')AppState.viewportStart=addDays(AppState.viewportStart,-7);
+function goToday() {
+  const now = new Date();
+  AppState.viewportStart = AppState.view === 'year' ? new Date(now.getFullYear(), now.getMonth(), 1) : startOf(now, AppState.view);
+  if (AppState.view === 'month') AppState.viewportStart = addDays(AppState.viewportStart, -7);
   resetViewPadding();
   render();
-  
+
   const ca = document.getElementById('chart-area');
   ca.scrollLeft = Math.max(0, dateToX(now) - ca.clientWidth / 2);
 }
 
 // ── Collapse / expand ─────────────────────────────────────────────────
-function togglePhase(ph){AppState.collapsed['p:'+ph]=!AppState.collapsed['p:'+ph];render();}
+function togglePhase(ph) { AppState.collapsed['p:' + ph] = !AppState.collapsed['p:' + ph]; render(); }
 function toggleCategory(ph, ca) {
   AppState.collapsed['c:' + ph + ':' + ca] = !AppState.collapsed['c:' + ph + ':' + ca];
   AppState._highlightCat = null;
   render();
 }
-function expandAll(){AppState.collapsed={};render();}
-function collapseAll(){
-  AppState.currentTasks.forEach(t=>{AppState.collapsed['p:'+t.Phase]=true;AppState.collapsed['c:'+t.Phase+':'+t.Category]=true;});
+function expandAll() { AppState.collapsed = {}; render(); }
+function collapseAll() {
+  AppState.currentTasks.forEach(t => { AppState.collapsed['p:' + t.Phase] = true; AppState.collapsed['c:' + t.Phase + ':' + t.Category] = true; });
   render();
 }
-function isAllCollapsed(){
-  const phases=[...new Set(AppState.currentTasks.map(t=>t.Phase))];
-  return phases.every(ph=>AppState.collapsed['p:'+ph]);
+function isAllCollapsed() {
+  const phases = [...new Set(AppState.currentTasks.map(t => t.Phase))];
+  return phases.every(ph => AppState.collapsed['p:' + ph]);
 }
-function updateToggleBtn(){
-  const btn=document.getElementById('toggle-all-btn');
-  if(btn) btn.textContent=isAllCollapsed()? '▶ Expand all' : '▼ Collapse all';
+function updateToggleBtn() {
+  const btn = document.getElementById('toggle-all-btn');
+  if (btn) btn.textContent = isAllCollapsed() ? '▶ Expand all' : '▼ Collapse all';
 }
-function toggleAll(){ isAllCollapsed()?expandAll():collapseAll(); }
+function toggleAll() { isAllCollapsed() ? expandAll() : collapseAll(); }
 
 // ── Filter ────────────────────────────────────────────────────────────
 function _updateFilterBtnState() {
@@ -6526,12 +6545,12 @@ function _updateFilterBtnState() {
   const active = hasCustomFilters();
   if (filterBtn) filterBtn.classList.toggle('active', active);
   if (active) {
-    ['all','active','overdue'].forEach(m => {
-      const el = document.getElementById('fb-'+m); if (el) el.classList.remove('active');
+    ['all', 'active', 'overdue'].forEach(m => {
+      const el = document.getElementById('fb-' + m); if (el) el.classList.remove('active');
     });
   } else {
-    ['all','active','overdue'].forEach(m => {
-      const el = document.getElementById('fb-'+m);
+    ['all', 'active', 'overdue'].forEach(m => {
+      const el = document.getElementById('fb-' + m);
       if (el) el.classList.toggle('active', m === AppState.filterMode);
     });
   }
@@ -6553,7 +6572,7 @@ function _renderFilterSummary() {
   if (existing) existing.remove();
   if (!hasCustomFilters()) return;
   const f = AppState._customFilters;
-  const propLabels = { status:'Status', priority:'Priority', comments:'Comments', dependency:'Dependency', due:'Overdue' };
+  const propLabels = { status: 'Status', priority: 'Priority', comments: 'Comments', dependency: 'Dependency', due: 'Overdue' };
   const valDisplay = (prop, v) => {
     if (v === '') return 'none';
     if (prop === 'comments') return v === 'yes' ? 'Has comments' : 'No comments';
@@ -6601,18 +6620,18 @@ function toggleFilterChip(prop, value) {
 }
 
 function clearAllFilters() {
-  AppState._customFilters = { status:[], priority:[], comments:[], dependency:[], due:[] };
+  AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [] };
   _updateFilterBtnState();
   _refreshFilterChips();
   render();
 }
 
-function setFilter(mode){
-  AppState.filterMode=mode;
-  AppState._customFilters={ status:[], priority:[], comments:[], dependency:[], due:[] };
-  const filterBtn=document.getElementById('filter-btn');
-  if(filterBtn) filterBtn.classList.remove('active');
-  ['all','active','overdue'].forEach(m=>document.getElementById('fb-'+m).classList.toggle('active',m===mode));
+function setFilter(mode) {
+  AppState.filterMode = mode;
+  AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [] };
+  const filterBtn = document.getElementById('filter-btn');
+  if (filterBtn) filterBtn.classList.remove('active');
+  ['all', 'active', 'overdue'].forEach(m => document.getElementById('fb-' + m).classList.toggle('active', m === mode));
   render();
 }
 
@@ -6625,7 +6644,7 @@ function initDragScroll() {
   let isDragging = false;
   let startX;
   let scrollLeft;
-  
+
   // Inertia tracking variables
   let velocity = 0;
   let lastTimestamp = 0;
@@ -6636,7 +6655,7 @@ function initDragScroll() {
     isDragging = true;
     velocity = 0;
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    
+
     ca.style.cursor = 'grabbing';
     startX = e.pageX - ca.offsetLeft;
     scrollLeft = ca.scrollLeft;
@@ -6678,22 +6697,22 @@ function initDragScroll() {
     lastX = e.pageX;
     lastTimestamp = e.timeStamp;
   });
-  
+
   function startInertia() {
     // If the velocity is extremely low, ignore.
     if (Math.abs(velocity) < 0.1) return;
-    
+
     let lastTime = performance.now();
     const friction = 0.95; // decay multiplier per frame (~16ms)
-    
+
     function updateInertia(time) {
       if (isDragging) return; // user grabbed it again
       const dt = time - lastTime;
       lastTime = time;
-      
+
       ca.scrollLeft -= velocity * dt;
       velocity *= friction; // apply smooth decay
-      
+
       // Stop animation when slow enough
       if (Math.abs(velocity) > 0.05) {
         animationFrameId = requestAnimationFrame(updateInertia);
@@ -6709,285 +6728,285 @@ function _setModalTaskInfo(elId, task) {
   const el = document.getElementById(elId);
   if (!el) return;
   if (!task) { el.innerHTML = ''; return; }
-  const catCol = catColor(task.Category||'');
+  const catCol = catColor(task.Category || '');
   el.innerHTML =
-    `<span class="comments-task-phase">${escHtml(task.Phase||'')}</span>` +
+    `<span class="comments-task-phase">${escHtml(task.Phase || '')}</span>` +
     `<span style="color:var(--text-mu);">\u203A</span>` +
-    `<span class="comments-task-cat" style="background:${catCol};">${escHtml(task.Category||'')}</span>` +
+    `<span class="comments-task-cat" style="background:${catCol};">${escHtml(task.Category || '')}</span>` +
     `<span style="color:var(--text-mu);">\u203A</span>` +
-    `<span class="comments-task-title" data-tooltip="${escHtml(task.Title||'')}">${escHtml(task.Title||'')}</span>`;
+    `<span class="comments-task-title" data-tooltip="${escHtml(task.Title || '')}">${escHtml(task.Title || '')}</span>`;
 }
 
 function openCommentsModal(task) {
-    if (!task) return;
-    openTaskModal(task, 'edit');
-    // If user's layout preference hides comments, force comments view
-    if (AppState._modalLayout === 'edit') _setView('comments');
+  if (!task) return;
+  openTaskModal(task, 'edit');
+  // If user's layout preference hides comments, force comments view
+  if (AppState._modalLayout === 'edit') _setView('comments');
 }
 
 function closeCommentsModal() { closeModal(); }
 
 function renderCommentList() {
-    const list = document.getElementById('comments-list');
-    if (!list || !AppState._modalTask) return;
-    list.innerHTML = '';
-    const comments = (AppState._modalTask.Comments || []).slice().sort((a, b) => {
-        const da = parseDate(a.date), db = parseDate(b.date);
-        if (da && db) return db - da; // newest first
-        return 0;
-    });
-    if (comments.length === 0) {
-        const empty = document.createElement('div');
-        empty.style.cssText = 'text-align:center;color:var(--text-lt);font-size:0.8rem;padding:16px 0;';
-        empty.textContent = 'No comments yet.';
-        list.appendChild(empty); return;
-    }
-    comments.forEach((c) => {
-        const realIdx = AppState._modalTask.Comments.indexOf(c); // index in original array
-        const item = document.createElement('div'); item.className = 'comment-item';
-        const color = commenterColor(c.name);
-        item.innerHTML = `
+  const list = document.getElementById('comments-list');
+  if (!list || !AppState._modalTask) return;
+  list.innerHTML = '';
+  const comments = (AppState._modalTask.Comments || []).slice().sort((a, b) => {
+    const da = parseDate(a.date), db = parseDate(b.date);
+    if (da && db) return db - da; // newest first
+    return 0;
+  });
+  if (comments.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'text-align:center;color:var(--text-lt);font-size:0.8rem;padding:16px 0;';
+    empty.textContent = 'No comments yet.';
+    list.appendChild(empty); return;
+  }
+  comments.forEach((c) => {
+    const realIdx = AppState._modalTask.Comments.indexOf(c); // index in original array
+    const item = document.createElement('div'); item.className = 'comment-item';
+    const color = commenterColor(c.name);
+    item.innerHTML = `
           <div class="comment-actions">
             <button class="comment-edit-btn" data-tooltip="Edit this comment">&#9999;</button>
             <button class="comment-delete-btn" style="color:#dc2626;" data-tooltip="Delete this comment">&#128465;</button>
           </div>
           <div class="comment-header"><span style="font-weight:700;color:${color}">${escHtml(c.name)}</span> &middot; ${escHtml(c.date)}</div>
           <div class="comment-text">${escHtml(c.text)}</div>`;
-        // Edit button
-        item.querySelector('.comment-edit-btn').addEventListener('click', () => {
-            const textDiv = item.querySelector('.comment-text');
-            if (item.querySelector('.comment-edit-area')) return; // already editing
-            const ta = document.createElement('textarea'); ta.className = 'comment-edit-area';
-            ta.value = c.text; ta.rows = 3;
-            textDiv.style.display = 'none'; item.appendChild(ta);
-            const acts = document.createElement('div'); acts.className = 'comment-edit-actions';
-            const saveBtn = document.createElement('button'); saveBtn.textContent = 'Save';
-            saveBtn.className = 'btn btn-primary'; saveBtn.style.fontSize = '0.72rem'; saveBtn.style.padding = '2px 10px';
-            const cancelBtn = document.createElement('button'); cancelBtn.textContent = 'Cancel';
-            cancelBtn.style.fontSize = '0.72rem'; cancelBtn.style.padding = '2px 8px';
-            acts.appendChild(saveBtn); acts.appendChild(cancelBtn); item.appendChild(acts);
-            saveBtn.addEventListener('click', () => {
-                const newText = normalizeText(ta.value);
-                if (!newText) return;
-                AppState._modalTask.Comments[realIdx].text = newText;
-                syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
-            });
-            cancelBtn.addEventListener('click', () => renderCommentList());
-        });
-        // Delete button
-        item.querySelector('.comment-delete-btn').addEventListener('click', () => {
-            hideTooltip();
-            if (confirm('Delete this comment?')) {
-                AppState._modalTask.Comments.splice(realIdx, 1);
-                syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
-            }
-        });
-        list.appendChild(item);
+    // Edit button
+    item.querySelector('.comment-edit-btn').addEventListener('click', () => {
+      const textDiv = item.querySelector('.comment-text');
+      if (item.querySelector('.comment-edit-area')) return; // already editing
+      const ta = document.createElement('textarea'); ta.className = 'comment-edit-area';
+      ta.value = c.text; ta.rows = 3;
+      textDiv.style.display = 'none'; item.appendChild(ta);
+      const acts = document.createElement('div'); acts.className = 'comment-edit-actions';
+      const saveBtn = document.createElement('button'); saveBtn.textContent = 'Save';
+      saveBtn.className = 'btn btn-primary'; saveBtn.style.fontSize = '0.72rem'; saveBtn.style.padding = '2px 10px';
+      const cancelBtn = document.createElement('button'); cancelBtn.textContent = 'Cancel';
+      cancelBtn.style.fontSize = '0.72rem'; cancelBtn.style.padding = '2px 8px';
+      acts.appendChild(saveBtn); acts.appendChild(cancelBtn); item.appendChild(acts);
+      saveBtn.addEventListener('click', () => {
+        const newText = normalizeText(ta.value);
+        if (!newText) return;
+        AppState._modalTask.Comments[realIdx].text = newText;
+        syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
+      });
+      cancelBtn.addEventListener('click', () => renderCommentList());
     });
+    // Delete button
+    item.querySelector('.comment-delete-btn').addEventListener('click', () => {
+      hideTooltip();
+      if (confirm('Delete this comment?')) {
+        AppState._modalTask.Comments.splice(realIdx, 1);
+        syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
+      }
+    });
+    list.appendChild(item);
+  });
 }
 
 function saveComment() {
-    if (!AppState._modalTask) return;
-    const name = normalizeText(document.getElementById('comments-name-input').value);
-    const text = normalizeText(document.getElementById('comments-text-input').value);
-    if (!name || !text) { alert('Please enter both your name and a comment.'); return; }
-    AppState._commenterName = name;
-    if (!AppState._modalTask.Comments) AppState._modalTask.Comments = [];
-    AppState._modalTask.Comments.push({ date: formatDateTimeStr(new Date()), name, text });
-    syncCurrentTasksToData(); setUnsavedChanges(true);
-    document.getElementById('comments-text-input').value = '';
-    _clearCommentsDirty();
-    // Update datalist
-    const dl = document.getElementById('comments-name-list');
-    if (dl && !Array.from(dl.options).some(o => o.value === name)) {
-        const o = document.createElement('option'); o.value = name; dl.appendChild(o);
-    }
-    renderCommentList();
-    _refreshCommentInfo();
+  if (!AppState._modalTask) return;
+  const name = normalizeText(document.getElementById('comments-name-input').value);
+  const text = normalizeText(document.getElementById('comments-text-input').value);
+  if (!name || !text) { alert('Please enter both your name and a comment.'); return; }
+  AppState._commenterName = name;
+  if (!AppState._modalTask.Comments) AppState._modalTask.Comments = [];
+  AppState._modalTask.Comments.push({ date: formatDateTimeStr(new Date()), name, text });
+  syncCurrentTasksToData(); setUnsavedChanges(true);
+  document.getElementById('comments-text-input').value = '';
+  _clearCommentsDirty();
+  // Update datalist
+  const dl = document.getElementById('comments-name-list');
+  if (dl && !Array.from(dl.options).some(o => o.value === name)) {
+    const o = document.createElement('option'); o.value = name; dl.appendChild(o);
+  }
+  renderCommentList();
+  _refreshCommentInfo();
 }
 
 function _refreshCommentInfo() {
-    if (!AppState._modalTask) return;
-    const comments = AppState._modalTask.Comments || [];
-    const infoEl = document.getElementById('modal-comment-info');
-    if (infoEl) {
-        infoEl.style.display = comments.length > 0 ? 'block' : 'none';
-        const countEl = document.getElementById('modal-comment-count');
-        if (countEl) countEl.textContent = `${comments.length} comment${comments.length !== 1 ? 's' : ''}`;
-        const latestEl = document.getElementById('modal-comment-latest');
-        if (latestEl && comments.length > 0) {
-            const sorted = comments.slice().sort((a,b) => { const da=parseDate(a.date),db=parseDate(b.date); return (db||0)-(da||0); });
-            latestEl.textContent = ` \xB7 last: ${sorted[0].date} by ${sorted[0].name}`;
-        }
+  if (!AppState._modalTask) return;
+  const comments = AppState._modalTask.Comments || [];
+  const infoEl = document.getElementById('modal-comment-info');
+  if (infoEl) {
+    infoEl.style.display = comments.length > 0 ? 'block' : 'none';
+    const countEl = document.getElementById('modal-comment-count');
+    if (countEl) countEl.textContent = `${comments.length} comment${comments.length !== 1 ? 's' : ''}`;
+    const latestEl = document.getElementById('modal-comment-latest');
+    if (latestEl && comments.length > 0) {
+      const sorted = comments.slice().sort((a, b) => { const da = parseDate(a.date), db = parseDate(b.date); return (db || 0) - (da || 0); });
+      latestEl.textContent = ` \xB7 last: ${sorted[0].date} by ${sorted[0].name}`;
     }
+  }
 }
 
 function openCommentsFromEdit() {
-    _setView('comments');
+  _setView('comments');
 }
 
 // ── Modal view switching ───────────────────────────────────────────────
 function _setView(view) {
-    AppState._modalLayout = view;
-    const c = document.getElementById('modal-container');
-    if (!c) return;
-    c.classList.remove('view-edit', 'view-comments', 'view-both');
-    c.classList.add('view-' + view);
-    const vs = document.getElementById('modal-view-switcher');
-    if (vs) {
-        vs.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
-        const map = { edit: 'modalSwitchEdit', both: 'modalSwitchBoth', comments: 'modalSwitchComments' };
-        const btn = vs.querySelector(`[data-action="${map[view]}"]`);
-        if (btn) btn.classList.add('active');
-    }
+  AppState._modalLayout = view;
+  const c = document.getElementById('modal-container');
+  if (!c) return;
+  c.classList.remove('view-edit', 'view-comments', 'view-both');
+  c.classList.add('view-' + view);
+  const vs = document.getElementById('modal-view-switcher');
+  if (vs) {
+    vs.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+    const map = { edit: 'modalSwitchEdit', both: 'modalSwitchBoth', comments: 'modalSwitchComments' };
+    const btn = vs.querySelector(`[data-action="${map[view]}"]`);
+    if (btn) btn.classList.add('active');
+  }
 }
 
-function modalSwitchEdit()     { _setView('edit'); }
+function modalSwitchEdit() { _setView('edit'); }
 function modalSwitchComments() { _setView('comments'); }
-function modalSwitchBoth()     { _setView('both'); }
+function modalSwitchBoth() { _setView('both'); }
 
 // ── Pending-comment dirty flag ────────────────────────────────────────
 function _markCommentsDirty() {
-    const txt = document.getElementById('comments-text-input');
-    AppState._commentsDirty = !!(txt && txt.value.trim());
+  const txt = document.getElementById('comments-text-input');
+  AppState._commentsDirty = !!(txt && txt.value.trim());
 }
 function _clearCommentsDirty() { AppState._commentsDirty = false; }
 
 // ── Unified modal close ────────────────────────────────────────────────
 function closeModal() {
-    AppState._modalOriginal = null;
-    AppState._modalTask = null;
-    document.querySelectorAll('#modal-overlay .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
-    const txt = document.getElementById('comments-text-input');
-    if (txt) txt.value = '';
-    _clearCommentsDirty();
-    const overlay = document.getElementById('modal-overlay');
-    if (overlay) overlay.style.display = 'none';
+  AppState._modalOriginal = null;
+  AppState._modalTask = null;
+  document.querySelectorAll('#modal-overlay .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
+  const txt = document.getElementById('comments-text-input');
+  if (txt) txt.value = '';
+  _clearCommentsDirty();
+  const overlay = document.getElementById('modal-overlay');
+  if (overlay) overlay.style.display = 'none';
 }
 
 function closeModalConfirm() {
-    _markCommentsDirty();
-    if ((_isEditDirty() || AppState._commentsDirty) && !confirm('Discard unsaved changes?')) return;
-    _clearCommentsDirty();
-    closeModal();
+  _markCommentsDirty();
+  if ((_isEditDirty() || AppState._commentsDirty) && !confirm('Discard unsaved changes?')) return;
+  _clearCommentsDirty();
+  closeModal();
 }
 
 // ── Rename Modal ───────────────────────────────────────────────────────
 let _renameType = null, _renameOldValue = null, _renamePhase = null;
 
 function openRenameModal(type, oldName, phase) {
-    _renameType = type; _renameOldValue = oldName; _renamePhase = phase || null;
-    document.getElementById('rename-modal-title').textContent = type === 'phase' ? 'Rename Phase' : 'Rename Category';
-    document.getElementById('rename-modal-label').textContent = type === 'phase' ? 'Phase name' : 'Category name';
-    document.getElementById('rename-modal-input').value = oldName;
-    document.getElementById('rename-modal-overlay').style.display = 'flex';
-    setTimeout(() => { const inp = document.getElementById('rename-modal-input'); if(inp){inp.focus();inp.select();} }, 50);
+  _renameType = type; _renameOldValue = oldName; _renamePhase = phase || null;
+  document.getElementById('rename-modal-title').textContent = type === 'phase' ? 'Rename Phase' : 'Rename Category';
+  document.getElementById('rename-modal-label').textContent = type === 'phase' ? 'Phase name' : 'Category name';
+  document.getElementById('rename-modal-input').value = oldName;
+  document.getElementById('rename-modal-overlay').style.display = 'flex';
+  setTimeout(() => { const inp = document.getElementById('rename-modal-input'); if (inp) { inp.focus(); inp.select(); } }, 50);
 }
 
 function closeRenameModal() {
-    document.getElementById('rename-modal-overlay').style.display = 'none';
+  document.getElementById('rename-modal-overlay').style.display = 'none';
 }
 
 function saveRename() {
-    const newName = normalizeText(document.getElementById('rename-modal-input').value);
-    if (!newName) return;
-    if (newName === _renameOldValue) { closeRenameModal(); return; }
+  const newName = normalizeText(document.getElementById('rename-modal-input').value);
+  if (!newName) return;
+  if (newName === _renameOldValue) { closeRenameModal(); return; }
 
-    if (_renameType === 'phase') {
-        const existingPhase = AppState.currentTasks.some(t => t.Phase === newName);
-        if (existingPhase) {
-            const choice = window.confirm(
-                `A Phase named "${newName}" already exists.\n\n` +
-                `Click OK to merge "${_renameOldValue}" into "${newName}" (all tasks will be moved).\n` +
-                `Click Cancel to keep both phases (a number will be added to avoid duplicates).`
-            );
-            if (choice === true) {
-                // Merge: move all tasks from old phase to new phase
-                AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = newName; });
-            } else if (choice === false) {
-                // Duplicate: add incremented suffix
-                let suffix = 2; let safeName = `${newName} ${suffix}`;
-                while (AppState.currentTasks.some(t => t.Phase === safeName)) { suffix++; safeName = `${newName} ${suffix}`; }
-                AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = safeName; });
-            }
-            // null = Cancel (dialog was dismissed) — do nothing
-        } else {
-            AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = newName; });
-        }
+  if (_renameType === 'phase') {
+    const existingPhase = AppState.currentTasks.some(t => t.Phase === newName);
+    if (existingPhase) {
+      const choice = window.confirm(
+        `A Phase named "${newName}" already exists.\n\n` +
+        `Click OK to merge "${_renameOldValue}" into "${newName}" (all tasks will be moved).\n` +
+        `Click Cancel to keep both phases (a number will be added to avoid duplicates).`
+      );
+      if (choice === true) {
+        // Merge: move all tasks from old phase to new phase
+        AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = newName; });
+      } else if (choice === false) {
+        // Duplicate: add incremented suffix
+        let suffix = 2; let safeName = `${newName} ${suffix}`;
+        while (AppState.currentTasks.some(t => t.Phase === safeName)) { suffix++; safeName = `${newName} ${suffix}`; }
+        AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = safeName; });
+      }
+      // null = Cancel (dialog was dismissed) — do nothing
     } else {
-        // Category rename
-        const samePhaseCatExists = AppState.currentTasks.some(t => t.Phase === _renamePhase && t.Category === newName);
-        const otherPhaseCatExists = !samePhaseCatExists && AppState.currentTasks.some(t => t.Phase !== _renamePhase && t.Category === newName);
-
-        if (samePhaseCatExists) {
-            const choice = window.confirm(
-                `A Category named "${newName}" already exists in phase "${_renamePhase}".\n\n` +
-                `Click OK to merge "${_renameOldValue}" into "${newName}" (all tasks will be moved).\n` +
-                `Click Cancel to keep both categories (a number will be added to avoid duplicates).`
-            );
-            if (choice === true) {
-                AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
-            } else if (choice === false) {
-                let suffix = 2; let safeName = `${newName} ${suffix}`;
-                while (AppState.currentTasks.some(t => t.Phase === _renamePhase && t.Category === safeName)) { suffix++; safeName = `${newName} ${suffix}`; }
-                AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = safeName; });
-            }
-        } else if (otherPhaseCatExists) {
-            const choice = window.confirm(
-                `A Category named "${newName}" exists in a different Phase.\n\n` +
-                `Click OK to merge and move all tasks from "${_renamePhase} \u203A ${_renameOldValue}" into that other category.\n` +
-                `Click Cancel to proceed with a simple rename (tasks stay in "${_renamePhase}").`
-            );
-            if (choice === true) {
-                // Find the phase of the matching category
-                const targetTask = AppState.currentTasks.find(t => t.Phase !== _renamePhase && t.Category === newName);
-                const targetPhase = targetTask ? targetTask.Phase : _renamePhase;
-                AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) { t.Category = newName; t.Phase = targetPhase; } });
-            } else if (choice === false) {
-                AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
-            }
-        } else {
-            AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
-        }
+      AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = newName; });
     }
-    syncCurrentTasksToData(); setUnsavedChanges(true);
-    closeRenameModal(); render();
+  } else {
+    // Category rename
+    const samePhaseCatExists = AppState.currentTasks.some(t => t.Phase === _renamePhase && t.Category === newName);
+    const otherPhaseCatExists = !samePhaseCatExists && AppState.currentTasks.some(t => t.Phase !== _renamePhase && t.Category === newName);
+
+    if (samePhaseCatExists) {
+      const choice = window.confirm(
+        `A Category named "${newName}" already exists in phase "${_renamePhase}".\n\n` +
+        `Click OK to merge "${_renameOldValue}" into "${newName}" (all tasks will be moved).\n` +
+        `Click Cancel to keep both categories (a number will be added to avoid duplicates).`
+      );
+      if (choice === true) {
+        AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
+      } else if (choice === false) {
+        let suffix = 2; let safeName = `${newName} ${suffix}`;
+        while (AppState.currentTasks.some(t => t.Phase === _renamePhase && t.Category === safeName)) { suffix++; safeName = `${newName} ${suffix}`; }
+        AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = safeName; });
+      }
+    } else if (otherPhaseCatExists) {
+      const choice = window.confirm(
+        `A Category named "${newName}" exists in a different Phase.\n\n` +
+        `Click OK to merge and move all tasks from "${_renamePhase} \u203A ${_renameOldValue}" into that other category.\n` +
+        `Click Cancel to proceed with a simple rename (tasks stay in "${_renamePhase}").`
+      );
+      if (choice === true) {
+        // Find the phase of the matching category
+        const targetTask = AppState.currentTasks.find(t => t.Phase !== _renamePhase && t.Category === newName);
+        const targetPhase = targetTask ? targetTask.Phase : _renamePhase;
+        AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) { t.Category = newName; t.Phase = targetPhase; } });
+      } else if (choice === false) {
+        AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
+      }
+    } else {
+      AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
+    }
+  }
+  syncCurrentTasksToData(); setUnsavedChanges(true);
+  closeRenameModal(); render();
 }
 
 function deletePhaseOrCategory() {
-    if (_renameType === 'phase') {
-        const tasks = AppState.currentTasks.filter(t => t.Phase === _renameOldValue);
-        if (tasks.length > 0) {
-            const ok = window.confirm(
-                `Phase "${_renameOldValue}" contains ${tasks.length} task${tasks.length !== 1 ? 's' : ''}.\n\n` +
-                `Deleting this phase will permanently remove all its tasks.\n\nProceed?`
-            );
-            if (!ok) return;
-        }
-        AppState.currentTasks = AppState.currentTasks.filter(t => t.Phase !== _renameOldValue);
-    } else {
-        const tasks = AppState.currentTasks.filter(t => t.Phase === _renamePhase && t.Category === _renameOldValue);
-        if (tasks.length > 0) {
-            const ok = window.confirm(
-                `Category "${_renameOldValue}" contains ${tasks.length} task${tasks.length !== 1 ? 's' : ''}.\n\n` +
-                `Deleting this category will permanently remove all its tasks.\n\nProceed?`
-            );
-            if (!ok) return;
-        }
-        AppState.currentTasks = AppState.currentTasks.filter(t => !(t.Phase === _renamePhase && t.Category === _renameOldValue));
+  if (_renameType === 'phase') {
+    const tasks = AppState.currentTasks.filter(t => t.Phase === _renameOldValue);
+    if (tasks.length > 0) {
+      const ok = window.confirm(
+        `Phase "${_renameOldValue}" contains ${tasks.length} task${tasks.length !== 1 ? 's' : ''}.\n\n` +
+        `Deleting this phase will permanently remove all its tasks.\n\nProceed?`
+      );
+      if (!ok) return;
     }
-    syncCurrentTasksToData(); setUnsavedChanges(true);
-    closeRenameModal(); render();
+    AppState.currentTasks = AppState.currentTasks.filter(t => t.Phase !== _renameOldValue);
+  } else {
+    const tasks = AppState.currentTasks.filter(t => t.Phase === _renamePhase && t.Category === _renameOldValue);
+    if (tasks.length > 0) {
+      const ok = window.confirm(
+        `Category "${_renameOldValue}" contains ${tasks.length} task${tasks.length !== 1 ? 's' : ''}.\n\n` +
+        `Deleting this category will permanently remove all its tasks.\n\nProceed?`
+      );
+      if (!ok) return;
+    }
+    AppState.currentTasks = AppState.currentTasks.filter(t => !(t.Phase === _renamePhase && t.Category === _renameOldValue));
+  }
+  syncCurrentTasksToData(); setUnsavedChanges(true);
+  closeRenameModal(); render();
 }
 
 // ── Init Events ───────────────────────────────────────────────────────
 function _openFilterPanel() {
   const panel = document.getElementById('filter-panel');
-  const btn   = document.getElementById('filter-btn');
+  const btn = document.getElementById('filter-btn');
   if (!panel || !btn) return;
   AppState._filterPanelOpen = true;
   const rect = btn.getBoundingClientRect();
-  panel.style.top  = (rect.bottom + 2) + 'px';
+  panel.style.top = (rect.bottom + 2) + 'px';
   panel.style.left = rect.left + 'px';
   panel.style.display = 'block';
   _refreshFilterChips();
@@ -6999,307 +7018,307 @@ function _closeFilterPanel() {
   panel.style.display = 'none';
 }
 function toggleAutoSave(checkbox) {
-    if (!checkbox) return;
-    AppState.autoSave = checkbox.checked;
-    if (AppState.autoSave && AppState.unsavedChanges && isSaveInPlaceSupported()) {
-        saveSnapshot(false);
-    }
+  if (!checkbox) return;
+  AppState.autoSave = checkbox.checked;
+  if (AppState.autoSave && AppState.unsavedChanges && isSaveInPlaceSupported()) {
+    saveSnapshot(false);
+  }
 }
 
 function initEvents() {
-    if (AppState._eventsInit) return;
-    document.body.addEventListener('click', (e) => {
-        const actionEl = e.target.closest('[data-action]');
-        if (actionEl) {
-            const action = actionEl.dataset.action;
-            const val = actionEl.dataset.value;
-            switch(action) {
-                case 'setView': setView(val); break;
-                case 'navigate': navigate(Number(val)); break;
-                case 'goToday': goToday(); break;
-                case 'toggleFlyout': toggleFlyout(); break;
-                case 'toggleInfoPanel': toggleInfoPanel(); break;
-                case 'toggleChangesOnly': toggleChangesOnly(); break;
-                case 'restoreFromSnapshot': restoreFromSnapshot(); break;
-                case 'clearCompare': clearCompare(); break;
-                case 'reloadFile': reloadFile(); break;
-                case 'saveSnapshot': saveSnapshot(); break;
-                case 'exportChart': exportChart(); break;
-                case 'downloadTemplate': exportChart(true); break;
-                case 'downloadExampleExcel': downloadExampleExcel(); break;
-                case 'startEmptyChart': startEmptyChart(); break;
-                case 'loadExampleData': loadExampleData(); break;
-                case 'setFilter': setFilter(val); break;
-                case 'toggleFilterPanel': toggleFilterPanel(); break;
-                case 'toggleFilterChip': toggleFilterChip(actionEl.dataset.prop, actionEl.dataset.value); break;
-                case 'clearAllFilters': clearAllFilters(); break;
-                case 'toggleAll': toggleAll(); break;
-                case 'toggleCompact': toggleCompact(); break;
-                case 'toggleDarkMode': toggleDarkMode(); break;
-                case 'cycleTheme': cycleTheme(); break;
-                case 'browseFile': openFilePicker(); break;
-                case 'toggleAutoSave': toggleAutoSave(actionEl); break;
-                // Task modal actions
-                case 'openTaskModalNew': openTaskModal(null, 'add'); break;
-                case 'closeTaskModal': closeModal(); break;
-                case 'closeTaskModalConfirm': closeModalConfirm(); break;
-                case 'closeModalConfirm': closeModalConfirm(); break;
-                case 'saveTaskModal': saveTaskModal(); break;
-                case 'saveTaskModalAndClose': saveTaskModalAndClose(); break;
-                case 'deleteTaskFromModal': deleteTaskFromModal(); break;
-                case 'duplicateTaskFromModal': duplicateTaskFromModal(); break;
-                case 'createDependentTask': createDependentTask(); break;
-                // Comments panel actions
-                case 'openCommentsFromEdit': openCommentsFromEdit(); break;
-                case 'closeCommentsModal': closeModal(); break;
-                case 'closeCommentsModalConfirm': closeModalConfirm(); break;
-                case 'saveComment': saveComment(); break;
-                // Modal view-switch actions
-                case 'modalSwitchEdit': modalSwitchEdit(); break;
-                case 'modalSwitchBoth': modalSwitchBoth(); break;
-                case 'modalSwitchComments': modalSwitchComments(); break;
-                // Legacy dual modal action names (kept for safety)
-                case 'closeDualModal': closeModal(); break;
-                case 'closeDualModalConfirm': closeModalConfirm(); break;
-                case 'saveDualEdit': saveTaskModal(); break;
-                case 'saveDualEditAndClose': saveTaskModalAndClose(); break;
-                // Rename modal actions
-                case 'closeRenameModal': closeRenameModal(); break;
-                case 'saveRename': saveRename(); break;
-                case 'deletePhaseOrCategory': deletePhaseOrCategory(); break;
-            }
-        }
-    });
-
-    // Close filter panel when clicking outside
-    document.addEventListener('mousedown', (e) => {
-      if (!AppState._filterPanelOpen) return;
-      const panel = document.getElementById('filter-panel');
-      const btn   = document.getElementById('filter-btn');
-      if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
-        _closeFilterPanel();
+  if (AppState._eventsInit) return;
+  document.body.addEventListener('click', (e) => {
+    const actionEl = e.target.closest('[data-action]');
+    if (actionEl) {
+      const action = actionEl.dataset.action;
+      const val = actionEl.dataset.value;
+      switch (action) {
+        case 'setView': setView(val); break;
+        case 'navigate': navigate(Number(val)); break;
+        case 'goToday': goToday(); break;
+        case 'toggleFlyout': toggleFlyout(); break;
+        case 'toggleInfoPanel': toggleInfoPanel(); break;
+        case 'toggleChangesOnly': toggleChangesOnly(); break;
+        case 'restoreFromSnapshot': restoreFromSnapshot(); break;
+        case 'clearCompare': clearCompare(); break;
+        case 'reloadFile': reloadFile(); break;
+        case 'saveSnapshot': saveSnapshot(); break;
+        case 'exportChart': exportChart(); break;
+        case 'downloadTemplate': exportChart(true); break;
+        case 'downloadExampleExcel': downloadExampleExcel(); break;
+        case 'startEmptyChart': startEmptyChart(); break;
+        case 'loadExampleData': loadExampleData(); break;
+        case 'setFilter': setFilter(val); break;
+        case 'toggleFilterPanel': toggleFilterPanel(); break;
+        case 'toggleFilterChip': toggleFilterChip(actionEl.dataset.prop, actionEl.dataset.value); break;
+        case 'clearAllFilters': clearAllFilters(); break;
+        case 'toggleAll': toggleAll(); break;
+        case 'toggleCompact': toggleCompact(); break;
+        case 'toggleDarkMode': toggleDarkMode(); break;
+        case 'cycleTheme': cycleTheme(); break;
+        case 'browseFile': openFilePicker(); break;
+        case 'toggleAutoSave': toggleAutoSave(actionEl); break;
+        // Task modal actions
+        case 'openTaskModalNew': openTaskModal(null, 'add'); break;
+        case 'closeTaskModal': closeModal(); break;
+        case 'closeTaskModalConfirm': closeModalConfirm(); break;
+        case 'closeModalConfirm': closeModalConfirm(); break;
+        case 'saveTaskModal': saveTaskModal(); break;
+        case 'saveTaskModalAndClose': saveTaskModalAndClose(); break;
+        case 'deleteTaskFromModal': deleteTaskFromModal(); break;
+        case 'duplicateTaskFromModal': duplicateTaskFromModal(); break;
+        case 'createDependentTask': createDependentTask(); break;
+        // Comments panel actions
+        case 'openCommentsFromEdit': openCommentsFromEdit(); break;
+        case 'closeCommentsModal': closeModal(); break;
+        case 'closeCommentsModalConfirm': closeModalConfirm(); break;
+        case 'saveComment': saveComment(); break;
+        // Modal view-switch actions
+        case 'modalSwitchEdit': modalSwitchEdit(); break;
+        case 'modalSwitchBoth': modalSwitchBoth(); break;
+        case 'modalSwitchComments': modalSwitchComments(); break;
+        // Legacy dual modal action names (kept for safety)
+        case 'closeDualModal': closeModal(); break;
+        case 'closeDualModalConfirm': closeModalConfirm(); break;
+        case 'saveDualEdit': saveTaskModal(); break;
+        case 'saveDualEditAndClose': saveTaskModalAndClose(); break;
+        // Rename modal actions
+        case 'closeRenameModal': closeRenameModal(); break;
+        case 'saveRename': saveRename(); break;
+        case 'deletePhaseOrCategory': deletePhaseOrCategory(); break;
       }
-    });
-
-    // Delegated dirty-state tracking for Edit modal form
-    const _editPanel = document.getElementById('modal-edit-panel');
-    if (_editPanel) {
-        _editPanel.addEventListener('input', _updateEditDirtyHighlights);
-        _editPanel.addEventListener('change', _updateEditDirtyHighlights);
-        _editPanel.addEventListener('click', (e) => {
-            if (e.target.classList.contains('select-pill')) setTimeout(_updateEditDirtyHighlights, 0);
-        });
     }
+  });
 
-    document.addEventListener('keydown', (e) => {
-      // Let browser handle all Ctrl/Cmd shortcuts (copy, paste, undo, etc.)
-      if (e.ctrlKey || e.metaKey) return;
-      if (e.key !== 'Escape' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
-      const modalOpen = document.getElementById('modal-overlay') && document.getElementById('modal-overlay').style.display !== 'none';
-      const renameModalOpen = document.getElementById('rename-modal-overlay') && document.getElementById('rename-modal-overlay').style.display !== 'none';
-      const anyModalOpen = modalOpen || renameModalOpen;
-      // Escape closes whichever modal is open (with unsaved-change prompt where relevant)
-      if (e.key === 'Escape') {
-        if (modalOpen)        { e.preventDefault(); closeModalConfirm(); }
-        else if (renameModalOpen)   { e.preventDefault(); closeRenameModal(); }
-        return;
+  // Close filter panel when clicking outside
+  document.addEventListener('mousedown', (e) => {
+    if (!AppState._filterPanelOpen) return;
+    const panel = document.getElementById('filter-panel');
+    const btn = document.getElementById('filter-btn');
+    if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+      _closeFilterPanel();
+    }
+  });
+
+  // Delegated dirty-state tracking for Edit modal form
+  const _editPanel = document.getElementById('modal-edit-panel');
+  if (_editPanel) {
+    _editPanel.addEventListener('input', _updateEditDirtyHighlights);
+    _editPanel.addEventListener('change', _updateEditDirtyHighlights);
+    _editPanel.addEventListener('click', (e) => {
+      if (e.target.classList.contains('select-pill')) setTimeout(_updateEditDirtyHighlights, 0);
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    // Let browser handle all Ctrl/Cmd shortcuts (copy, paste, undo, etc.)
+    if (e.ctrlKey || e.metaKey) return;
+    if (e.key !== 'Escape' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
+    const modalOpen = document.getElementById('modal-overlay') && document.getElementById('modal-overlay').style.display !== 'none';
+    const renameModalOpen = document.getElementById('rename-modal-overlay') && document.getElementById('rename-modal-overlay').style.display !== 'none';
+    const anyModalOpen = modalOpen || renameModalOpen;
+    // Escape closes whichever modal is open (with unsaved-change prompt where relevant)
+    if (e.key === 'Escape') {
+      if (modalOpen) { e.preventDefault(); closeModalConfirm(); }
+      else if (renameModalOpen) { e.preventDefault(); closeRenameModal(); }
+      return;
+    }
+    if (modalOpen) {
+      if (e.key === 'e') { e.preventDefault(); modalSwitchEdit(); }
+      if (e.key === 'c') { e.preventDefault(); modalSwitchComments(); }
+      if (e.key === 'b') { e.preventDefault(); modalSwitchBoth(); }
+    } else if (!anyModalOpen) {
+      if (e.key === 's') { e.preventDefault(); saveSnapshot(); }
+      if (e.key === 'x') { e.preventDefault(); exportChart(); }
+      if (e.key === 'i') { e.preventDefault(); toggleInfoPanel(); }
+      if (e.key === 't') { e.preventDefault(); goToday(); }
+      if (e.key === 'm') { e.preventDefault(); toggleDarkMode(); }
+      if (e.key === 'p') { e.preventDefault(); cycleTheme(); }
+      if (e.key === 'v') {
+        e.preventDefault();
+        const _views = ['week', 'month', 'year'];
+        setView(_views[(_views.indexOf(AppState.view) + 1) % 3]);
       }
-      if (modalOpen) {
-        if (e.key === 'e') { e.preventDefault(); modalSwitchEdit(); }
-        if (e.key === 'c') { e.preventDefault(); modalSwitchComments(); }
-        if (e.key === 'b') { e.preventDefault(); modalSwitchBoth(); }
-      } else if (!anyModalOpen) {
-        if (e.key === 's') { e.preventDefault(); saveSnapshot(); }
-        if (e.key === 'x') { e.preventDefault(); exportChart(); }
-        if (e.key === 'i') { e.preventDefault(); toggleInfoPanel(); }
-        if (e.key === 't') { e.preventDefault(); goToday(); }
-        if (e.key === 'm') { e.preventDefault(); toggleDarkMode(); }
-        if (e.key === 'p') { e.preventDefault(); cycleTheme(); }
-        if (e.key === 'v') {
+      const _activeHoverTask = AppState._hoveredTask || AppState._hoveredLeftTask;
+      if (_activeHoverTask) {
+        if (e.key === 'c') { e.preventDefault(); openCommentsModal(_activeHoverTask); }
+        if (e.key === 'e') { e.preventDefault(); openTaskModal(_activeHoverTask, 'edit'); }
+        if (e.key === 'd') {
           e.preventDefault();
-          const _views = ['week', 'month', 'year'];
-          setView(_views[(_views.indexOf(AppState.view) + 1) % 3]);
+          openTaskModal(_activeHoverTask, 'edit');
+          createDependentTask();
         }
-        const _activeHoverTask = AppState._hoveredTask || AppState._hoveredLeftTask;
-        if (_activeHoverTask) {
-          if (e.key === 'c') { e.preventDefault(); openCommentsModal(_activeHoverTask); }
-          if (e.key === 'e') { e.preventDefault(); openTaskModal(_activeHoverTask, 'edit'); }
-          if (e.key === 'd') {
-            e.preventDefault();
-            openTaskModal(_activeHoverTask, 'edit');
-            createDependentTask();
-          }
-          if (e.key === 'n') {
-            e.preventDefault();
-            openTaskModal(_activeHoverTask, 'edit');
-            duplicateTaskFromModal();
-          }
-        }
-        if (!_activeHoverTask) {
-          if (e.key === 'e' || e.key === 'r') {
-            if (AppState._hoveredPhase) { e.preventDefault(); openRenameModal('phase', AppState._hoveredPhase); }
-            else if (AppState._hoveredCatInfo) { e.preventDefault(); openRenameModal('category', AppState._hoveredCatInfo.cat, AppState._hoveredCatInfo.phase); }
-          }
-            if (e.key === 'n') {
-            if (AppState._hoveredPhase) { e.preventDefault(); openTaskModal(null, 'add', AppState._hoveredPhase, null); }
-            else if (AppState._hoveredCatInfo) { e.preventDefault(); openTaskModal(null, 'add', AppState._hoveredCatInfo.phase, AppState._hoveredCatInfo.cat); }
-          }
-        }
-        // 'n' in chart area (no task/phase/cat hovered) — open Add Task pre-filled to closest visible task
-        if (e.key === 'n' && AppState._cursorInChartArea && !_activeHoverTask && !AppState._hoveredPhase && !AppState._hoveredCatInfo) {
+        if (e.key === 'n') {
           e.preventDefault();
-          const ca = document.getElementById('chart-area');
-          const today2 = new Date(); today2.setHours(0,0,0,0);
-          const compareTasks2 = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
-          const allRows2 = buildAllRows(AppState.currentTasks, compareTasks2, AppState.compareLabel, today2);
-          const visRows2 = getVisibleRows(allRows2, today2);
-          let defPhase = null, defCat = null;
-          if (ca && visRows2.length) {
-            const caRect = ca.getBoundingClientRect();
-            const cursorRowF = (AppState._chartCursorClientY - caRect.top + ca.scrollTop) / ROW_H;
-            let closestDist = Infinity;
-            visRows2.forEach((r, ri) => {
-              if (r.type !== 'task' || r.ghost) return;
-              const dist = Math.abs(ri - cursorRowF);
-              if (dist < closestDist) { closestDist = dist; defPhase = r.task.Phase; defCat = r.task.Category; }
-            });
-          }
-          openTaskModal(null, 'add', defPhase || 'Phase 1', defCat || 'Category 1');
+          openTaskModal(_activeHoverTask, 'edit');
+          duplicateTaskFromModal();
         }
       }
-    });
-
-    document.body.addEventListener('change', (e) => {
-        if (e.target.id === 'compare-sel') {
-            onCompareChange(e.target.value);
-        } else if (e.target.id === 'file-input') {
-            handleFileSelect(e);
+      if (!_activeHoverTask) {
+        if (e.key === 'e' || e.key === 'r') {
+          if (AppState._hoveredPhase) { e.preventDefault(); openRenameModal('phase', AppState._hoveredPhase); }
+          else if (AppState._hoveredCatInfo) { e.preventDefault(); openRenameModal('category', AppState._hoveredCatInfo.cat, AppState._hoveredCatInfo.phase); }
         }
-    });
-
-    document.body.addEventListener('input', (e) => {
-        if (e.target.id === 'modal-task-title') {
-            onTaskTitleInput();
+        if (e.key === 'n') {
+          if (AppState._hoveredPhase) { e.preventDefault(); openTaskModal(null, 'add', AppState._hoveredPhase, null); }
+          else if (AppState._hoveredCatInfo) { e.preventDefault(); openTaskModal(null, 'add', AppState._hoveredCatInfo.phase, AppState._hoveredCatInfo.cat); }
         }
-        // Track pending unsaved comment text for dirty-state warning (single and dual modal)
-        if (e.target.id === 'comments-text-input') {
-            _markCommentsDirty();
+      }
+      // 'n' in chart area (no task/phase/cat hovered) — open Add Task pre-filled to closest visible task
+      if (e.key === 'n' && AppState._cursorInChartArea && !_activeHoverTask && !AppState._hoveredPhase && !AppState._hoveredCatInfo) {
+        e.preventDefault();
+        const ca = document.getElementById('chart-area');
+        const today2 = new Date(); today2.setHours(0, 0, 0, 0);
+        const compareTasks2 = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
+        const allRows2 = buildAllRows(AppState.currentTasks, compareTasks2, AppState.compareLabel, today2);
+        const visRows2 = getVisibleRows(allRows2, today2);
+        let defPhase = null, defCat = null;
+        if (ca && visRows2.length) {
+          const caRect = ca.getBoundingClientRect();
+          const cursorRowF = (AppState._chartCursorClientY - caRect.top + ca.scrollTop) / ROW_H;
+          let closestDist = Infinity;
+          visRows2.forEach((r, ri) => {
+            if (r.type !== 'task' || r.ghost) return;
+            const dist = Math.abs(ri - cursorRowF);
+            if (dist < closestDist) { closestDist = dist; defPhase = r.task.Phase; defCat = r.task.Category; }
+          });
         }
-    });
-
-    document.body.addEventListener('mousemove', (e) => {
-        const tooltipEl = e.target.closest('[data-tooltip]');
-        if (tooltipEl) {
-            showSimpleTooltip(e, tooltipEl.dataset.tooltip, tooltipEl.dataset.shortcut);
-        } else if (e.target.closest('#unsaved-warning')) {
-            showHTMLTooltip(e, UNSAVED_WARNING_HTML);
-        } else if (e.target.closest('#toolbar')) {
-            onToolbarMove(e);
-        }
-    });
-
-    document.body.addEventListener('mouseout', (e) => {
-        if (e.target.closest('[data-tooltip]')) hideTooltip();
-        if (e.target.closest('#unsaved-warning')) hideTooltip();
-        if (e.target.closest('#toolbar')) onToolbarOut(e);
-    });
-    // ── Click outside modal to close ──────────────────────────────────
-    const _modalOverlay = document.getElementById('modal-overlay');
-    if (_modalOverlay) _modalOverlay.addEventListener('click', e => { if (e.target === _modalOverlay) closeModalConfirm(); });
-
-    // ── Hover open/close filter panel ────────────────────────────────
-    const _filterBtnEl  = document.getElementById('filter-btn');
-    const _filterPanelEl = document.getElementById('filter-panel');
-    if (_filterBtnEl && _filterPanelEl) {
-      _filterBtnEl.addEventListener('mouseenter', () => {
-        clearTimeout(AppState._filterCloseTimeout);
-        if (!AppState._filterPanelOpen) _openFilterPanel();
-      });
-      _filterBtnEl.addEventListener('mouseleave', () => {
-        AppState._filterCloseTimeout = setTimeout(() => { if (!AppState._filterPanelOpen || !_filterPanelEl.matches(':hover')) _closeFilterPanel(); }, 120);
-      });
-      _filterPanelEl.addEventListener('mouseenter', () => {
-        clearTimeout(AppState._filterCloseTimeout);
-      });
-      _filterPanelEl.addEventListener('mouseleave', () => {
-        _closeFilterPanel();
-      });
+        openTaskModal(null, 'add', defPhase || 'Phase 1', defCat || 'Category 1');
+      }
     }
+  });
 
-    // Easter egg: 21 clicks on source data name
-    const _titleEl = document.getElementById('app-title');
-    if (_titleEl) {
-        _titleEl.addEventListener('click', (e) => {
-            if (e.button !== 0) return;
-            AppState._easterClickCount++;
-            clearTimeout(AppState._easterClickTimer);
-            if (AppState._easterClickCount >= 21) {
-                AppState._easterClickCount = 0;
-                _showEasterEggPopup(_EGG_SAD_CAT, "I'm sorry..");
-            } else {
-                AppState._easterClickTimer = setTimeout(() => { AppState._easterClickCount = 0; }, 2000);
-            }
-        });
+  document.body.addEventListener('change', (e) => {
+    if (e.target.id === 'compare-sel') {
+      onCompareChange(e.target.value);
+    } else if (e.target.id === 'file-input') {
+      handleFileSelect(e);
     }
+  });
 
-    AppState._eventsInit = true;
+  document.body.addEventListener('input', (e) => {
+    if (e.target.id === 'modal-task-title') {
+      onTaskTitleInput();
+    }
+    // Track pending unsaved comment text for dirty-state warning (single and dual modal)
+    if (e.target.id === 'comments-text-input') {
+      _markCommentsDirty();
+    }
+  });
+
+  document.body.addEventListener('mousemove', (e) => {
+    const tooltipEl = e.target.closest('[data-tooltip]');
+    if (tooltipEl) {
+      showSimpleTooltip(e, tooltipEl.dataset.tooltip, tooltipEl.dataset.shortcut);
+    } else if (e.target.closest('#unsaved-warning')) {
+      showHTMLTooltip(e, UNSAVED_WARNING_HTML);
+    } else if (e.target.closest('#toolbar')) {
+      onToolbarMove(e);
+    }
+  });
+
+  document.body.addEventListener('mouseout', (e) => {
+    if (e.target.closest('[data-tooltip]')) hideTooltip();
+    if (e.target.closest('#unsaved-warning')) hideTooltip();
+    if (e.target.closest('#toolbar')) onToolbarOut(e);
+  });
+  // ── Click outside modal to close ──────────────────────────────────
+  const _modalOverlay = document.getElementById('modal-overlay');
+  if (_modalOverlay) _modalOverlay.addEventListener('click', e => { if (e.target === _modalOverlay) closeModalConfirm(); });
+
+  // ── Hover open/close filter panel ────────────────────────────────
+  const _filterBtnEl = document.getElementById('filter-btn');
+  const _filterPanelEl = document.getElementById('filter-panel');
+  if (_filterBtnEl && _filterPanelEl) {
+    _filterBtnEl.addEventListener('mouseenter', () => {
+      clearTimeout(AppState._filterCloseTimeout);
+      if (!AppState._filterPanelOpen) _openFilterPanel();
+    });
+    _filterBtnEl.addEventListener('mouseleave', () => {
+      AppState._filterCloseTimeout = setTimeout(() => { if (!AppState._filterPanelOpen || !_filterPanelEl.matches(':hover')) _closeFilterPanel(); }, 120);
+    });
+    _filterPanelEl.addEventListener('mouseenter', () => {
+      clearTimeout(AppState._filterCloseTimeout);
+    });
+    _filterPanelEl.addEventListener('mouseleave', () => {
+      _closeFilterPanel();
+    });
+  }
+
+  // Easter egg: 21 clicks on source data name
+  const _titleEl = document.getElementById('app-title');
+  if (_titleEl) {
+    _titleEl.addEventListener('click', (e) => {
+      if (e.button !== 0) return;
+      AppState._easterClickCount++;
+      clearTimeout(AppState._easterClickTimer);
+      if (AppState._easterClickCount >= 21) {
+        AppState._easterClickCount = 0;
+        _showEasterEggPopup(_EGG_SAD_CAT, "I'm sorry..");
+      } else {
+        AppState._easterClickTimer = setTimeout(() => { AppState._easterClickCount = 0; }, 2000);
+      }
+    });
+  }
+
+  AppState._eventsInit = true;
 }
 
 // ── Auto-Compact Resize Logic ─────────────────────────────────────────
 AppState._wasNarrow = window.innerWidth <= NARROW_BREAKPOINT_PX;
 window.addEventListener('resize', () => {
-    const isNarrow = window.innerWidth <= NARROW_BREAKPOINT_PX;
-    if (isNarrow !== AppState._wasNarrow) {
-        AppState._wasNarrow = isNarrow;
-        if (isNarrow && !AppState.compactMode) toggleCompact();
-        else if (!isNarrow && AppState.compactMode) toggleCompact();
-    }
+  const isNarrow = window.innerWidth <= NARROW_BREAKPOINT_PX;
+  if (isNarrow !== AppState._wasNarrow) {
+    AppState._wasNarrow = isNarrow;
+    if (isNarrow && !AppState.compactMode) toggleCompact();
+    else if (!isNarrow && AppState.compactMode) toggleCompact();
+  }
 });
 
 // ── Init ──────────────────────────────────────────────────────────────
-function init(){
+function init() {
   // Status 'Done' → Progress 100
-  AppState.currentTasks=DATA.tasks.map(t=>{
-    if((String(t.Status||'')).toLowerCase()==='done')return{...t,Progress:100};
+  AppState.currentTasks = DATA.tasks.map(t => {
+    if ((String(t.Status || '')).toLowerCase() === 'done') return { ...t, Progress: 100 };
     return t;
   });
 
   // App title + date pill
-  const meta=DATA.meta||{};
-  let src=String(meta.source_file||'Gantt Chart');
+  const meta = DATA.meta || {};
+  let src = String(meta.source_file || 'Gantt Chart');
   src = src.replace(/\.xls[xm]?$/i, '');
-  const trimmed=src.length>20?src.slice(0,20)+'..':src;
-  const narrowed=src.length>5?src.slice(0,5)+'..':src;
-  const titleEl=document.getElementById('app-title');
-  if(titleEl) {
-    titleEl.innerHTML=`<span class="txt-full">${escHtml(trimmed)}</span><span class="txt-short">${escHtml(narrowed)}</span>`;
-    if(src.length>5) titleEl.dataset.tooltip = src;
+  const trimmed = src.length > 20 ? src.slice(0, 20) + '..' : src;
+  const narrowed = src.length > 5 ? src.slice(0, 5) + '..' : src;
+  const titleEl = document.getElementById('app-title');
+  if (titleEl) {
+    titleEl.innerHTML = `<span class="txt-full">${escHtml(trimmed)}</span><span class="txt-short">${escHtml(narrowed)}</span>`;
+    if (src.length > 5) titleEl.dataset.tooltip = src;
     else delete titleEl.dataset.tooltip;
   }
-  const pillEl=document.getElementById('date-pill');
-  if(pillEl){
-      if (meta.generated_at) {
-          const parts = meta.generated_at.split(' ');
-          let shortDate = parts[0] || meta.generated_at;
-          const dParts = shortDate.split('-');
-          if (dParts.length === 3) shortDate = dParts[0] + '-' + dParts[1];
-          pillEl.innerHTML=`<span class="txt-full">${meta.generated_at}</span><span class="txt-short">${shortDate}</span>&thinsp;&#x21A9;&#xFE0E;`;
-      } else {
-          pillEl.innerHTML = '';
-      }
-      pillEl.style.display=meta.generated_at?'inline-flex':'none'; 
+  const pillEl = document.getElementById('date-pill');
+  if (pillEl) {
+    if (meta.generated_at) {
+      const parts = meta.generated_at.split(' ');
+      let shortDate = parts[0] || meta.generated_at;
+      const dParts = shortDate.split('-');
+      if (dParts.length === 3) shortDate = dParts[0] + '-' + dParts[1];
+      pillEl.innerHTML = `<span class="txt-full">${meta.generated_at}</span><span class="txt-short">${shortDate}</span>&thinsp;&#x21A9;&#xFE0E;`;
+    } else {
+      pillEl.innerHTML = '';
+    }
+    pillEl.style.display = meta.generated_at ? 'inline-flex' : 'none';
   }
 
-  AppState.currentTasks.forEach(t=>catColor(t.Category));
-  const dates=AppState.currentTasks.map(t=>parseDate(t['Start Date'])).filter(Boolean);
-  const today=new Date(); today.setHours(0,0,0,0);
-  const earliest=dates.length?new Date(Math.min(...dates.map(d=>d.getTime()))):today;
-  AppState.viewportStart=startOf(today<earliest?earliest:today,'month');
-  AppState.viewportStart=addDays(AppState.viewportStart,-7);
+  AppState.currentTasks.forEach(t => catColor(t.Category));
+  const dates = AppState.currentTasks.map(t => parseDate(t['Start Date'])).filter(Boolean);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const earliest = dates.length ? new Date(Math.min(...dates.map(d => d.getTime()))) : today;
+  AppState.viewportStart = startOf(today < earliest ? earliest : today, 'month');
+  AppState.viewportStart = addDays(AppState.viewportStart, -7);
   populateCompare();
-  
+
   if (window.innerWidth <= NARROW_BREAKPOINT_PX && !AppState.compactMode) {
-      toggleCompact();
+    toggleCompact();
   }
 
   _initSyncScroll();
@@ -7312,7 +7331,7 @@ function init(){
   document.fonts.ready.then(() => _measureLeftPanel());
   updateScrollAnchoring();
 }
-window.addEventListener('load',init);
+window.addEventListener('load', init);
 
 // --- STANDALONE DATA LOADING LAYER ---
 
@@ -7322,363 +7341,363 @@ const PREDEFINED_PRIORITIES = ['high', 'medium', 'low', 'none'];
 
 // ── Edit / Dual modal dirty-state helpers ─────────────────────────────
 function _getEditFieldValues() {
-    return {
-        title:    document.getElementById('modal-task-title')?.value    ?? '',
-        phase:    document.getElementById('modal-task-phase')?.value    ?? '',
-        cat:      document.getElementById('modal-task-cat')?.value      ?? '',
-        desc:     document.getElementById('modal-task-desc')?.value     ?? '',
-        start:    document.getElementById('modal-task-start')?.value    ?? '',
-        end:      document.getElementById('modal-task-end')?.value      ?? '',
-        progress: document.getElementById('modal-task-progress-range')?.value ?? '0',
-        dep:      document.getElementById('modal-task-dependency')?.value    ?? '',
-        id:       document.getElementById('modal-task-id')?.value       ?? '',
-        priority: document.getElementById('modal-priority-container')?.dataset.value ?? 'medium',
-        status:   document.getElementById('modal-status-container')?.dataset.value   ?? 'none',
-    };
+  return {
+    title: document.getElementById('modal-task-title')?.value ?? '',
+    phase: document.getElementById('modal-task-phase')?.value ?? '',
+    cat: document.getElementById('modal-task-cat')?.value ?? '',
+    desc: document.getElementById('modal-task-desc')?.value ?? '',
+    start: document.getElementById('modal-task-start')?.value ?? '',
+    end: document.getElementById('modal-task-end')?.value ?? '',
+    progress: document.getElementById('modal-task-progress-range')?.value ?? '0',
+    dep: document.getElementById('modal-task-dependency')?.value ?? '',
+    id: document.getElementById('modal-task-id')?.value ?? '',
+    priority: document.getElementById('modal-priority-container')?.dataset.value ?? 'medium',
+    status: document.getElementById('modal-status-container')?.dataset.value ?? 'none',
+  };
 }
 function _captureEditSnapshot() {
-    AppState._modalOriginal = (AppState._modalMode === 'edit') ? _getEditFieldValues() : null;
+  AppState._modalOriginal = (AppState._modalMode === 'edit') ? _getEditFieldValues() : null;
 }
 function _isEditDirty() {
-    if (!AppState._modalOriginal) return false;
-    const cur = _getEditFieldValues();
-    return Object.keys(AppState._modalOriginal).some(k => cur[k] !== AppState._modalOriginal[k]);
+  if (!AppState._modalOriginal) return false;
+  const cur = _getEditFieldValues();
+  return Object.keys(AppState._modalOriginal).some(k => cur[k] !== AppState._modalOriginal[k]);
 }
 function _updateEditDirtyHighlights() {
-    if (!AppState._modalOriginal) return;
-    const cur = _getEditFieldValues();
-    [['title','modal-task-title'],['phase','modal-task-phase'],['cat','modal-task-cat'],
-     ['desc','modal-task-desc'],['start','modal-task-start'],['end','modal-task-end'],
-     ['progress','modal-task-progress-range'],['dep','modal-task-dependency'],
-     ['id','modal-task-id'],['priority','modal-priority-container'],['status','modal-status-container']
-    ].forEach(([key, elId]) => {
-        const el = document.getElementById(elId); if (!el) return;
-        const fg = el.closest('.form-group'); if (!fg) return;
-        fg.classList.toggle('form-group--dirty', cur[key] !== AppState._modalOriginal[key]);
-    });
+  if (!AppState._modalOriginal) return;
+  const cur = _getEditFieldValues();
+  [['title', 'modal-task-title'], ['phase', 'modal-task-phase'], ['cat', 'modal-task-cat'],
+  ['desc', 'modal-task-desc'], ['start', 'modal-task-start'], ['end', 'modal-task-end'],
+  ['progress', 'modal-task-progress-range'], ['dep', 'modal-task-dependency'],
+  ['id', 'modal-task-id'], ['priority', 'modal-priority-container'], ['status', 'modal-status-container']
+  ].forEach(([key, elId]) => {
+    const el = document.getElementById(elId); if (!el) return;
+    const fg = el.closest('.form-group'); if (!fg) return;
+    fg.classList.toggle('form-group--dirty', cur[key] !== AppState._modalOriginal[key]);
+  });
 }
 function openTaskModal(task, mode, defaultPhase, defaultCat) {
-    AppState._modalTask = task;
-    AppState._modalMode = mode;
-    const isEdit = mode === 'edit';
+  AppState._modalTask = task;
+  AppState._modalMode = mode;
+  const isEdit = mode === 'edit';
 
-    document.getElementById('modal-title').textContent = isEdit ? 'Edit Task' : 'Add Task';
-    
-    const titleVal = isEdit ? task.Title : '';
-    document.getElementById('modal-task-title').value = titleVal;
-    document.getElementById('modal-task-phase').value = isEdit ? task.Phase : (defaultPhase || 'Phase 1');
-    document.getElementById('modal-task-cat').value = isEdit ? task.Category : (defaultCat || 'Category 1');
-    document.getElementById('modal-task-desc').value = isEdit ? task.Description : '';
-    
-    // Auto ID logic state
-    const autoId = isEdit ? task.ID : '';
-    document.getElementById('modal-task-id').value = autoId;
-    document.getElementById('modal-task-id').dataset.autoGenerated = !isEdit || (autoId === titleVal.replace(/[^a-zA-Z0-9 ]/g, '')) ? 'true' : 'false';
-    
-    // Dates
-    const sDate = isEdit && task['Start Date'] ? parseDate(task['Start Date']) : new Date();
-    const eDate = isEdit && task['End Date'] ? parseDate(task['End Date']) : addDays(sDate, 7);
-    
-    if (sDate && !isNaN(sDate)) {
-        document.getElementById('modal-task-start').value = sDate.toISOString().split('T')[0];
-    } else {
-        document.getElementById('modal-task-start').value = '';
+  document.getElementById('modal-title').textContent = isEdit ? 'Edit Task' : 'Add Task';
+
+  const titleVal = isEdit ? task.Title : '';
+  document.getElementById('modal-task-title').value = titleVal;
+  document.getElementById('modal-task-phase').value = isEdit ? task.Phase : (defaultPhase || 'Phase 1');
+  document.getElementById('modal-task-cat').value = isEdit ? task.Category : (defaultCat || 'Category 1');
+  document.getElementById('modal-task-desc').value = isEdit ? task.Description : '';
+
+  // Auto ID logic state
+  const autoId = isEdit ? task.ID : '';
+  document.getElementById('modal-task-id').value = autoId;
+  document.getElementById('modal-task-id').dataset.autoGenerated = !isEdit || (autoId === titleVal.replace(/[^a-zA-Z0-9 ]/g, '')) ? 'true' : 'false';
+
+  // Dates
+  const sDate = isEdit && task['Start Date'] ? parseDate(task['Start Date']) : new Date();
+  const eDate = isEdit && task['End Date'] ? parseDate(task['End Date']) : addDays(sDate, 7);
+
+  if (sDate && !isNaN(sDate)) {
+    document.getElementById('modal-task-start').value = sDate.toISOString().split('T')[0];
+  } else {
+    document.getElementById('modal-task-start').value = '';
+  }
+  if (eDate && !isNaN(eDate)) {
+    document.getElementById('modal-task-end').value = eDate.toISOString().split('T')[0];
+  } else {
+    document.getElementById('modal-task-end').value = '';
+  }
+
+  // Progress
+  const prog = isEdit ? (Number(task.Progress) || 0) : 0;
+  document.getElementById('modal-task-progress-range').value = prog;
+  document.getElementById('modal-task-progress-num').value = prog;
+
+  // Setup datalists
+  const phaseSet = new Set(), catSet = new Set();
+  AppState.currentTasks.forEach(t => { phaseSet.add(t.Phase); catSet.add(t.Category); });
+  const pl = document.getElementById('modal-phase-sel'); pl.innerHTML = '<option value="" disabled selected hidden>&mdash; Or select existing &mdash;</option>';
+  phaseSet.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; pl.appendChild(o); });
+  const cl = document.getElementById('modal-cat-sel'); cl.innerHTML = '<option value="" disabled selected hidden>&mdash; Or select existing &mdash;</option>';
+  catSet.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; cl.appendChild(o); });
+
+  // Dependencies
+  const depSel = document.getElementById('modal-task-dependency');
+  _buildDepOptions(depSel, isEdit ? getTaskId(task) : null);
+  depSel.value = isEdit ? (task.Dependency || '') : '';
+
+  // Select Pills
+  renderPills('modal-priority-container', PREDEFINED_PRIORITIES, isEdit ? (task.Priority || 'medium') : 'medium');
+  renderPills('modal-status-container', PREDEFINED_STATUSES, isEdit ? (task.Status || 'none') : 'none');
+
+  document.getElementById('modal-btn-delete').style.display = isEdit ? 'inline-block' : 'none';
+  const dupBtn = document.getElementById('modal-btn-duplicate');
+  if (dupBtn) dupBtn.style.display = isEdit ? 'inline-block' : 'none';
+  const depBtn = document.getElementById('modal-btn-dependent');
+  if (depBtn) depBtn.style.display = isEdit ? 'inline-block' : 'none';
+
+  // Comment info section
+  const comments = (isEdit && task && task.Comments) ? task.Comments : [];
+  const infoEl = document.getElementById('modal-comment-info');
+  if (infoEl) {
+    infoEl.style.display = comments.length > 0 ? 'block' : 'none';
+    const countEl = document.getElementById('modal-comment-count');
+    if (countEl) countEl.textContent = `${comments.length} comment${comments.length !== 1 ? 's' : ''}`;
+    const latestEl = document.getElementById('modal-comment-latest');
+    if (latestEl && comments.length > 0) {
+      const latest = comments[comments.length - 1];
+      latestEl.textContent = ` \xB7 last: ${latest.date} by ${latest.name}`;
     }
-    if (eDate && !isNaN(eDate)) {
-        document.getElementById('modal-task-end').value = eDate.toISOString().split('T')[0];
-    } else {
-        document.getElementById('modal-task-end').value = '';
-    }
-    
-    // Progress
-    const prog = isEdit ? (Number(task.Progress) || 0) : 0;
-    document.getElementById('modal-task-progress-range').value = prog;
-    document.getElementById('modal-task-progress-num').value = prog;
-    
-    // Setup datalists
-    const phaseSet = new Set(), catSet = new Set();
-    AppState.currentTasks.forEach(t => { phaseSet.add(t.Phase); catSet.add(t.Category); });
-    const pl = document.getElementById('modal-phase-sel'); pl.innerHTML = '<option value="" disabled selected hidden>&mdash; Or select existing &mdash;</option>';
-    phaseSet.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; pl.appendChild(o); });
-    const cl = document.getElementById('modal-cat-sel'); cl.innerHTML = '<option value="" disabled selected hidden>&mdash; Or select existing &mdash;</option>';
-    catSet.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; cl.appendChild(o); });
-    
-    // Dependencies
-    const depSel = document.getElementById('modal-task-dependency');
-    _buildDepOptions(depSel, isEdit ? getTaskId(task) : null);
-    depSel.value = isEdit ? (task.Dependency || '') : '';
-    
-    // Select Pills
-    renderPills('modal-priority-container', PREDEFINED_PRIORITIES, isEdit ? (task.Priority || 'medium') : 'medium');
-    renderPills('modal-status-container', PREDEFINED_STATUSES, isEdit ? (task.Status || 'none') : 'none');
-    
-    document.getElementById('modal-btn-delete').style.display = isEdit ? 'inline-block' : 'none';
-    const dupBtn = document.getElementById('modal-btn-duplicate');
-    if (dupBtn) dupBtn.style.display = isEdit ? 'inline-block' : 'none';
-    const depBtn = document.getElementById('modal-btn-dependent');
-    if (depBtn) depBtn.style.display = isEdit ? 'inline-block' : 'none';
+  }
 
-    // Comment info section
-    const comments = (isEdit && task && task.Comments) ? task.Comments : [];
-    const infoEl = document.getElementById('modal-comment-info');
-    if (infoEl) {
-      infoEl.style.display = comments.length > 0 ? 'block' : 'none';
-      const countEl = document.getElementById('modal-comment-count');
-      if (countEl) countEl.textContent = `${comments.length} comment${comments.length !== 1 ? 's' : ''}`;
-      const latestEl = document.getElementById('modal-comment-latest');
-      if (latestEl && comments.length > 0) {
-        const latest = comments[comments.length - 1];
-        latestEl.textContent = ` \xB7 last: ${latest.date} by ${latest.name}`;
-      }
-    }
+  // Task info strip in view bar
+  _setModalTaskInfo('modal-taskinfo', isEdit ? task : null);
 
-    // Task info strip in view bar
-    _setModalTaskInfo('modal-taskinfo', isEdit ? task : null);
+  // Populate comments panel
+  if (isEdit && task) {
+    if (!task.Comments) task.Comments = [];
+    const nameSet = new Set();
+    AppState.currentTasks.forEach(t2 => (t2.Comments || []).forEach(c => { if (c.name) nameSet.add(c.name); }));
+    const dl = document.getElementById('comments-name-list');
+    if (dl) { dl.innerHTML = ''; nameSet.forEach(n => { const o = document.createElement('option'); o.value = n; dl.appendChild(o); }); }
+    const nameInput = document.getElementById('comments-name-input');
+    if (nameInput && AppState._commenterName) nameInput.value = AppState._commenterName;
+    const textInput = document.getElementById('comments-text-input');
+    if (textInput) { textInput.value = ''; _clearCommentsDirty(); }
+    renderCommentList();
+  }
 
-    // Populate comments panel
-    if (isEdit && task) {
-        if (!task.Comments) task.Comments = [];
-        const nameSet = new Set();
-        AppState.currentTasks.forEach(t2 => (t2.Comments||[]).forEach(c => { if(c.name) nameSet.add(c.name); }));
-        const dl = document.getElementById('comments-name-list');
-        if (dl) { dl.innerHTML = ''; nameSet.forEach(n => { const o = document.createElement('option'); o.value = n; dl.appendChild(o); }); }
-        const nameInput = document.getElementById('comments-name-input');
-        if (nameInput && AppState._commenterName) nameInput.value = AppState._commenterName;
-        const textInput = document.getElementById('comments-text-input');
-        if (textInput) { textInput.value = ''; _clearCommentsDirty(); }
-        renderCommentList();
-    }
+  // Reset dirty highlights and capture snapshot
+  document.querySelectorAll('#modal-edit-panel .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
+  _captureEditSnapshot();
 
-    // Reset dirty highlights and capture snapshot
-    document.querySelectorAll('#modal-edit-panel .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
-    _captureEditSnapshot();
+  // Hide view-switcher for add mode (no comments on a brand-new task yet)
+  const _vs = document.getElementById('modal-view-switcher');
+  if (_vs) _vs.style.display = isEdit ? '' : 'none';
 
-    // Hide view-switcher for add mode (no comments on a brand-new task yet)
-    const _vs = document.getElementById('modal-view-switcher');
-    if (_vs) _vs.style.display = isEdit ? '' : 'none';
-
-    // Apply view preference (always 'edit' for add mode)
-    _setView(isEdit ? AppState._modalLayout : 'edit');
-    document.getElementById('modal-overlay').style.display = 'flex';
-    // Auto-focus title field when creating a new task
-    if (!isEdit) {
-        setTimeout(() => { const el = document.getElementById('modal-task-title'); if (el) { el.focus(); el.select(); } }, 80);
-    }
+  // Apply view preference (always 'edit' for add mode)
+  _setView(isEdit ? AppState._modalLayout : 'edit');
+  document.getElementById('modal-overlay').style.display = 'flex';
+  // Auto-focus title field when creating a new task
+  if (!isEdit) {
+    setTimeout(() => { const el = document.getElementById('modal-task-title'); if (el) { el.focus(); el.select(); } }, 80);
+  }
 }
 
 function renderPills(containerId, options, currentValue) {
-    const c = document.getElementById(containerId);
-    c.innerHTML = '';
-    c.dataset.value = currentValue.toLowerCase();
-    options.forEach(opt => {
-        const pill = document.createElement('span');
-        pill.className = 'select-pill';
-        const optLower = opt.toLowerCase();
-        pill.textContent = opt === 'none' ? 'None' : opt;
-        if (c.dataset.value === optLower) {
-            pill.classList.add('active');
-            pill.style.background = optLower === 'none' ? '#94a3b8' : (STATUS_COLORS[optLower] || '#3b82f6');
-            pill.style.color = 'var(--pill-text)';
-        } else {
-            pill.style.background = 'transparent';
-            pill.style.color = optLower === 'none' ? '#94a3b8' : (STATUS_COLORS[optLower] || '#3b82f6');
-            pill.style.borderColor = pill.style.color;
-        }
-        pill.onclick = () => {
-            c.dataset.value = optLower;
-            renderPills(containerId, options, optLower);
-        };
-        c.appendChild(pill);
-    });
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  c.dataset.value = currentValue.toLowerCase();
+  options.forEach(opt => {
+    const pill = document.createElement('span');
+    pill.className = 'select-pill';
+    const optLower = opt.toLowerCase();
+    pill.textContent = opt === 'none' ? 'None' : opt;
+    if (c.dataset.value === optLower) {
+      pill.classList.add('active');
+      pill.style.background = optLower === 'none' ? '#94a3b8' : (STATUS_COLORS[optLower] || '#3b82f6');
+      pill.style.color = 'var(--pill-text)';
+    } else {
+      pill.style.background = 'transparent';
+      pill.style.color = optLower === 'none' ? '#94a3b8' : (STATUS_COLORS[optLower] || '#3b82f6');
+      pill.style.borderColor = pill.style.color;
+    }
+    pill.onclick = () => {
+      c.dataset.value = optLower;
+      renderPills(containerId, options, optLower);
+    };
+    c.appendChild(pill);
+  });
 }
 
 function onTaskTitleInput() {
-    const idInput = document.getElementById('modal-task-id');
-    if (idInput.dataset.autoGenerated === 'true') {
-        const titleVal = document.getElementById('modal-task-title').value;
-        const baseId = titleVal.replace(/[^a-zA-Z0-9 ]/g, '');
-        const existingIds = new Set(AppState.currentTasks.map(t => getTaskId(t)));
-        let candidate = baseId;
-        let n = 2;
-        while (candidate && existingIds.has(candidate)) { candidate = baseId + ' (' + n++ + ')'; }
-        idInput.value = candidate;
-    }
+  const idInput = document.getElementById('modal-task-id');
+  if (idInput.dataset.autoGenerated === 'true') {
+    const titleVal = document.getElementById('modal-task-title').value;
+    const baseId = titleVal.replace(/[^a-zA-Z0-9 ]/g, '');
+    const existingIds = new Set(AppState.currentTasks.map(t => getTaskId(t)));
+    let candidate = baseId;
+    let n = 2;
+    while (candidate && existingIds.has(candidate)) { candidate = baseId + ' (' + n++ + ')'; }
+    idInput.value = candidate;
+  }
 }
 
 function ensureModalIdHandler() {
-    if (AppState._modalIdInit) return;
-    const idInput = document.getElementById('modal-task-id');
-    if (idInput) {
-        idInput.addEventListener('input', function() { this.dataset.autoGenerated = 'false'; });
-        AppState._modalIdInit = true;
-    }
+  if (AppState._modalIdInit) return;
+  const idInput = document.getElementById('modal-task-id');
+  if (idInput) {
+    idInput.addEventListener('input', function () { this.dataset.autoGenerated = 'false'; });
+    AppState._modalIdInit = true;
+  }
 }
 
 function saveTaskModal() {
-    ensureModalIdHandler();
-    const isEdit = AppState._modalMode === 'edit';
-    const t = isEdit ? AppState._modalTask : {};
+  ensureModalIdHandler();
+  const isEdit = AppState._modalMode === 'edit';
+  const t = isEdit ? AppState._modalTask : {};
 
-    t.Title = normalizeText(document.getElementById('modal-task-title').value) || 'New Task';
-    t.Phase = normalizeText(document.getElementById('modal-task-phase').value) || 'Phase 1';
-    t.Category = normalizeText(document.getElementById('modal-task-cat').value) || 'Category 1';
-    t.Description = normalizeText(document.getElementById('modal-task-desc').value);
+  t.Title = normalizeText(document.getElementById('modal-task-title').value) || 'New Task';
+  t.Phase = normalizeText(document.getElementById('modal-task-phase').value) || 'Phase 1';
+  t.Category = normalizeText(document.getElementById('modal-task-cat').value) || 'Category 1';
+  t.Description = normalizeText(document.getElementById('modal-task-desc').value);
 
-    let priorityStr = document.getElementById('modal-priority-container').dataset.value;
-    t.Priority = priorityStr === 'none' ? '' : priorityStr.charAt(0).toUpperCase() + priorityStr.slice(1);
+  let priorityStr = document.getElementById('modal-priority-container').dataset.value;
+  t.Priority = priorityStr === 'none' ? '' : priorityStr.charAt(0).toUpperCase() + priorityStr.slice(1);
 
-    let statusStr = document.getElementById('modal-status-container').dataset.value;
-    t.Status = statusStr === 'none' ? '' : statusStr;
+  let statusStr = document.getElementById('modal-status-container').dataset.value;
+  t.Status = statusStr === 'none' ? '' : statusStr;
 
-    const sdInput = document.getElementById('modal-task-start').value;
-    if (sdInput) t['Start Date'] = sdInput;
-    const edInput = document.getElementById('modal-task-end').value;
-    if (edInput) t['End Date'] = edInput;
+  const sdInput = document.getElementById('modal-task-start').value;
+  if (sdInput) t['Start Date'] = sdInput;
+  const edInput = document.getElementById('modal-task-end').value;
+  if (edInput) t['End Date'] = edInput;
 
-    t.Progress = document.getElementById('modal-task-progress-range').value;
-    t.Dependency = document.getElementById('modal-task-dependency').value;
+  t.Progress = document.getElementById('modal-task-progress-range').value;
+  t.Dependency = document.getElementById('modal-task-dependency').value;
 
-    let idVal = normalizeText(document.getElementById('modal-task-id').value);
-    if (!idVal) idVal = t.Title.replace(/[^a-zA-Z0-9 ]/g, '');
-    if (!isEdit) {
-        // Ensure uniqueness for new tasks
-        const existingIds = new Set(AppState.currentTasks.map(t2 => getTaskId(t2)));
-        let candidate = idVal; let n = 2;
-        while (candidate && existingIds.has(candidate)) { candidate = idVal + ' (' + n++ + ')'; }
-        idVal = candidate;
-    } else {
-        // Ensure uniqueness for edited tasks — exclude the task currently being edited
-        const existingIds = new Set(
-            AppState.currentTasks.filter(t2 => t2 !== AppState._modalTask).map(t2 => getTaskId(t2))
-        );
-        let candidate = idVal; let n = 2;
-        while (candidate && existingIds.has(candidate)) { candidate = idVal + ' (' + n++ + ')'; }
-        idVal = candidate;
+  let idVal = normalizeText(document.getElementById('modal-task-id').value);
+  if (!idVal) idVal = t.Title.replace(/[^a-zA-Z0-9 ]/g, '');
+  if (!isEdit) {
+    // Ensure uniqueness for new tasks
+    const existingIds = new Set(AppState.currentTasks.map(t2 => getTaskId(t2)));
+    let candidate = idVal; let n = 2;
+    while (candidate && existingIds.has(candidate)) { candidate = idVal + ' (' + n++ + ')'; }
+    idVal = candidate;
+  } else {
+    // Ensure uniqueness for edited tasks — exclude the task currently being edited
+    const existingIds = new Set(
+      AppState.currentTasks.filter(t2 => t2 !== AppState._modalTask).map(t2 => getTaskId(t2))
+    );
+    let candidate = idVal; let n = 2;
+    while (candidate && existingIds.has(candidate)) { candidate = idVal + ' (' + n++ + ')'; }
+    idVal = candidate;
+  }
+  t.ID = idVal;
+
+  if (!isEdit) {
+    // Copy comments from duplicate source if present (not for dependent tasks)
+    if (AppState._pendingDuplicateComments) {
+      t.Comments = AppState._pendingDuplicateComments;
+      AppState._pendingDuplicateComments = null;
     }
-    t.ID = idVal;
-
-    if (!isEdit) {
-        // Copy comments from duplicate source if present (not for dependent tasks)
-        if (AppState._pendingDuplicateComments) {
-            t.Comments = AppState._pendingDuplicateComments;
-            AppState._pendingDuplicateComments = null;
-        }
-        AppState.currentTasks.push(t);
-        syncCurrentTasksToData();
-        setUnsavedChanges(true);
-        closeModal();
-        scrollToTask(t);
-        return;
-    }
-
+    AppState.currentTasks.push(t);
     syncCurrentTasksToData();
     setUnsavedChanges(true);
-    // Keep edit modal open — refresh dep dropdown and reset dirty state
-    const depSel = document.getElementById('modal-task-dependency');
-    _buildDepOptions(depSel, getTaskId(t));
-    depSel.value = t.Dependency || '';
-    const comments = t.Comments || [];
-    const infoEl = document.getElementById('modal-comment-info');
-    if (infoEl) {
-        infoEl.style.display = comments.length > 0 ? 'block' : 'none';
-        const countEl = document.getElementById('modal-comment-count');
-        if (countEl) countEl.textContent = `${comments.length} comment${comments.length !== 1 ? 's' : ''}`;
-        const latestEl = document.getElementById('modal-comment-latest');
-        if (latestEl && comments.length > 0) {
-            const latest = comments[comments.length - 1];
-            latestEl.textContent = ` \xB7 last: ${latest.date} by ${latest.name}`;
-        }
+    closeModal();
+    scrollToTask(t);
+    return;
+  }
+
+  syncCurrentTasksToData();
+  setUnsavedChanges(true);
+  // Keep edit modal open — refresh dep dropdown and reset dirty state
+  const depSel = document.getElementById('modal-task-dependency');
+  _buildDepOptions(depSel, getTaskId(t));
+  depSel.value = t.Dependency || '';
+  const comments = t.Comments || [];
+  const infoEl = document.getElementById('modal-comment-info');
+  if (infoEl) {
+    infoEl.style.display = comments.length > 0 ? 'block' : 'none';
+    const countEl = document.getElementById('modal-comment-count');
+    if (countEl) countEl.textContent = `${comments.length} comment${comments.length !== 1 ? 's' : ''}`;
+    const latestEl = document.getElementById('modal-comment-latest');
+    if (latestEl && comments.length > 0) {
+      const latest = comments[comments.length - 1];
+      latestEl.textContent = ` \xB7 last: ${latest.date} by ${latest.name}`;
     }
-    document.querySelectorAll('#modal-edit-panel .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
-    _captureEditSnapshot();
-    render();
+  }
+  document.querySelectorAll('#modal-edit-panel .form-group--dirty').forEach(fg => fg.classList.remove('form-group--dirty'));
+  _captureEditSnapshot();
+  render();
 }
 
 function saveTaskModalAndClose() {
-    ensureModalIdHandler();
-    const isEdit = AppState._modalMode === 'edit';
-    // Auto-flush any pending comment (if both name and text are filled)
-    const _cNameEl = document.getElementById('comments-name-input');
-    const _cTextEl = document.getElementById('comments-text-input');
-    if (_cNameEl && _cTextEl && _cNameEl.value.trim() && _cTextEl.value.trim()) {
-        saveComment();
-    }
-    saveTaskModal();
-    if (isEdit) closeModal();
+  ensureModalIdHandler();
+  const isEdit = AppState._modalMode === 'edit';
+  // Auto-flush any pending comment (if both name and text are filled)
+  const _cNameEl = document.getElementById('comments-name-input');
+  const _cTextEl = document.getElementById('comments-text-input');
+  if (_cNameEl && _cTextEl && _cNameEl.value.trim() && _cTextEl.value.trim()) {
+    saveComment();
+  }
+  saveTaskModal();
+  if (isEdit) closeModal();
 }
 
 function deleteTaskFromModal() {
-    if (AppState._modalMode !== 'edit' || !AppState._modalTask) return;
-    if (confirm('Are you sure you want to delete this task?')) {
-        AppState.currentTasks = AppState.currentTasks.filter(t => t !== AppState._modalTask);
-        syncCurrentTasksToData();
-        setUnsavedChanges(true);
-        closeModal();
-        render();
-    }
+  if (AppState._modalMode !== 'edit' || !AppState._modalTask) return;
+  if (confirm('Are you sure you want to delete this task?')) {
+    AppState.currentTasks = AppState.currentTasks.filter(t => t !== AppState._modalTask);
+    syncCurrentTasksToData();
+    setUnsavedChanges(true);
+    closeModal();
+    render();
+  }
 }
 
 function duplicateTaskFromModal() {
-    // Copy comments from the original task to the new duplicate
-    AppState._pendingDuplicateComments = (AppState._modalTask && AppState._modalTask.Comments && AppState._modalTask.Comments.length)
-        ? AppState._modalTask.Comments.map(c => ({...c}))
-        : null;
-    document.getElementById('modal-task-title').value += " - COPY";
-    document.getElementById('modal-task-id').value = "";
-    document.getElementById('modal-task-id').dataset.autoGenerated = "true";
-    
-    // Repopulate dependencies dropdown since we are switching to add mode
-    const currentDep = document.getElementById('modal-task-dependency').value;
-    const depSel = document.getElementById('modal-task-dependency');
-    _buildDepOptions(depSel, null); // allow depending on the duplicated task
-    depSel.value = currentDep;
-    AppState._modalMode = 'add';
-    document.getElementById('modal-title').textContent = 'Add Task';
-    document.getElementById('modal-btn-delete').style.display = 'none';
-    const dupBtn = document.getElementById('modal-btn-duplicate');
-    if (dupBtn) dupBtn.style.display = 'none';
-    const depBtn = document.getElementById('modal-btn-dependent');
-    if (depBtn) depBtn.style.display = 'none';
-    setTimeout(() => { const el = document.getElementById('modal-task-title'); if (el) { el.focus(); el.select(); } }, 80);
+  // Copy comments from the original task to the new duplicate
+  AppState._pendingDuplicateComments = (AppState._modalTask && AppState._modalTask.Comments && AppState._modalTask.Comments.length)
+    ? AppState._modalTask.Comments.map(c => ({ ...c }))
+    : null;
+  document.getElementById('modal-task-title').value += " - COPY";
+  document.getElementById('modal-task-id').value = "";
+  document.getElementById('modal-task-id').dataset.autoGenerated = "true";
+
+  // Repopulate dependencies dropdown since we are switching to add mode
+  const currentDep = document.getElementById('modal-task-dependency').value;
+  const depSel = document.getElementById('modal-task-dependency');
+  _buildDepOptions(depSel, null); // allow depending on the duplicated task
+  depSel.value = currentDep;
+  AppState._modalMode = 'add';
+  document.getElementById('modal-title').textContent = 'Add Task';
+  document.getElementById('modal-btn-delete').style.display = 'none';
+  const dupBtn = document.getElementById('modal-btn-duplicate');
+  if (dupBtn) dupBtn.style.display = 'none';
+  const depBtn = document.getElementById('modal-btn-dependent');
+  if (depBtn) depBtn.style.display = 'none';
+  setTimeout(() => { const el = document.getElementById('modal-task-title'); if (el) { el.focus(); el.select(); } }, 80);
 }
 
 function createDependentTask() {
-    AppState._pendingDuplicateComments = null; // dependent tasks never copy parent comments
-    const parentId = document.getElementById('modal-task-id').value || document.getElementById('modal-task-title').value.replace(/[^a-zA-Z0-9 ]/g, '');
-    
-    document.getElementById('modal-task-title').value = "";
-    document.getElementById('modal-task-id').value = "";
-    document.getElementById('modal-task-id').dataset.autoGenerated = "true";
-    
-    // Re-populate dependencies since we are now adding a new task, which allows depending on the previous one
-    const depSel = document.getElementById('modal-task-dependency');
-    _buildDepOptions(depSel, null); // include all tasks — new task can depend on the parent
-    depSel.value = parentId;
+  AppState._pendingDuplicateComments = null; // dependent tasks never copy parent comments
+  const parentId = document.getElementById('modal-task-id').value || document.getElementById('modal-task-title').value.replace(/[^a-zA-Z0-9 ]/g, '');
 
-    // Clear the comment info section — the new dependent task starts with no comments
-    const _depInfoEl = document.getElementById('modal-comment-info');
-    if (_depInfoEl) _depInfoEl.style.display = 'none';
+  document.getElementById('modal-task-title').value = "";
+  document.getElementById('modal-task-id').value = "";
+  document.getElementById('modal-task-id').dataset.autoGenerated = "true";
 
-    // Prefill Start Date with parent's End Date + 1 day
-    const parentTask = AppState.currentTasks.find(t => getTaskId(t) === parentId);
-    if (parentTask && parentTask['End Date']) {
-        const parentEnd = parseDate(parentTask['End Date']);
-        if (parentEnd && !isNaN(parentEnd)) {
-            const depStart = addDays(parentEnd, 1);
-            document.getElementById('modal-task-start').value = depStart.toISOString().split('T')[0];
-            const newEnd = addDays(depStart, 7);
-            document.getElementById('modal-task-end').value = newEnd.toISOString().split('T')[0];
-        }
+  // Re-populate dependencies since we are now adding a new task, which allows depending on the previous one
+  const depSel = document.getElementById('modal-task-dependency');
+  _buildDepOptions(depSel, null); // include all tasks — new task can depend on the parent
+  depSel.value = parentId;
+
+  // Clear the comment info section — the new dependent task starts with no comments
+  const _depInfoEl = document.getElementById('modal-comment-info');
+  if (_depInfoEl) _depInfoEl.style.display = 'none';
+
+  // Prefill Start Date with parent's End Date + 1 day
+  const parentTask = AppState.currentTasks.find(t => getTaskId(t) === parentId);
+  if (parentTask && parentTask['End Date']) {
+    const parentEnd = parseDate(parentTask['End Date']);
+    if (parentEnd && !isNaN(parentEnd)) {
+      const depStart = addDays(parentEnd, 1);
+      document.getElementById('modal-task-start').value = depStart.toISOString().split('T')[0];
+      const newEnd = addDays(depStart, 7);
+      document.getElementById('modal-task-end').value = newEnd.toISOString().split('T')[0];
     }
+  }
 
-    AppState._modalMode = 'add';
-    document.getElementById('modal-title').textContent = 'Add Task';
-    document.getElementById('modal-btn-delete').style.display = 'none';
-    const dupBtn = document.getElementById('modal-btn-duplicate');
-    if (dupBtn) dupBtn.style.display = 'none';
-    const depBtn = document.getElementById('modal-btn-dependent');
-    if (depBtn) depBtn.style.display = 'none';
-    setTimeout(() => { const el = document.getElementById('modal-task-title'); if (el) { el.focus(); } }, 80);
+  AppState._modalMode = 'add';
+  document.getElementById('modal-title').textContent = 'Add Task';
+  document.getElementById('modal-btn-delete').style.display = 'none';
+  const dupBtn = document.getElementById('modal-btn-duplicate');
+  if (dupBtn) dupBtn.style.display = 'none';
+  const depBtn = document.getElementById('modal-btn-dependent');
+  if (depBtn) depBtn.style.display = 'none';
+  setTimeout(() => { const el = document.getElementById('modal-task-title'); if (el) { el.focus(); } }, 80);
 }
 
 </script>
