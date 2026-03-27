@@ -6,7 +6,8 @@
 <title>Gantt Chart (Standalone)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Outfit:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Outfit:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" as="style" onload="this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Outfit:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 html {
   margin: 0;
@@ -2772,18 +2773,24 @@ details.info-section[open] .info-section-heading::after {
   background: var(--bg);
   border: 1px solid var(--border-md);
   border-radius: 6px;
-  padding: 2px 8px;
+  padding: 0;
+  width: 30px;
+  height: 26px;
   cursor: pointer;
   font-size: 0.88rem;
   color: var(--text);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-  line-height: 1.5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   white-space: nowrap;
 }
 
 .bar-hover-actions button:hover {
   background: var(--surface2);
-  border-color: var(--accent);
+}
+.bar-hover-actions button:focus {
+  outline: none;
 }
 
 /* ── Modal view bar (top row above modal header, same style as toolbar view buttons) ── */
@@ -5653,37 +5660,43 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
   ov.style.width = hitClientRect.width + 'px';
   ov.style.height = hitClientRect.height + 'px';
 
-  // Always place buttons to the right of the cursor (clear zone = cursorGap).
-  // If that overflows the right edge, float the group just past the right edge.
+  // Place buttons above the bar, centered on the cursor horizontally
+  const btnGroupW = BAR_HOVER_BTN_W;
   const cursorInBar = cursorClientX - hitClientRect.left;
-  const btnGroupW = BAR_HOVER_BTN_W;    // approx total width: 2 buttons + 4px gap
-  const cursorGap = BAR_HOVER_CURSOR_GAP; // small clear zone so cursor doesn't cover buttons
-
-  let btnLeft = cursorInBar + cursorGap;
-  if (btnLeft + btnGroupW > hitClientRect.width) {
-    // No room to the right — float just past the right edge
-    btnLeft = hitClientRect.width + 4;
-  }
-  const btnTop = (hitClientRect.height - 26) / 2;
+  const btnLeft = cursorInBar - btnGroupW / 2;
+  const btnTop = -30;
 
   ov.innerHTML = '';
   const actions = document.createElement('div'); actions.className = 'bar-hover-actions';
   actions.style.left = btnLeft + 'px';
   actions.style.top = btnTop + 'px';
 
-  // Edit button (✎) is leftmost, Comments (💬) is to the right
+  // Edit button (✎) is leftmost, Comments (solid bubble) is to the right
   const btnE = document.createElement('button'); btnE.textContent = '\u270E'; btnE.dataset.tooltip = 'Edit task'; btnE.dataset.shortcut = 'e: edit';
   btnE.addEventListener('mouseenter', () => clearTimeout(AppState._hoverOverlayTimer));
   btnE.addEventListener('mouseleave', _scheduleHideBarHover);
   btnE.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openTaskModal(task, 'edit'); };
 
-  const btnC = document.createElement('button'); btnC.textContent = '\uD83D\uDCAC'; btnC.dataset.tooltip = 'Comments'; btnC.dataset.shortcut = 'c: comments';
+  const btnC = document.createElement('button'); btnC.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 15" fill="currentColor" style="display:block"><path d="M8 0C3.582 0 0 3.015 0 6.727c0 2.168 1.194 4.09 3.047 5.31L2 15l3.484-1.74A9.12 9.12 0 0 0 8 13.454c4.418 0 8-3.015 8-6.727S12.418 0 8 0z"/></svg>'; btnC.dataset.tooltip = 'Comments'; btnC.dataset.shortcut = 'c: comments';
   btnC.addEventListener('mouseenter', () => clearTimeout(AppState._hoverOverlayTimer));
   btnC.addEventListener('mouseleave', _scheduleHideBarHover);
   btnC.onclick = (e) => { e.stopPropagation(); _removeBarHoverOverlay(); openCommentsModal(task); };
 
   actions.appendChild(btnE); actions.appendChild(btnC);
   ov.appendChild(actions);
+}
+
+function _updateBarHoverPosition(cursorClientX, hitClientRect) {
+  const ov = document.getElementById('bar-hover-overlay');
+  if (!ov) return;
+  const actions = ov.querySelector('.bar-hover-actions');
+  if (!actions) return;
+  const cursorInBar = cursorClientX - hitClientRect.left;
+  const currentLeft = parseFloat(actions.style.left) || 0;
+  // Only reposition if cursor has moved outside the button group's horizontal bounds
+  if (cursorInBar < currentLeft || cursorInBar > currentLeft + BAR_HOVER_BTN_W) {
+    actions.style.left = (cursorInBar - BAR_HOVER_BTN_W / 2) + 'px';
+  }
 }
 
 // ── Render SVG chart ──────────────────────────────────────────────────
@@ -5844,7 +5857,7 @@ function renderChart(visible, today) {
   if (todayX >= 0 && todayX <= totalW) {
     svg.appendChild(svgEl('line', { x1: todayX, y1: 0, x2: todayX, y2: totalH, stroke: 'var(--status-waiting)', 'stroke-width': 1.5, 'stroke-dasharray': '5,4', opacity: .85 }));
     // Small amber triangle in header pointing down to today
-    hSvg.appendChild(svgEl('polygon', { points: `${todayX - 4},${HEAD_H + 12} ${todayX + 4},${HEAD_H + 12} ${todayX},${HEAD_H + 6}`, fill: 'var(--status-waiting)' }));
+    hSvg.appendChild(svgEl('polygon', { points: `${todayX - 9},${HEAD_H + 12} ${todayX + 9},${HEAD_H + 12} ${todayX},${HEAD_H - 2}`, fill: 'var(--status-waiting)' }));
     // Today label in chart area (below header, top of chart) - not in header to avoid overlap with date labels
     const todayLbl = `Today \u00b7 ${MONTH_ABBR[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
     svg.appendChild(svgEl('text', {
@@ -5998,10 +6011,10 @@ function renderChart(visible, today) {
     const partner = ghost ? currById[myId] : (AppState.compareLabel ? ghostById[myId] : null);
 
     const hit = svgEl('rect', { x, y, width: drawW, height: h, fill: 'transparent', rx, style: 'cursor:pointer' });
-    hit.addEventListener('mousemove', e => showTooltip(e, t, r.snapshotLabel, partner, ghost));
+    hit.addEventListener('mousemove', e => { showTooltip(e, t, r.snapshotLabel, partner, ghost); if (!ghost) _updateBarHoverPosition(e.clientX, hit.getBoundingClientRect()); });
     hit.addEventListener('mouseleave', hideTooltip);
     if (!ghost) {
-      hit.addEventListener('click', (e) => { e.stopPropagation(); hideTooltip(); if (!AppState._didDragScroll) scrollToTask(t, false); });
+      hit.addEventListener('click', (e) => { e.stopPropagation(); hideTooltip(); if (!AppState._didDragScroll) highlightTask(t); });
       hit.addEventListener('mouseenter', (e) => { _showBarHoverOverlay(t, e.clientX, hit.getBoundingClientRect()); });
       hit.addEventListener('mouseleave', _scheduleHideBarHover);
     }
@@ -6209,6 +6222,14 @@ function onToolbarOut(_e) {
   hideTooltip();
 }
 function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+// ── Highlight task in-place (no scroll/jump) ──────────────────────────────
+function highlightTask(task) {
+  AppState._highlightId = getTaskId(task);
+  if (AppState._highlightTimer) clearTimeout(AppState._highlightTimer);
+  AppState._highlightTimer = setTimeout(() => { AppState._highlightId = null; render(); }, HIGHLIGHT_DURATION_MS);
+  render();
+}
 
 // ── Jump to task ──────────────────────────────────────────────────
 function scrollToTask(task, scrollVertical = true) {
