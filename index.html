@@ -1734,7 +1734,36 @@ select#compare-sel {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--bg)
+  background: var(--bg);
+  position: relative
+}
+
+#center-view-arrow {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 15px solid var(--border-md);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 3
+}
+
+#center-view-arrow-up {
+  position: absolute;
+  top: calc(var(--head-h) - 15px);
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 15px solid var(--border-md);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 3
 }
 
 #timeline-header {
@@ -3025,7 +3054,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="drop-card" id="drop-card" style="position: relative;">
     <div class="drop-title">&#128200; Gantt Chart Builder</div>
     <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
-    <div class="drop-version">v2.11</div>
+    <div class="drop-version">v2.12</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
       Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
@@ -3184,6 +3213,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     </div>
     <div id="right-panel">
       <div id="timeline-header"></div>
+      <div id="center-view-arrow" aria-hidden="true"></div>
+      <div id="center-view-arrow-up" aria-hidden="true"></div>
       <div id="chart-area"><svg id="gantt-svg"></svg></div>
     </div>
   </div>
@@ -3423,7 +3454,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
       &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.11</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.12</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
         <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
@@ -3479,6 +3510,11 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <span class="filter-prop-label">Overdue</span>
     <button class="filter-chip" data-action="toggleFilterChip" data-prop="due" data-value="yes">Overdue</button>
     <button class="filter-chip" data-action="toggleFilterChip" data-prop="due" data-value="no">Not overdue</button>
+  </div>
+  <div class="filter-panel-row">
+    <span class="filter-prop-label">Milestone</span>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="milestone" data-value="yes">Is milestone</button>
+    <button class="filter-chip" data-action="toggleFilterChip" data-prop="milestone" data-value="no">Not milestone</button>
   </div>
 </div>
 
@@ -3806,7 +3842,7 @@ const AppState = {
   _modalLayout: 'both',
 
   // Filters
-  _customFilters: { status: [], priority: [], comments: [], dependency: [], due: [] },
+  _customFilters: { status: [], priority: [], comments: [], dependency: [], due: [], milestone: [] },
   _filterPanelOpen: false,
   _filterCloseTimeout: null,
 
@@ -3831,6 +3867,10 @@ const AppState = {
   // Init flags
   _dragScrollInit: false,
   _eventsInit: false,
+  _didDragScroll: false,
+
+  // Inertia scroll animation frame handle (set by initDragScroll, cancelled by _stopInertia)
+  _inertiaAnimFrame: null,
 
   // Timer / DOM handles
   _hoverOverlayTimer: null,
@@ -3956,7 +3996,7 @@ function overdueInfo(task, today) {
 }
 function hasCustomFilters() {
   const f = AppState._customFilters;
-  return f.status.length > 0 || f.priority.length > 0 || f.comments.length > 0 || f.dependency.length > 0 || f.due.length > 0;
+  return f.status.length > 0 || f.priority.length > 0 || f.comments.length > 0 || f.dependency.length > 0 || f.due.length > 0 || f.milestone.length > 0;
 }
 
 function isCustomFilterMatch(task, today) {
@@ -3982,6 +4022,10 @@ function isCustomFilterMatch(task, today) {
     const end = parseDate(task['End Date']);
     const isOverdue = prog < 100 && end && end < today;
     if (!f.due.some(v => (v === 'yes' && isOverdue) || (v === 'no' && !isOverdue))) return false;
+  }
+  if (f.milestone.length > 0) {
+    const isMs = /\(milestone\)/i.test(task.Title || '');
+    if (!f.milestone.some(v => (v === 'yes' && isMs) || (v === 'no' && !isMs))) return false;
   }
   return true;
 }
@@ -5715,7 +5759,7 @@ function renderChart(visible, today) {
   else hdr.classList.remove('changes-glow');
 
   const hSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  hSvg.setAttribute('width', totalW); hSvg.setAttribute('height', HEAD_H);
+  hSvg.setAttribute('width', totalW); hSvg.setAttribute('height', HEAD_H + 12);
   hSvg.style.display = 'block'; hdr.appendChild(hSvg);
 
   if (AppState.view === 'week') {
@@ -5800,7 +5844,7 @@ function renderChart(visible, today) {
   if (todayX >= 0 && todayX <= totalW) {
     svg.appendChild(svgEl('line', { x1: todayX, y1: 0, x2: todayX, y2: totalH, stroke: 'var(--status-waiting)', 'stroke-width': 1.5, 'stroke-dasharray': '5,4', opacity: .85 }));
     // Small amber triangle in header pointing down to today
-    hSvg.appendChild(svgEl('polygon', { points: `${todayX - 4},${HEAD_H} ${todayX + 4},${HEAD_H} ${todayX},${HEAD_H - 6}`, fill: 'var(--status-waiting)' }));
+    hSvg.appendChild(svgEl('polygon', { points: `${todayX - 4},${HEAD_H + 12} ${todayX + 4},${HEAD_H + 12} ${todayX},${HEAD_H + 6}`, fill: 'var(--status-waiting)' }));
     // Today label in chart area (below header, top of chart) - not in header to avoid overlap with date labels
     const todayLbl = `Today \u00b7 ${MONTH_ABBR[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
     svg.appendChild(svgEl('text', {
@@ -5957,7 +6001,7 @@ function renderChart(visible, today) {
     hit.addEventListener('mousemove', e => showTooltip(e, t, r.snapshotLabel, partner, ghost));
     hit.addEventListener('mouseleave', hideTooltip);
     if (!ghost) {
-      hit.addEventListener('click', (e) => { e.stopPropagation(); hideTooltip(); openTaskModal(t, 'edit'); });
+      hit.addEventListener('click', (e) => { e.stopPropagation(); hideTooltip(); if (!AppState._didDragScroll) scrollToTask(t, false); });
       hit.addEventListener('mouseenter', (e) => { _showBarHoverOverlay(t, e.clientX, hit.getBoundingClientRect()); });
       hit.addEventListener('mouseleave', _scheduleHideBarHover);
     }
@@ -5965,6 +6009,17 @@ function renderChart(visible, today) {
   });
 
   _renderFilterSummary();
+  _updateCenterArrow();
+}
+
+function _updateCenterArrow() {
+  const ca = document.getElementById('chart-area');
+  if (!ca) return;
+  const x = ca.clientWidth / 2 + 'px';
+  const a1 = document.getElementById('center-view-arrow');
+  const a2 = document.getElementById('center-view-arrow-up');
+  if (a1) a1.style.left = x;
+  if (a2) a2.style.left = x;
 }
 
 // ── Scroll sync ───────────────────────────────────────────────────────
@@ -6156,7 +6211,7 @@ function onToolbarOut(_e) {
 function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
 // ── Jump to task ──────────────────────────────────────────────────
-function scrollToTask(task) {
+function scrollToTask(task, scrollVertical = true) {
   const start = parseDate(task['Start Date']); if (!start) return;
   AppState._highlightId = getTaskId(task);
   if (AppState._highlightTimer) clearTimeout(AppState._highlightTimer);
@@ -6178,7 +6233,7 @@ function scrollToTask(task) {
     const vis = getVisibleRows(allR, today2);
     const rowIdx = vis.findIndex(r => r.type === 'task' && !r.ghost &&
       getTaskId(r.task) === AppState._highlightId);
-    if (rowIdx >= 0) {
+    if (scrollVertical && rowIdx >= 0) {
       const targetY = rowIdx * ROW_H + ROW_H / 2;
       ca.scrollTop = Math.max(0, targetY - ca.offsetHeight / 2);
       lr.scrollTop = ca.scrollTop;
@@ -6329,6 +6384,7 @@ function resetViewPadding() {
 }
 
 function loadMore(dir) {
+  _stopInertia();
   const ca = document.getElementById('chart-area');
   const cw = getColWidth();
 
@@ -6477,6 +6533,7 @@ function render() {
 }
 
 function setView(v) {
+  _stopInertia();
   // Capture the date at the horizontal center of the screen before switching views
   const ca = document.getElementById('chart-area');
   let centerDate = null;
@@ -6498,6 +6555,7 @@ function setView(v) {
   }
 }
 function navigate(dir) {
+  _stopInertia();
   const d = AppState.viewportStart;
   if (AppState.view === 'week') AppState.viewportStart = addDays(d, dir * 7);
   else if (AppState.view === 'month') AppState.viewportStart = addDays(d, dir * 30);
@@ -6507,6 +6565,7 @@ function navigate(dir) {
   updateScrollAnchoring();
 }
 function goToday() {
+  _stopInertia();
   const today = new Date(); today.setHours(0, 0, 0, 0);
   AppState.viewportStart = AppState.view === 'year' ? new Date(today.getFullYear(), today.getMonth(), 1) : startOf(today, AppState.view);
   if (AppState.view === 'month') AppState.viewportStart = addDays(AppState.viewportStart, -7);
@@ -6572,12 +6631,13 @@ function _renderFilterSummary() {
   if (existing) existing.remove();
   if (!hasCustomFilters()) return;
   const f = AppState._customFilters;
-  const propLabels = { status: 'Status', priority: 'Priority', comments: 'Comments', dependency: 'Dependency', due: 'Overdue' };
+  const propLabels = { status: 'Status', priority: 'Priority', comments: 'Comments', dependency: 'Dependency', due: 'Overdue', milestone: 'Milestone' };
   const valDisplay = (prop, v) => {
     if (v === '') return 'none';
     if (prop === 'comments') return v === 'yes' ? 'Has comments' : 'No comments';
     if (prop === 'dependency') return v === 'yes' ? 'Has dep' : 'No dep';
     if (prop === 'due') return v === 'yes' ? 'Overdue' : 'Not overdue';
+    if (prop === 'milestone') return v === 'yes' ? 'Is milestone' : 'Not milestone';
     return v;
   };
   const wrap = document.createElement('div');
@@ -6620,7 +6680,7 @@ function toggleFilterChip(prop, value) {
 }
 
 function clearAllFilters() {
-  AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [] };
+  AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [], milestone: [] };
   _updateFilterBtnState();
   _refreshFilterChips();
   render();
@@ -6628,7 +6688,7 @@ function clearAllFilters() {
 
 function setFilter(mode) {
   AppState.filterMode = mode;
-  AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [] };
+  AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [], milestone: [] };
   const filterBtn = document.getElementById('filter-btn');
   if (filterBtn) filterBtn.classList.remove('active');
   ['all', 'active', 'overdue'].forEach(m => document.getElementById('fb-' + m).classList.toggle('active', m === mode));
@@ -6637,9 +6697,17 @@ function setFilter(mode) {
 
 
 // ── Click and Drag Scrolling ──────────────────────────────────────────
+function _stopInertia() {
+  if (AppState._inertiaAnimFrame) {
+    cancelAnimationFrame(AppState._inertiaAnimFrame);
+    AppState._inertiaAnimFrame = null;
+  }
+}
+
 function initDragScroll() {
   if (AppState._dragScrollInit) return;
   const ca = document.getElementById('chart-area');
+  const hd = document.getElementById('timeline-header');
   if (!ca) return;
   let isDragging = false;
   let startX;
@@ -6649,13 +6717,13 @@ function initDragScroll() {
   let velocity = 0;
   let lastTimestamp = 0;
   let lastX = 0;
-  let animationFrameId = null;
 
   ca.addEventListener('mousedown', (e) => {
     isDragging = true;
     velocity = 0;
-    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    AppState._didDragScroll = false;
 
+    _stopInertia();
     ca.style.cursor = 'grabbing';
     startX = e.pageX - ca.offsetLeft;
     scrollLeft = ca.scrollLeft;
@@ -6685,7 +6753,9 @@ function initDragScroll() {
     e.preventDefault();
     const x = e.pageX - ca.offsetLeft;
     const walk = (x - startX);
+    if (Math.abs(walk) > 5) AppState._didDragScroll = true;
     ca.scrollLeft = scrollLeft - walk;
+    if (hd) hd.scrollLeft = ca.scrollLeft;
 
     // Calculate instantaneous velocity (pixels per ms)
     const dt = e.timeStamp - lastTimestamp;
@@ -6706,20 +6776,35 @@ function initDragScroll() {
     const friction = 0.95; // decay multiplier per frame (~16ms)
 
     function updateInertia(time) {
-      if (isDragging) return; // user grabbed it again
+      if (isDragging || !AppState._inertiaAnimFrame) return; // user grabbed it again, or externally cancelled
       const dt = time - lastTime;
       lastTime = time;
 
       ca.scrollLeft -= velocity * dt;
+      if (hd) hd.scrollLeft = ca.scrollLeft;
       velocity *= friction; // apply smooth decay
 
       // Stop animation when slow enough
       if (Math.abs(velocity) > 0.05) {
-        animationFrameId = requestAnimationFrame(updateInertia);
+        AppState._inertiaAnimFrame = requestAnimationFrame(updateInertia);
+      } else {
+        AppState._inertiaAnimFrame = null;
       }
     }
-    animationFrameId = requestAnimationFrame(updateInertia);
+    AppState._inertiaAnimFrame = requestAnimationFrame(updateInertia);
   }
+  // Intercept wheel events so horizontal scroll stays JS-driven.
+  // Without this, Chrome's compositor handles wheel scroll on a separate
+  // thread and the timeline-header sync fires one frame late.
+  ca.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    _stopInertia();
+    const scale = e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? ca.clientWidth : 1;
+    ca.scrollLeft += e.deltaX * scale;
+    ca.scrollTop  += e.deltaY * scale;
+    if (hd) hd.scrollLeft = ca.scrollLeft;
+  }, { passive: false });
+
   AppState._dragScrollInit = true;
 }
 
@@ -7141,8 +7226,17 @@ function initEvents() {
       }
       const _activeHoverTask = AppState._hoveredTask || AppState._hoveredLeftTask;
       if (_activeHoverTask) {
-        if (e.key === 'c') { e.preventDefault(); openCommentsModal(_activeHoverTask); }
-        if (e.key === 'e') { e.preventDefault(); openTaskModal(_activeHoverTask, 'edit'); }
+        if (e.key === 'c') {
+          e.preventDefault();
+          const _focusComment = AppState._modalLayout === 'both';
+          openCommentsModal(_activeHoverTask);
+          if (_focusComment) { setTimeout(() => { const el = document.getElementById('comments-text-input'); if (el) el.focus(); }, 80); }
+        }
+        if (e.key === 'e') {
+          e.preventDefault();
+          if (AppState._modalLayout === 'comments') AppState._modalLayout = 'edit';
+          openTaskModal(_activeHoverTask, 'edit');
+        }
         if (e.key === 'd') {
           e.preventDefault();
           openTaskModal(_activeHoverTask, 'edit');
@@ -7273,6 +7367,7 @@ window.addEventListener('resize', () => {
     if (isNarrow && !AppState.compactMode) toggleCompact();
     else if (!isNarrow && AppState.compactMode) toggleCompact();
   }
+  _updateCenterArrow();
 });
 
 // ── Init ──────────────────────────────────────────────────────────────
