@@ -1857,13 +1857,13 @@ select#compare-sel {
 }
 
 #tooltip .tt-diff-curr {
-  color: #16a34a;
+  color: var(--green-old);
   font-weight: 700;
   margin-left: 6px
 }
 
 #tooltip .tt-diff-snap {
-  color: #991b1b;
+  color: var(--danger);
   font-weight: 700;
   margin-left: 6px
 }
@@ -5560,6 +5560,7 @@ function renderLeft(visible, today, statsMap) {
       }
       // All task rows (current + ghost) are clickable
       div.onclick = () => scrollToTask(r.task);
+      if (!r.ghost) div.ondblclick = (e) => { e.stopPropagation(); openTaskModal(r.task, 'edit'); };
     }
     c.appendChild(div);
   });
@@ -6015,6 +6016,7 @@ function renderChart(visible, today) {
     hit.addEventListener('mouseleave', hideTooltip);
     if (!ghost) {
       hit.addEventListener('click', (e) => { e.stopPropagation(); hideTooltip(); if (!AppState._didDragScroll) highlightTask(t); });
+      hit.addEventListener('dblclick', (e) => { e.stopPropagation(); hideTooltip(); _removeBarHoverOverlay(); openTaskModal(t, 'edit'); });
       hit.addEventListener('mouseenter', (e) => { _showBarHoverOverlay(t, e.clientX, hit.getBoundingClientRect()); });
       hit.addEventListener('mouseleave', _scheduleHideBarHover);
     }
@@ -6151,7 +6153,10 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
       const snapLatest = partnerComments.slice().sort((a, b) => { const da = parseDate(a.date), db = parseDate(b.date); return (da && db) ? db - da : 0; })[0];
       const spColor = commenterColor(snapLatest.name);
       const snapShort = snapLatest.text.length > 45 ? snapLatest.text.slice(0, 45) + '\u2026' : snapLatest.text;
-      rows += `<div class="tt-row"><span class="tt-label">Snap note</span><span style="color:${spColor};font-weight:700">${escHtml(snapLatest.name)}</span> <span style="color:var(--text-mu);font-size:0.75em;">${escHtml(snapLatest.date)}</span>: ${escHtml(snapShort)}</div>`;
+      rows += `<div class="tt-row" style="flex-direction:column;align-items:flex-start;gap:2px;">` +
+        `<div style="display:flex;align-items:center;"><span class="tt-label">Snap note</span><span style="color:${spColor};font-weight:700">${escHtml(snapLatest.name)}</span>&nbsp;<span style="color:var(--text-mu);font-size:0.75em;">${escHtml(snapLatest.date)}</span></div>` +
+        `<div style="padding-left:78px;white-space:pre-wrap;word-break:break-word;line-height:1.5;">${escHtml(snapShort)}</div>` +
+        `</div>`;
     }
   }
 
