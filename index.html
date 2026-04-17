@@ -4216,7 +4216,17 @@ function loadFile(file, isReload = false) {
         document.getElementById('app').style.display = 'flex';
 
         const asw = document.getElementById('autosave-wrapper');
-        if (asw) asw.style.display = (isSaveInPlaceSupported() && !file.name.toLowerCase().endsWith('.xlsm')) ? 'flex' : 'none';
+        const _autoSaveSupported = isSaveInPlaceSupported() && !file.name.toLowerCase().endsWith('.xlsm');
+        if (asw) asw.style.display = _autoSaveSupported ? 'flex' : 'none';
+
+        if (!isReload && _autoSaveSupported) {
+            const _enableAutoSave = confirm('Enable auto-save for this session?\n\nChanges will be saved automatically to "' + file.name + '".');
+            if (_enableAutoSave) {
+                AppState.autoSave = true;
+                const cb = document.getElementById('autosave-toggle');
+                if (cb) cb.checked = true;
+            }
+        }
 
         // Ensure comparison is reset on load
         clearCompare();
