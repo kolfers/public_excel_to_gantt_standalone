@@ -3845,6 +3845,8 @@ const AppState = {
   // Row highlight
   _highlightId: null, _highlightTimer: null,
   _highlightCat: null,
+  _lastClickTaskId: null,
+  _lastClickTime: 0,
 
   // Hover state (chart + left panel)
   _hoveredTask: null,
@@ -5628,8 +5630,21 @@ function renderLeft(visible, today, statsMap) {
         div.addEventListener('mouseleave', () => { AppState._hoveredLeftTask = null; });
       }
       // All task rows (current + ghost) are clickable
-      div.onclick = () => scrollToTask(r.task);
-      if (!r.ghost) div.ondblclick = (e) => { e.stopPropagation(); openTaskModal(r.task, 'edit'); };
+      div.onclick = (e) => {
+        const taskId = getTaskId(r.task);
+        const now = Date.now();
+        if (AppState._lastClickTaskId === taskId && now - AppState._lastClickTime < 300) {
+          AppState._lastClickTaskId = null;
+          if (!r.ghost) {
+            e.stopPropagation();
+            openTaskModal(r.task, 'edit');
+          }
+        } else {
+          AppState._lastClickTaskId = taskId;
+          AppState._lastClickTime = now;
+          scrollToTask(r.task);
+        }
+      };
     }
     c.appendChild(div);
   });
@@ -6084,8 +6099,23 @@ function renderChart(visible, today) {
     hit.addEventListener('mousemove', e => { showTooltip(e, t, r.snapshotLabel, partner, ghost); if (!ghost) _updateBarHoverPosition(e.clientX, hit.getBoundingClientRect()); });
     hit.addEventListener('mouseleave', hideTooltip);
     if (!ghost) {
-      hit.addEventListener('click', (e) => { e.stopPropagation(); hideTooltip(); if (!AppState._didDragScroll) highlightTask(t); });
-      hit.addEventListener('dblclick', (e) => { e.stopPropagation(); hideTooltip(); _removeBarHoverOverlay(); openTaskModal(t, 'edit'); });
+      hit.addEventListener('click', (e) => {
+        e.stopPropagation();
+        hideTooltip();
+        if (AppState._didDragScroll) return;
+
+        const taskId = getTaskId(t);
+        const now = Date.now();
+        if (AppState._lastClickTaskId === taskId && now - AppState._lastClickTime < 300) {
+          AppState._lastClickTaskId = null;
+          _removeBarHoverOverlay();
+          openTaskModal(t, 'edit');
+        } else {
+          AppState._lastClickTaskId = taskId;
+          AppState._lastClickTime = now;
+          highlightTask(t);
+        }
+      });
       hit.addEventListener('mouseenter', (e) => { _showBarHoverOverlay(t, e.clientX, hit.getBoundingClientRect()); });
       hit.addEventListener('mouseleave', _scheduleHideBarHover);
     }
