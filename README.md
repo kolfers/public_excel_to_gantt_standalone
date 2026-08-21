@@ -1,9 +1,17 @@
 # Gantt Chart Tool
 
+***Last updated: 21 Aug 2026: v2.15***
+
 **Live App:** [https://kolfers.github.io/public_excel_to_gantt_standalone/](https://kolfers.github.io/public_excel_to_gantt_standalone/)
 **GitHub Repository:** [https://github.com/kolfers/public_excel_to_gantt_standalone](https://github.com/kolfers/public_excel_to_gantt_standalone)
 
 A standalone HTML/JS tool that reads an Excel planning file and renders an interactive Gantt chart in the browser. No server or installation is required. All parsing and rendering runs locally in the browser, so your data stays on your machine.
+
+## Changelog
+
+### v2.15 — 21 Aug 2026
+- Starting a new empty chart now begins with one example task already filled in (instead of an empty chart and a blank "Add Task" popup), so there's a row to edit right away.
+- In the Add/Edit Task window, changing the Start Date now automatically shifts the End Date to keep the task's original duration. Changing the End Date to a date earlier than the Start Date now automatically moves the Start Date up to match.
 
 ## Quick Start
 

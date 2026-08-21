@@ -3071,7 +3071,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="drop-card" id="drop-card" style="position: relative;">
     <div class="drop-title">&#128200; Gantt Chart Builder</div>
     <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
-    <div class="drop-version">v2.13</div>
+    <div class="drop-version">v2.15</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
       Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
@@ -3471,7 +3471,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
       &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.13</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.15</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
         <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
@@ -4303,8 +4303,24 @@ function startEmptyChart() {
     AppState._currentArrayBuffer = null;
     _resetColorMaps();
 
+    const today = new Date();
+    const defaultTask = {
+        ID: 'New Task',
+        Title: 'New Task',
+        Phase: 'Phase 1',
+        Category: 'Category 1',
+        Description: '',
+        Priority: '',
+        Status: '',
+        'Start Date': formatDateStr(today),
+        'End Date': formatDateStr(addDays(today, 7)),
+        Progress: 0,
+        Dependency: '',
+        Comments: []
+    };
+
     DATA = {
-        tasks: [],
+        tasks: [defaultTask],
         snapshots: {},
         meta: {
             source_file: "New_Plan.xlsx",
@@ -4316,7 +4332,6 @@ function startEmptyChart() {
     document.getElementById('app').style.display = 'flex';
     clearCompare();
     init();
-    openTaskModal(null, 'add', null, null);
 }
 
 function parseAnyDate(d) {
@@ -7412,6 +7427,10 @@ function initEvents() {
       onCompareChange(e.target.value);
     } else if (e.target.id === 'file-input') {
       handleFileSelect(e);
+    } else if (e.target.id === 'modal-task-start') {
+      _onModalStartDateChange();
+    } else if (e.target.id === 'modal-task-end') {
+      _onModalEndDateChange();
     }
   });
 
@@ -7596,6 +7615,42 @@ function _updateEditDirtyHighlights() {
     fg.classList.toggle('form-group--dirty', cur[key] !== AppState._modalOriginal[key]);
   });
 }
+// ── Start/End date auto-adjust ────────────────────────────────────────
+// Keeps track of each date field's previously-committed value (in the
+// `data-prev-value` attribute) so the change handlers below can compute
+// the interval that existed before the user's edit.
+function _syncModalDatePrevValues() {
+  const startEl = document.getElementById('modal-task-start');
+  const endEl = document.getElementById('modal-task-end');
+  if (startEl) startEl.dataset.prevValue = startEl.value;
+  if (endEl) endEl.dataset.prevValue = endEl.value;
+}
+function _onModalStartDateChange() {
+  const startEl = document.getElementById('modal-task-start');
+  const endEl = document.getElementById('modal-task-end');
+  if (!startEl || !endEl) return;
+  const newStart = parseDate(startEl.value);
+  const prevStart = parseDate(startEl.dataset.prevValue);
+  const oldEnd = parseDate(endEl.value);
+  if (newStart && !isNaN(newStart) && prevStart && !isNaN(prevStart) && oldEnd && !isNaN(oldEnd)) {
+    const intervalDays = dayDiff(prevStart, oldEnd);
+    endEl.value = addDays(newStart, intervalDays).toISOString().split('T')[0];
+  }
+  _syncModalDatePrevValues();
+  _updateEditDirtyHighlights();
+}
+function _onModalEndDateChange() {
+  const startEl = document.getElementById('modal-task-start');
+  const endEl = document.getElementById('modal-task-end');
+  if (!startEl || !endEl) return;
+  const newEnd = parseDate(endEl.value);
+  const startVal = parseDate(startEl.value);
+  if (newEnd && !isNaN(newEnd) && startVal && !isNaN(startVal) && newEnd < startVal) {
+    startEl.value = endEl.value;
+  }
+  _syncModalDatePrevValues();
+  _updateEditDirtyHighlights();
+}
 function openTaskModal(task, mode, defaultPhase, defaultCat) {
   AppState._modalTask = task;
   AppState._modalMode = mode;
@@ -7628,6 +7683,7 @@ function openTaskModal(task, mode, defaultPhase, defaultCat) {
   } else {
     document.getElementById('modal-task-end').value = '';
   }
+  _syncModalDatePrevValues();
 
   // Progress
   const prog = isEdit ? (Number(task.Progress) || 0) : 0;
@@ -7909,6 +7965,7 @@ function createDependentTask() {
       document.getElementById('modal-task-end').value = newEnd.toISOString().split('T')[0];
     }
   }
+  _syncModalDatePrevValues();
 
   AppState._modalMode = 'add';
   document.getElementById('modal-title').textContent = 'Add Task';
