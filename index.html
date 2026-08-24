@@ -2229,6 +2229,22 @@ details.info-section[open] .info-section-heading::after {
   animation: blink 0.6s ease-in-out 2;
 }
 
+@keyframes loadMorePulse {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 14px rgba(234, 179, 8, 0.95));
+  }
+}
+
+.load-more-btn.pulse rect {
+  animation: loadMorePulse 1.1s ease-in-out 4;
+}
+
 /* Standalone Specific Styles */
 #landing-zone {
   position: fixed;
@@ -3071,7 +3087,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="drop-card" id="drop-card" style="position: relative;">
     <div class="drop-title">&#128200; Gantt Chart Builder</div>
     <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
-    <div class="drop-version">v2.15</div>
+    <div class="drop-version">v2.17</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
       Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
@@ -3471,7 +3487,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
       &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.15</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.17</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
         <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
@@ -3562,9 +3578,18 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             Task</button>
         </div>
         <div class="modal-body">
-          <div class="form-group">
-            <label>Title</label>
-            <input type="text" id="modal-task-title">
+          <div class="form-row">
+            <div class="form-group" style="flex:1;">
+              <label>Title</label>
+              <input type="text" id="modal-task-title">
+            </div>
+            <div class="form-group" style="flex:0 0 auto;">
+              <label>Milestone</label>
+              <label style="display:flex; align-items:center; height:31px; cursor:pointer;"
+                data-tooltip="Mark this task as a milestone">
+                <input type="checkbox" id="modal-task-milestone-toggle" style="cursor:pointer; width:16px; height:16px;">
+              </label>
+            </div>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -3710,6 +3735,7 @@ window.IS_EXPORTED = false;
 let DATA = /*__GANTT_DATA__*/{ tasks: [], snapshots: {}, meta: { source_file: 'None' } };
 const STATUS_COLORS = {"done": "var(--status-done)", "on track": "var(--status-on-track)", "behind": "var(--status-behind)", "waiting": "var(--status-waiting)", "on hold": "var(--status-on-hold)"};
 const CAT_COLORS    = ["var(--cat-1)", "var(--cat-2)", "var(--cat-3)", "var(--cat-4)", "var(--cat-5)", "var(--cat-6)", "var(--cat-7)", "var(--cat-8)", "var(--cat-9)", "var(--cat-10)"];
+const PRIORITY_COLORS = {"high": "var(--status-behind)", "medium": "var(--status-waiting)", "low": "var(--status-done)"};
 
 function getExampleData() {
     const today = new Date();
@@ -5991,21 +6017,45 @@ function renderChart(visible, today) {
   });
 
   // ── Load More Buttons ──
-  const btnW = 120, btnH = 30;
+  // Sized larger and pinned to the top of the chart area, vertically centred
+  // on the first (phase) row so they line up with the first phase bar.
+  const btnW = 170, btnH = 44;
+  const btnY = Math.max(4, ROW_H / 2 - btnH / 2);
 
   // Load More Past (Left)
-  const leftG = svgEl('g', { style: 'cursor:pointer;' });
-  leftG.appendChild(svgEl('rect', { x: 10, y: totalH / 2 - btnH / 2, width: btnW, height: btnH, rx: 15, fill: 'var(--bg)', stroke: 'var(--today)', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))' }));
-  leftG.appendChild(svgEl('text', { x: 10 + btnW / 2, y: totalH / 2 + 4, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 12, 'font-weight': '600', style: 'pointer-events:none;' }, '« Load More Past'));
+  const leftG = svgEl('g', { class: 'load-more-btn', style: 'cursor:pointer;' });
+  leftG.appendChild(svgEl('rect', { x: 10, y: btnY, width: btnW, height: btnH, rx: btnH / 2, fill: 'var(--bg)', stroke: 'var(--today)', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))' }));
+  leftG.appendChild(svgEl('text', { x: 10 + btnW / 2, y: btnY + btnH / 2 + 5, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 14, 'font-weight': '600', style: 'pointer-events:none;' }, '« Load More Past'));
   leftG.onmousedown = (e) => { e.stopPropagation(); loadMore('past'); };
   svg.appendChild(leftG);
 
   // Load More Future (Right)
-  const rightG = svgEl('g', { style: 'cursor:pointer;' });
-  rightG.appendChild(svgEl('rect', { x: totalW - btnW - 10, y: totalH / 2 - btnH / 2, width: btnW, height: btnH, rx: 15, fill: 'var(--bg)', stroke: 'var(--today)', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))' }));
-  rightG.appendChild(svgEl('text', { x: totalW - btnW / 2 - 10, y: totalH / 2 + 4, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 12, 'font-weight': '600', style: 'pointer-events:none;' }, 'Load More Future »'));
+  const rightG = svgEl('g', { class: 'load-more-btn', style: 'cursor:pointer;' });
+  rightG.appendChild(svgEl('rect', { x: totalW - btnW - 10, y: btnY, width: btnW, height: btnH, rx: btnH / 2, fill: 'var(--bg)', stroke: 'var(--today)', 'stroke-width': 2, style: 'filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4))' }));
+  rightG.appendChild(svgEl('text', { x: totalW - btnW / 2 - 10, y: btnY + btnH / 2 + 5, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 14, 'font-weight': '600', style: 'pointer-events:none;' }, 'Load More Future »'));
   rightG.onmousedown = (e) => { e.stopPropagation(); loadMore('future'); };
   svg.appendChild(rightG);
+
+  // Only start the pulse once a button actually scrolls into view — on first load the
+  // chart-area auto-scrolls away from x:10 immediately after render, so an animation
+  // fired right on insert would already be finished (and unseen) by the time the user
+  // scrolls there.
+  const chartAreaEl = document.getElementById('chart-area');
+  if (chartAreaEl && 'IntersectionObserver' in window) {
+    const pulseObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('pulse');
+          pulseObserver.unobserve(entry.target);
+        }
+      });
+    }, { root: chartAreaEl, threshold: 0.5 });
+    pulseObserver.observe(leftG);
+    pulseObserver.observe(rightG);
+  } else {
+    leftG.classList.add('pulse');
+    rightG.classList.add('pulse');
+  }
 
   svg.appendChild(arrG); // Append dependencies behind bars
 
@@ -6937,6 +6987,10 @@ function initDragScroll() {
   // Without this, Chrome's compositor handles wheel scroll on a separate
   // thread and the timeline-header sync fires one frame late.
   ca.addEventListener('wheel', (e) => {
+    // Let Ctrl/Cmd+wheel (and pinch-zoom, which browsers report as ctrlKey wheel
+    // events) pass through untouched so the browser's native page zoom works
+    // inside the chart area, same as it does everywhere else on the page.
+    if (e.ctrlKey || e.metaKey) return;
     e.preventDefault();
     _stopInertia();
     const scale = e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? ca.clientWidth : 1;
@@ -7431,6 +7485,8 @@ function initEvents() {
       _onModalStartDateChange();
     } else if (e.target.id === 'modal-task-end') {
       _onModalEndDateChange();
+    } else if (e.target.id === 'modal-task-milestone-toggle') {
+      toggleMilestoneModal();
     }
   });
 
@@ -7660,6 +7716,7 @@ function openTaskModal(task, mode, defaultPhase, defaultCat) {
 
   const titleVal = isEdit ? task.Title : '';
   document.getElementById('modal-task-title').value = titleVal;
+  document.getElementById('modal-task-milestone-toggle').checked = isEdit && isMilestoneTask(task);
   document.getElementById('modal-task-phase').value = isEdit ? task.Phase : (defaultPhase || 'Phase 1');
   document.getElementById('modal-task-cat').value = isEdit ? task.Category : (defaultCat || 'Category 1');
   document.getElementById('modal-task-desc').value = isEdit ? task.Description : '';
@@ -7765,6 +7822,7 @@ function renderPills(containerId, options, currentValue) {
   const c = document.getElementById(containerId);
   c.innerHTML = '';
   c.dataset.value = currentValue.toLowerCase();
+  const colorMap = containerId === 'modal-priority-container' ? PRIORITY_COLORS : STATUS_COLORS;
   options.forEach(opt => {
     const pill = document.createElement('span');
     pill.className = 'select-pill';
@@ -7772,11 +7830,11 @@ function renderPills(containerId, options, currentValue) {
     pill.textContent = opt === 'none' ? 'None' : opt;
     if (c.dataset.value === optLower) {
       pill.classList.add('active');
-      pill.style.background = optLower === 'none' ? '#94a3b8' : (STATUS_COLORS[optLower] || '#3b82f6');
+      pill.style.background = optLower === 'none' ? '#94a3b8' : (colorMap[optLower] || '#3b82f6');
       pill.style.color = 'var(--pill-text)';
     } else {
       pill.style.background = 'transparent';
-      pill.style.color = optLower === 'none' ? '#94a3b8' : (STATUS_COLORS[optLower] || '#3b82f6');
+      pill.style.color = optLower === 'none' ? '#94a3b8' : (colorMap[optLower] || '#3b82f6');
       pill.style.borderColor = pill.style.color;
     }
     pill.onclick = () => {
@@ -7787,10 +7845,25 @@ function renderPills(containerId, options, currentValue) {
   });
 }
 
+function toggleMilestoneModal() {
+  const titleEl = document.getElementById('modal-task-title');
+  const checked = document.getElementById('modal-task-milestone-toggle').checked;
+  const hasTag = /\(milestone\)/i.test(titleEl.value);
+  if (checked && !hasTag) {
+    titleEl.value = titleEl.value.trim() ? `${titleEl.value.trim()} (milestone)` : '(milestone)';
+  } else if (!checked && hasTag) {
+    titleEl.value = titleEl.value.replace(/\s*\(milestone\)/ig, '').trim();
+  }
+  onTaskTitleInput();
+  _updateEditDirtyHighlights();
+}
+
 function onTaskTitleInput() {
+  const titleEl = document.getElementById('modal-task-title');
+  document.getElementById('modal-task-milestone-toggle').checked = /\(milestone\)/i.test(titleEl.value);
   const idInput = document.getElementById('modal-task-id');
   if (idInput.dataset.autoGenerated === 'true') {
-    const titleVal = document.getElementById('modal-task-title').value;
+    const titleVal = titleEl.value;
     const baseId = titleVal.replace(/[^a-zA-Z0-9 ]/g, '');
     const existingIds = new Set(AppState.currentTasks.map(t => getTaskId(t)));
     let candidate = baseId;
@@ -7942,6 +8015,7 @@ function createDependentTask() {
   const parentId = document.getElementById('modal-task-id').value || document.getElementById('modal-task-title').value.replace(/[^a-zA-Z0-9 ]/g, '');
 
   document.getElementById('modal-task-title').value = "";
+  document.getElementById('modal-task-milestone-toggle').checked = false;
   document.getElementById('modal-task-id').value = "";
   document.getElementById('modal-task-id').dataset.autoGenerated = "true";
 
