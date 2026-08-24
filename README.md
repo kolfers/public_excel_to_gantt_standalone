@@ -1,17 +1,12 @@
 # Gantt Chart Tool
 
-***Last updated: 21 Aug 2026: v2.15***
+***Last updated: 24 Aug 2026: v2.17***
 
 **Live App:** [https://kolfers.github.io/public_excel_to_gantt_standalone/](https://kolfers.github.io/public_excel_to_gantt_standalone/)
 **GitHub Repository:** [https://github.com/kolfers/public_excel_to_gantt_standalone](https://github.com/kolfers/public_excel_to_gantt_standalone)
 
 A standalone HTML/JS tool that reads an Excel planning file and renders an interactive Gantt chart in the browser. No server or installation is required. All parsing and rendering runs locally in the browser, so your data stays on your machine.
 
-## Changelog
-
-### v2.15 — 21 Aug 2026
-- Starting a new empty chart now begins with one example task already filled in (instead of an empty chart and a blank "Add Task" popup), so there's a row to edit right away.
-- In the Add/Edit Task window, changing the Start Date now automatically shifts the End Date to keep the task's original duration. Changing the End Date to a date earlier than the Start Date now automatically moves the Start Date up to match.
 
 ## Quick Start
 
@@ -70,6 +65,21 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 - **On-open snapshot (automatic):** Every time you open a file, the app compares *Current Planning* against the most recent Log entry. If they differ — because Auto-Save ran since the last manual save, or the file was edited externally — a snapshot is silently appended to the Log, timestamped with the file's last-modified date. Your history stays complete with no extra steps.
 - Use the **Compare** dropdown to overlay any past snapshot as ghost tracks on the chart. Changed items are highlighted and the timeline header glows red. The **Stats** flyout summarises milestones, completions, holds, and overruns relative to the chosen baseline.
 - **Export Chart** packages the current view into a single self-contained `.html` file that can be opened on any computer without the original Excel file.
+
+## Changelog
+
+### v2.17 — 24 Aug 2026
+- Priority pills in the Add/Edit Task window (High/Medium/Low) once again show distinct colors matching the Filter panel's priority chips, instead of all rendering the same blue.
+- The Load More Past / Load More Future buttons now pulse only once they've actually scrolled into view, instead of firing immediately on load — previously the initial pulse could finish off-screen (behind the auto-scroll-to-today jump) before you ever saw it.
+
+### v2.16 — 21 Aug 2026
+- The Add/Edit Task window now has a **Milestone** checkbox next to Title — checking/unchecking it adds or removes the `(milestone)` tag on the title for you, instead of typing it by hand.
+- The **Load More Past / Load More Future** buttons are bigger, pinned near the top of the chart area (in line with the first phase row) instead of the vertical middle of the whole chart, and briefly pulse to draw attention.
+- Ctrl/Cmd + mousewheel (and trackpad pinch) now zooms the page as expected while the cursor is over the chart area, instead of being silently swallowed.
+
+### v2.15 — 21 Aug 2026
+- Starting a new empty chart now begins with one example task already filled in (instead of an empty chart and a blank "Add Task" popup), so there's a row to edit right away.
+- In the Add/Edit Task window, changing the Start Date now automatically shifts the End Date to keep the task's original duration. Changing the End Date to a date earlier than the Start Date now automatically moves the Start Date up to match.
 
 ---
 *Released under the MIT License.*
