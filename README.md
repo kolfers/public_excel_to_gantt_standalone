@@ -1,6 +1,6 @@
 # Gantt Chart Tool
 
-***Last updated: 24 Aug 2026: v2.17***
+***Last updated: 3 Sep 2026: v2.17***
 
 **Live App:** [https://kolfers.github.io/public_excel_to_gantt_standalone/](https://kolfers.github.io/public_excel_to_gantt_standalone/)
 **GitHub Repository:** [https://github.com/kolfers/public_excel_to_gantt_standalone](https://github.com/kolfers/public_excel_to_gantt_standalone)
@@ -46,6 +46,7 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 - Tasks are grouped by Phase and Category. Milestone and completion stats are aggregated in the left panel.
 - Click and drag the chart to scroll horizontally.
 - Switch between Week, Month, and Year scale views. Week view aligns to Mondays.
+- **Flow view** (toggle button in the toolbar, or press `f`) lays tasks out left-to-right by dependency chain instead of by date, so you can follow a chain of dependent tasks at a glance. Dependency arrows connect each task to what it's waiting on, and snapshot comparisons still show ghost bars for changed items. Add Task, Edit, and all the usual row shortcuts work the same as in Timeline view.
 
 ### Task Management
 - Click any task bar to open the Edit Task modal. Hovering a bar shows ✎ Edit and 💬 Comments buttons. The same options are available by hovering task rows in the left panel.
@@ -68,9 +69,10 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 
 ## Changelog
 
-### v2.17 — 24 Aug 2026
-- Priority pills in the Add/Edit Task window (High/Medium/Low) once again show distinct colors matching the Filter panel's priority chips, instead of all rendering the same blue.
-- The Load More Past / Load More Future buttons now pulse only once they've actually scrolled into view, instead of firing immediately on load — previously the initial pulse could finish off-screen (behind the auto-scroll-to-today jump) before you ever saw it.
+### v2.17 — 3 Sep 2026
+- New **Flow view**: toggle the chart (button in the toolbar, or press `f`) between the usual date-based Timeline and a new dependency-chain layout, where tasks are arranged left-to-right by what they depend on rather than by date. Handy for following a chain of related tasks without scrolling around the calendar.
+- Flow view has its own toolbar controls (Active/Overdue filters, First/Last navigation) and keeps dependency arrows, snapshot-comparison ghost bars, hover tooltips, and click-to-edit all working the same as Timeline view.
+- Added a floating **+** button over the chart for quickly adding a new task from either view.
 
 ### v2.16 — 21 Aug 2026
 - The Add/Edit Task window now has a **Milestone** checkbox next to Title — checking/unchecking it adds or removes the `(milestone)` tag on the title for you, instead of typing it by hand.

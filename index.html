@@ -53,6 +53,10 @@ html {
   /* Semantic tokens */
   --header-bg: var(--slate-700);
   --header-text: #ffffff;
+  /* Flow-view timeline-header background. Derived from --accent/--surface (both already
+     redefined per palette/theme below) rather than hardcoded per palette, so it adapts
+     automatically under every palette without needing its own per-palette declaration. */
+  --flow-header-bg: color-mix(in srgb, var(--accent) 14%, var(--surface));
   --pill-date-bg: var(--green-800);
   --pill-date-hover: var(--green-900);
   --btn-active-bg: var(--slate-700);
@@ -943,6 +947,26 @@ body {
   font-size: 1rem;
 }
 
+/* Flow (dependency) view toolbar buttons — All/Active/Overdue duplicated from the
+   left-menu filter buttons, colour-coded to match their meaning. */
+.flow-filter-group .btn.filter-mode-btn[data-value="all"].active {
+  background: var(--text-mu);
+  border-color: var(--text-mu);
+  color: #fff;
+}
+
+.flow-filter-group .btn.filter-mode-btn[data-value="active"].active {
+  background: var(--status-on-track);
+  border-color: var(--status-on-track);
+  color: #fff;
+}
+
+.flow-filter-group .btn.filter-mode-btn[data-value="overdue"].active {
+  background: var(--status-behind);
+  border-color: var(--status-behind);
+  color: #fff;
+}
+
 
 /* Compare controls */
 .compare-label {
@@ -1194,27 +1218,6 @@ select#compare-sel {
   font-weight: 600
 }
 
-.toolbar-add-task {
-  flex: 1;
-  display: none;
-  align-items: center;
-  justify-content: center
-}
-
-.add-task-toolbar-btn {
-  background: var(--header-bg);
-  color: #fff;
-  border-color: var(--header-bg);
-  font-size: 1rem;
-  font-weight: 700
-}
-
-.add-task-toolbar-btn:hover {
-  filter: brightness(1.15);
-  background: var(--header-bg);
-  color: #fff
-}
-
 #filter-panel {
   position: fixed;
   z-index: 9998;
@@ -1398,7 +1401,8 @@ select#compare-sel {
 #filter-summary {
   position: fixed;
   top: calc(var(--toolbar-h) + var(--head-h));
-  left: var(--lp-compact-w, var(--left-w));
+  /* Starts to the right of the floating "+" new-task button (8px inset + 30px button + 8px gap). */
+  left: calc(var(--lp-compact-w, var(--left-w)) + 46px);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -1409,6 +1413,73 @@ select#compare-sel {
   max-width: 60vw;
   justify-content: flex-start;
   transition: left .2s
+}
+
+/* Floating "+" new-task button — top-left of the chart, same row as the first phase
+   bar. Shared by both Timeline and Flow view. Reuses --header-bg/--header-text (the
+   same high-contrast pairing as the app-title bar) so it stands out against the chart
+   background in every palette without a bespoke colour. */
+.new-task-fab {
+  position: fixed;
+  /* Vertically centred within the first phase row's --row-h band (34px), the same
+     band #filter-summary's top and the chart's row-0 both anchor to: bandTop + half
+     the leftover space, so a 30px button sits with an equal ~2px margin top/bottom. */
+  top: calc(var(--toolbar-h) + var(--head-h) + (var(--row-h) - 30px) / 2);
+  left: calc(var(--lp-compact-w, var(--left-w)) + 8px);
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  font-family: var(--font);
+  background: var(--header-bg);
+  color: var(--header-text);
+  /* Border uses --accent (not --header-bg) so the button keeps a visible outline even in
+     palettes where --header-bg sits close in lightness to --bg (e.g. some dark themes) —
+     it always needs to read as a distinct control against the chart background. */
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 21;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+  transition: left .2s, filter .1s
+}
+
+.new-task-fab:hover {
+  filter: brightness(1.15)
+}
+
+/* Flow-view header title — replaces the Timeline header's date columns. */
+#flow-title-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--head-h);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: .3px;
+  color: var(--text);
+  pointer-events: none;
+  z-index: 2
+}
+
+#flow-title-label.visible {
+  display: flex
+}
+
+/* Flow-view header background — visually distinguishes Flow mode from Timeline mode.
+   Derived from --accent/--surface (both already redefined per palette/theme) rather
+   than a new hardcoded colour per palette, so it adapts automatically everywhere. */
+#timeline-header.flow-header {
+  background: var(--flow-header-bg)
 }
 
 .filter-summary-chip {
@@ -3087,7 +3158,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="drop-card" id="drop-card" style="position: relative;">
     <div class="drop-title">&#128200; Gantt Chart Builder</div>
     <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
-    <div class="drop-version">v2.17</div>
+    <div class="drop-version">v2.19</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
       Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
@@ -3189,16 +3260,24 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         <button class="btn" id="btn-year" data-action="setView" data-value="year" data-tooltip="Year view" data-shortcut="v: cycle views"><span
             class="txt-full">Year</span><span class="txt-short">Y</span></button>
       </div>
+      <div class="btn-group flow-filter-group" id="flow-filter-btns" style="display:none;">
+        <button class="btn filter-mode-btn active" id="ffb-all" data-action="setFilter" data-value="all"
+          data-tooltip="Show all items">All</button>
+        <button class="btn filter-mode-btn" id="ffb-active" data-action="setFilter" data-value="active"
+          data-tooltip="Show only active (non-completed) items">Active</button>
+        <button class="btn filter-mode-btn" id="ffb-overdue" data-action="setFilter" data-value="overdue"
+          data-tooltip="Show only items past their end date that are not 100% complete">Overdue</button>
+      </div>
       <button class="btn icon-btn" data-action="navigate" data-value="-1"
-        data-tooltip="Previous time period">&#8592;</button>
-      <button class="btn today-btn" data-action="goToday" data-tooltip="Jump to today" data-shortcut="t: today"><span
+        data-tooltip="Previous time period / scroll left one item">&#8592;</button>
+      <button class="btn today-btn" id="today-btn" data-action="goToday" data-tooltip="Jump to today" data-shortcut="t: today"><span
           class="txt-full">Today</span><span class="txt-short">T</span></button>
+      <div class="btn-group flow-first-last-group" id="flow-first-last-btns" style="display:none;">
+        <button class="btn" data-action="flowGoFirst" data-tooltip="Scroll to first tasks (dependency roots)">First</button>
+        <button class="btn" data-action="flowGoLast" data-tooltip="Scroll to last tasks (end of dependency chain)">Last</button>
+      </div>
       <button class="btn icon-btn" data-action="navigate" data-value="1"
-        data-tooltip="Next time period">&#8594;</button>
-    </div>
-    <div class="toolbar-add-task">
-      <button class="btn add-task-toolbar-btn" data-action="openTaskModalNew" data-tooltip="Add a new task"><span
-          class="txt-full">+ Add Task</span><span class="txt-short">+</span></button>
+        data-tooltip="Next time period / scroll right one item">&#8594;</button>
     </div>
     <div class="toolbar-right">
       <span id="unsaved-warning" class="unsaved-warning" style="display:none;"><span class="txt-full">Unsaved
@@ -3208,6 +3287,10 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         data-tooltip="Automatically save changes to Excel">
         <input type="checkbox" id="autosave-toggle" data-action="toggleAutoSave"> Auto-save
       </label>
+      <button class="btn" id="viewmode-btn" data-action="toggleViewMode"
+        style="margin-right:12px; border-color:var(--accent); color:var(--accent);"
+        data-tooltip="Switch to Dependency Flow view" data-shortcut="f: toggle view">&#128279;<span
+          class="txt-full"> Flow View</span><span class="txt-short txt-min"> F</span></button>
       <button class="btn" id="save-btn" data-action="saveSnapshot"
         style="margin-right:12px; border-color:var(--status-done); color:var(--status-done);"
         data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file."
@@ -3226,11 +3309,11 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <div id="left-header">
         <span class="tasks-label">Tasks</span>
         <div class="filter-btns">
-          <button class="fbtn active" id="fb-all" data-action="setFilter" data-value="all"
+          <button class="fbtn filter-mode-btn active" id="fb-all" data-action="setFilter" data-value="all"
             data-tooltip="Show all items">All</button>
-          <button class="fbtn" id="fb-active" data-action="setFilter" data-value="active"
+          <button class="fbtn filter-mode-btn" id="fb-active" data-action="setFilter" data-value="active"
             data-tooltip="Show only active (non-completed) items">Active</button>
-          <button class="fbtn" id="fb-overdue" data-action="setFilter" data-value="overdue"
+          <button class="fbtn filter-mode-btn" id="fb-overdue" data-action="setFilter" data-value="overdue"
             data-tooltip="Show only items past their end date that are not 100% complete">Overdue</button>
         </div>
         <button class="filter-btn" id="filter-btn" data-tooltip="Filter tasks">Filter</button>
@@ -3246,8 +3329,11 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     </div>
     <div id="right-panel">
       <div id="timeline-header"></div>
+      <div id="flow-title-label" aria-hidden="true">Dependency Flow View</div>
       <div id="center-view-arrow" aria-hidden="true"></div>
       <div id="center-view-arrow-up" aria-hidden="true"></div>
+      <button id="new-task-fab" class="new-task-fab" data-action="openTaskModalNew"
+        data-tooltip="New task">+</button>
       <div id="chart-area"><svg id="gantt-svg"></svg></div>
     </div>
   </div>
@@ -3281,8 +3367,9 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         <ul>
           <li><strong>Edit:</strong> Click any task bar, or hover a bar and click the &#9998; button that appears to its
             side. Hovering a task row in the left panel also reveals the same shortcuts.</li>
-          <li><strong>Add:</strong> Use the global "Add Task" button in the toolbar, hover a Phase/Category row to
-            reveal an inline "+" button, or press <kbd>n</kbd> while hovering a Phase or Category row.</li>
+          <li><strong>Add:</strong> Click the floating <strong>+</strong> button at the top-left of the chart (above
+            the first phase row), hover a Phase/Category row to reveal an inline "+" button, or press <kbd>n</kbd>
+            while hovering a Phase or Category row. Works identically in Timeline and Flow view.</li>
           <li><strong>Duplicate / Chain:</strong> Inside the Edit modal, use <em>Duplicate Task</em> to copy (comments
             are copied too), or <em>Dependent Task</em> to create a follow-on task pre-linked to the current one
             (comments are <em>not</em> copied). The main view scrolls to the new task after creation.</li>
@@ -3341,6 +3428,30 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             creating a new snapshot.</li>
           <li><strong>Dependency arrows:</strong> Hovering a task bar with a dependency highlights its incoming arrow in
             amber.</li>
+        </ul>
+      </details>
+
+      <details class="info-section">
+        <summary class="info-section-heading">Flow (Dependency) View</summary>
+        <ul>
+          <li><strong>Toggle:</strong> Click the &#128279;/&#128197; button in the toolbar (or press <kbd>f</kbd>) to
+            switch between the date-based <strong>Timeline</strong> view and the <strong>Flow</strong> view, which
+            lays tasks out left-to-right by dependency chain instead of by date. The header bar gets a distinct
+            tinted background and a large centred title in Flow view so it's always obvious which view is active.</li>
+          <li><strong>Layout:</strong> Tasks with no dependency start near the left edge; a dependent task always
+            starts a little after its parent ends, so it never overlaps it and every dependency arrow is a simple
+            elbow connector. Bars come in three fixed widths &mdash; small, normal, and wide &mdash; based on how
+            long the task runs.</li>
+          <li><strong>Row order:</strong> Within each category, tasks are grouped by dependency: a task is followed
+            immediately by its own dependents, before moving on to the next unrelated task in that category. Sibling
+            tasks (at the same nesting level) are ordered by Priority, then Start Date.</li>
+          <li><strong>Snapshot comparison:</strong> Same as Timeline view &mdash; when a Compare snapshot is active,
+            faded dashed "ghost" bars for the snapshot's version of each task appear directly under their current
+            counterpart, with the same diff-highlighted tooltip.</li>
+          <li><strong>Toolbar:</strong> Week/Month/Year and Today are replaced by <strong>All / Active /
+              Overdue</strong> (the same filters as the left panel) and <strong>First / Last</strong>, which jump to
+            the start or end of the dependency chain. The &larr; &rarr; arrows scroll by one "wide" bar's width.</li>
+          <li>Adding, editing, and commenting on tasks works exactly the same as in Timeline view.</li>
         </ul>
       </details>
 
@@ -3412,12 +3523,17 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             <tr>
               <td style="padding:3px 6px;">Main view (no modal open)</td>
               <td style="padding:3px 6px;"><kbd>v</kbd></td>
-              <td style="padding:3px 6px;">Cycle view: Week &rarr; Month &rarr; Year &rarr; &hellip;</td>
+              <td style="padding:3px 6px;">Cycle view: Week &rarr; Month &rarr; Year &rarr; &hellip; (Timeline view only)</td>
             </tr>
             <tr>
               <td style="padding:3px 6px;">Main view (no modal open)</td>
               <td style="padding:3px 6px;"><kbd>t</kbd></td>
-              <td style="padding:3px 6px;">Jump to Today</td>
+              <td style="padding:3px 6px;">Jump to Today (or First, in Flow view)</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Main view (no modal open)</td>
+              <td style="padding:3px 6px;"><kbd>f</kbd></td>
+              <td style="padding:3px 6px;">Toggle Timeline / Flow view</td>
             </tr>
             <tr>
               <td style="padding:3px 6px;">Main view (no modal open)</td>
@@ -3487,7 +3603,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
       &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.17</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.19</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
         <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
@@ -3860,10 +3976,19 @@ const BAR_HOVER_HIDE_DELAY_MS = 500;  // ms: delay before hiding the bar-hover o
 const BAR_HOVER_BTN_W         = 68;   // px: approx total width of the bar-hover button group
 const BAR_HOVER_CURSOR_GAP    = 20;   // px: clearance between cursor and hover buttons
 
+// ── Flow (dependency) view layout constants ────────────────────────────
+const FLOW_LEFT_OFFSET_FRAC = 0.2;  // fraction of chart viewport width: left-edge x for root (no-dependency) tasks
+const FLOW_WIDE_FRAC        = 0.2;  // fraction of chart viewport width: bar width for "wide" (>30 day) tasks
+const FLOW_SMALL_MAX_DAYS   = 7;    // days: task duration <= this uses "small" bar width in Flow view
+const FLOW_NORMAL_MAX_DAYS  = 30;   // days: task duration <= this (and > small) uses "normal" bar width in Flow view
+const FLOW_DEP_GAP_PX       = 28;   // px: horizontal gap between a parent bar's end and its dependent's start in Flow view
+const FLOW_SCROLL_PAD_PX    = 240;  // px: fixed blank-canvas buffer before the first / after the last Flow-view bar, so drag/inertia scrolling always has somewhere to go (independent of FLOW_LEFT_OFFSET_FRAC, which is a content margin, not scroll room)
+
 // ── State ────────────────────────────────────────────────────────────
 const AppState = {
   // View / Navigation
   view: 'month', viewportStart: null, renderStart: null, compareLabel: '', filterMode: 'all',
+  viewMode: 'timeline', // 'timeline' (date-based, default) | 'flow' (dependency-chain based)
   viewPadLeft: 0, viewPadRight: 0,
   collapsed: {}, currentTasks: [],
   changesOnly: false, compactMode: false, unsavedChanges: false, autoSave: false,
@@ -5896,6 +6021,9 @@ function renderChart(visible, today) {
   const hdr = document.getElementById('timeline-header'); hdr.innerHTML = '';
   if (AppState.changesOnly && AppState.compareLabel) hdr.classList.add('changes-glow');
   else hdr.classList.remove('changes-glow');
+  hdr.classList.remove('flow-header');
+  const flowTitle = document.getElementById('flow-title-label');
+  if (flowTitle) flowTitle.classList.remove('visible');
 
   const hSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   hSvg.setAttribute('width', totalW); hSvg.setAttribute('height', HEAD_H + 12);
@@ -6191,12 +6319,351 @@ function renderChart(visible, today) {
   _updateCenterArrow();
 }
 
+// ── Flow (dependency-chain) layout ──────────────────────────────────────
+// Computes per-task {x, w} pixel positions for the Flow view. Root tasks (no
+// resolvable Dependency) start at FLOW_LEFT_OFFSET_FRAC of the chart viewport width,
+// PLUS a fixed FLOW_SCROLL_PAD_PX — the two are independent, additive terms: the
+// fraction is a purely visual content margin (keeps root bars off the left panel
+// edge), the fixed px is scroll-canvas buffer baked in here once so every consumer of
+// this layout (renderFlowChart, flowGoLast, scrollToTask) automatically works in the
+// same "canvas-absolute" coordinate space with no risk of one of them forgetting to
+// add it separately. renderFlowChart() adds a matching FLOW_SCROLL_PAD_PX after the
+// rightmost bar when sizing the scrollable SVG width, so there's real empty canvas —
+// not just already-visible margin — on both sides for drag/inertia scrolling to use.
+// A dependent task always starts FLOW_DEP_GAP_PX after its parent ends, regardless of
+// the child's actual Start/End Date — this guarantees every dependency arrow is a
+// simple 2-elbow orthogonal path (see renderFlowChart()).
+// Resolution is a memoized DFS keyed by task ID (only one Dependency per task), which
+// naturally processes parents before children; a dependency cycle or an unresolved
+// parent (missing, or not in the currently visible row set) falls back to root.
+//
+// Ghost (snapshot-comparison) tasks are positioned too, keyed as `'ghost:' + id` so they
+// never collide with a current task sharing the same ID: a ghost simply reuses its
+// current counterpart's x (buildAllRows always places the ghost row directly under its
+// counterpart, so this keeps them visually paired the same way Timeline view does), with
+// its own width bucket computed from the ghost's own dates so a duration change since
+// the snapshot is still visible. An "orphan" ghost (a task removed since the snapshot,
+// with no current counterpart at all) has nothing to anchor to, so — like an unresolved
+// dependency — it falls back to root position.
+function computeFlowLayout(visible, chartWidth) {
+  const cw = chartWidth || 960;
+  const leftOffset = cw * FLOW_LEFT_OFFSET_FRAC + FLOW_SCROLL_PAD_PX;
+  const wideW = cw * FLOW_WIDE_FRAC;
+  const normalW = wideW * 2 / 3;
+  const smallW = wideW / 3;
+
+  const taskById = {};
+  visible.forEach(r => {
+    if (r.type === 'task' && !r.ghost) {
+      const id = getTaskId(r.task);
+      if (id) taskById[id] = r.task;
+    }
+  });
+
+  function widthFor(t) {
+    const s = parseDate(t['Start Date']), e = parseDate(t['End Date']);
+    if (!s || !e) return smallW;
+    const days = dayDiff(s, e);
+    if (days > FLOW_NORMAL_MAX_DAYS) return wideW;
+    if (days > FLOW_SMALL_MAX_DAYS) return normalW;
+    return smallW;
+  }
+
+  const layout = {}; // id -> {x, w}; ghost rows use key 'ghost:' + id
+  function resolve(id, path) {
+    if (layout[id]) return layout[id];
+    const t = taskById[id];
+    if (!t) return null;
+    const w = widthFor(t);
+    const depId = t.Dependency ? String(t.Dependency).trim() : '';
+    let x = leftOffset;
+    if (depId && depId !== id && taskById[depId] && !path.has(depId)) {
+      const parentPath = new Set(path); parentPath.add(id);
+      const parentLayout = resolve(depId, parentPath);
+      if (parentLayout) {
+        x = parentLayout.x + parentLayout.w + FLOW_DEP_GAP_PX;
+      }
+    }
+    layout[id] = { x, w };
+    return layout[id];
+  }
+  Object.keys(taskById).forEach(id => resolve(id, new Set()));
+
+  visible.forEach(r => {
+    if (r.type !== 'task' || !r.ghost) return;
+    const id = getTaskId(r.task);
+    if (!id) return;
+    const key = 'ghost:' + id;
+    if (layout[key]) return; // already computed
+    const w = widthFor(r.task);
+    const current = layout[id];
+    layout[key] = { x: current ? current.x : leftOffset, w };
+  });
+
+  return layout;
+}
+
+// ── Render Flow (dependency-chain) chart ────────────────────────────────
+// Mirrors renderChart()'s structure (defs/markers, row backgrounds, highlight, dependency
+// arrows, bars, hit-rect interaction wiring) but positions bars via computeFlowLayout()
+// instead of dateToX(), and drops date-scale-only concepts (timeline header date columns —
+// replaced by the #flow-title-label HTML overlay, see _syncViewModeToolbar() — Today line,
+// Load More buttons). Snapshot-comparison ghost bars ARE shown (styled the same
+// reduced-emphasis dashed way as renderChart()'s), positioned by computeFlowLayout()
+// under their current counterpart.
+function renderFlowChart(visible, today) {
+  const svg = document.getElementById('gantt-svg');
+  const chartArea = document.getElementById('chart-area');
+  const rightPanel = document.getElementById('right-panel');
+  const rightW = (rightPanel && rightPanel.offsetWidth) || 960;
+  const chartViewportW = (chartArea && chartArea.clientWidth) || rightW;
+
+  const layout = computeFlowLayout(visible, chartViewportW);
+  let maxRight = 0;
+  Object.keys(layout).forEach(id => { const l = layout[id]; if (l.x + l.w > maxRight) maxRight = l.x + l.w; });
+  // FLOW_SCROLL_PAD_PX buffer beyond the rightmost bar, and a floor of viewport width +
+  // buffer on both sides — so even a tiny chart (few tasks, or none) still has real
+  // scrollable canvas past both edges instead of scrollWidth === clientWidth (no drag
+  // room at all, which is what made inertial scrolling feel broken).
+  const totalW = Math.max(maxRight + FLOW_SCROLL_PAD_PX, chartViewportW + FLOW_SCROLL_PAD_PX * 2);
+
+  const extraBottomPad = Math.floor(window.innerHeight / 2);
+  const chartAreaH = (chartArea && chartArea.clientHeight) || 0;
+  const totalH = Math.max(visible.length * ROW_H + extraBottomPad, chartAreaH, 400);
+
+  svg.setAttribute('width', totalW); svg.setAttribute('height', totalH);
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  const _barBg = 'var(--bg)';
+  const _ghostBg = 'var(--surface)';
+  const _ghostProg = 'var(--border-md)';
+  const _normProg = 'var(--chart-prog)';
+  const _barText = 'var(--text)';
+  const _rowSep = 'var(--border)';
+
+  const defs = svgEl('defs');
+  const mk = svgEl('marker', { id: 'arr', markerWidth: 6, markerHeight: 6, refX: 6, refY: 3, orient: 'auto' });
+  mk.appendChild(svgEl('path', { d: 'M0,0 L6,3 L0,6 Z', fill: 'var(--text-lt)' }));
+  defs.appendChild(mk);
+  const mkHi = svgEl('marker', { id: 'arr-hi', markerWidth: 3.6, markerHeight: 3.6, refX: 3.6, refY: 1.8, orient: 'auto' });
+  mkHi.appendChild(svgEl('path', { d: 'M0,0 L3.6,1.8 L0,3.6 Z', fill: 'var(--status-waiting)' }));
+  defs.appendChild(mkHi);
+  svg.appendChild(defs);
+
+  // Build partner lookup for tooltip diff highlight (same as renderChart)
+  const currById = {}, ghostById = {};
+  visible.forEach(r => {
+    if (r.type !== 'task') return;
+    const id = getTaskId(r.task);
+    if (!id) return;
+    if (r.ghost) ghostById[id] = r.task; else currById[id] = r.task;
+  });
+
+  // ── Row backgrounds (ghost row tint + phase separators) ──
+  visible.forEach((r, ri) => {
+    if (r.ghost && r.type === 'task')
+      svg.appendChild(svgEl('rect', { x: 0, y: ri * ROW_H, width: totalW, height: ROW_H, fill: _ghostBg }));
+    if (r.type === 'phase' && ri > 0)
+      svg.appendChild(svgEl('line', { x1: 0, y1: ri * ROW_H, x2: totalW, y2: ri * ROW_H, stroke: _rowSep, 'stroke-width': 1.5 }));
+  });
+
+  // ── Timeline header: cleared, no date columns. The visible "Dependency Flow View"
+  // title is the separate #flow-title-label HTML overlay (kept outside #timeline-header
+  // so clearing its innerHTML every render doesn't wipe it) — shown/hidden via the
+  // .visible class, the same technique used for .changes-glow on this same element.
+  // The header itself gets a distinct background via .flow-header (--flow-header-bg).
+  const hdr = document.getElementById('timeline-header'); hdr.innerHTML = '';
+  hdr.classList.remove('changes-glow');
+  hdr.classList.add('flow-header');
+  const flowTitle = document.getElementById('flow-title-label');
+  if (flowTitle) flowTitle.classList.add('visible');
+
+  // ── Row highlight (drawn after row separators, same behaviour as renderChart) ──
+  const _highlightRi = AppState._highlightId
+    ? visible.findIndex(r => r.type === 'task' && !r.ghost && getTaskId(r.task) === AppState._highlightId)
+    : -1;
+  const _highlightCatRi = AppState._highlightCat
+    ? visible.findIndex(r => r.type === 'category' && r.phase === AppState._highlightCat.phase && r.cat === AppState._highlightCat.cat)
+    : -1;
+  const _dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (_highlightRi >= 0) {
+    svg.appendChild(svgEl('rect', { x: 0, y: _highlightRi * ROW_H, width: totalW, height: ROW_H, fill: _barBg }));
+    svg.appendChild(svgEl('rect', { x: 0, y: _highlightRi * ROW_H, width: totalW, height: ROW_H, fill: _dark ? 'rgba(251,191,36,0.18)' : 'rgba(239,68,68,0.10)' }));
+  }
+  if (_highlightCatRi >= 0) {
+    svg.appendChild(svgEl('rect', { x: 0, y: _highlightCatRi * ROW_H, width: totalW, height: ROW_H, fill: _dark ? 'rgba(56,189,248,0.18)' : 'rgba(239,68,68,0.10)' }));
+  }
+
+  // ── Dependency arrows (drawn behind bars, same bent-elbow style as renderChart) ──
+  const taskRows = visible.map((r, ri) => ({ ...r, ri })).filter(r => r.type === 'task' && !r.ghost);
+  const idToRow = {};
+  taskRows.forEach(r => { const id = getTaskId(r.task); if (id) idToRow[id] = r; });
+  const arrG = svgEl('g');
+  taskRows.forEach(r => {
+    const dep = r.task.Dependency ? String(r.task.Dependency).trim() : ''; if (!dep) return;
+    const parent = idToRow[dep]; if (!parent) return;
+    const myId = getTaskId(r.task);
+    const pl = layout[dep], cl = layout[myId];
+    if (!pl || !cl) return;
+    const x1 = pl.x + pl.w, y1 = parent.ri * ROW_H + ROW_H / 2;
+    const x2 = cl.x, y2 = r.ri * ROW_H + ROW_H / 2;
+    // computeFlowLayout() guarantees x2 >= x1 + FLOW_DEP_GAP_PX, so a child's start is
+    // always comfortably right of its parent's end — a simple 2-elbow orthogonal path
+    // (horizontal / vertical / horizontal) is always usable, no jog fallback needed.
+    const d = `M${x1},${y1} H${(x1 + x2) / 2} V${y2} H${x2}`;
+    const arrPath = svgEl('path', { d, fill: 'none', stroke: 'var(--text-lt)', 'stroke-width': 1.5, 'marker-end': 'url(#arr)', style: 'pointer-events:none' });
+    arrPath.dataset.depChildId = myId;
+    arrG.appendChild(arrPath);
+  });
+  svg.appendChild(arrG);
+
+  // ── Bars ──
+  visible.forEach((r, ri) => {
+    if (r.type !== 'task') return;
+    const t = r.task; const ghost = r.ghost; const color = r.color;
+    const id = getTaskId(t);
+    const l = ghost ? layout['ghost:' + id] : layout[id];
+    if (!l) return;
+    const end = parseDate(t['End Date']);
+    const drawW = Math.max(l.w, MIN_BAR_W);
+    const x = l.x; const y = ri * ROW_H + 5; const h = ROW_H - 10; const rx = 8;
+    const pct = Math.max(0, Math.min(100, Number(t.Progress) || 0));
+    const isOverdue = !ghost && end && end < today && pct < 100;
+
+    const clipId = `flowclip${ri}`;
+    const cp = svgEl('clipPath', { id: clipId });
+    cp.appendChild(svgEl('rect', { x: x + 1.5, y: y + 1.5, width: Math.max(drawW - 3, 0), height: h - 3, rx: Math.max(rx - 1, 0) }));
+    defs.appendChild(cp);
+
+    // Partner for tooltip diff highlight (same pairing logic as renderChart)
+    const partner = ghost ? currById[id] : (AppState.compareLabel ? ghostById[id] : null);
+
+    if (ghost) {
+      // Reduced-emphasis dashed ghost bar — same visual language as renderChart()'s.
+      const gg = svgEl('g', { opacity: '0.7' });
+      gg.appendChild(svgEl('rect', { x, y, width: drawW, height: h, rx, fill: _ghostBg, stroke: 'var(--text-lt)', 'stroke-width': 1.5, 'stroke-dasharray': '4,3' }));
+      if (pct > 0) gg.appendChild(svgEl('rect', { x: x + 1.5, y: y + 1.5, width: Math.max((drawW - 3) * pct / 100, 0), height: h - 3, fill: _ghostProg, 'clip-path': `url(#${clipId})` }));
+      if (drawW > 12) {
+        const gt = svgEl('text', {
+          x: x + 5, y: y + h / 2 + 4, fill: 'var(--text-lt)', 'font-size': 12, 'font-weight': '500',
+          'font-family': 'var(--font)', 'clip-path': `url(#${clipId})`, style: 'pointer-events:none'
+        });
+        gt.textContent = t.Title || ''; gg.appendChild(gt);
+      }
+      svg.appendChild(gg);
+
+      // Ghost bars only get a tooltip (with diff highlighting against their current
+      // counterpart) — no click/edit/hover-overlay, matching renderChart()'s behaviour.
+      const ghostHit = svgEl('rect', { x, y, width: drawW, height: h, fill: 'transparent', rx, style: 'cursor:pointer' });
+      ghostHit.addEventListener('mousemove', e => showTooltip(e, t, r.snapshotLabel, partner, true));
+      ghostHit.addEventListener('mouseleave', hideTooltip);
+      svg.appendChild(ghostHit);
+      return;
+    }
+
+    if (isOverdue) svg.appendChild(svgEl('rect', { x: x - 3, y: y - 3, width: drawW + 6, height: h + 6, rx: rx + 2, fill: 'none', stroke: 'var(--today)', 'stroke-width': 2, opacity: '0.5' }));
+    svg.appendChild(svgEl('rect', { x, y, width: drawW, height: h, rx, fill: _barBg }));
+    if (pct > 0) svg.appendChild(svgEl('rect', { x: x + 1.5, y: y + 1.5, width: Math.max((drawW - 3) * pct / 100, 0), height: h - 3, fill: _normProg, 'clip-path': `url(#${clipId})` }));
+    svg.appendChild(svgEl('rect', { x, y, width: drawW, height: h, rx, fill: 'none', stroke: color, 'stroke-width': 2 }));
+    const sc = STATUS_COLORS[(t.Status || '').toLowerCase()] || '#94a3b8';
+    const circX = x + drawW - 9;
+    svg.appendChild(svgEl('circle', { cx: circX, cy: y + h / 2, r: 4.5, fill: sc }));
+    const CHAR_W = 6.3;
+    const availW = drawW - 5 - 18;
+    const rawTitle = t.Title || '';
+    const dispTitle = rawTitle.replace(/\(milestone\)/gi, '').trim();
+    const maxChars = Math.max(3, Math.floor(availW / CHAR_W));
+    const displayTitle = dispTitle.length > maxChars ? dispTitle.slice(0, maxChars - 1) + '…' : dispTitle;
+    const tx = svgEl('text', {
+      x: x + 5, y: y + h / 2 + 4, fill: _barText, 'font-size': 12, 'font-weight': '600',
+      'font-family': 'var(--font)', 'clip-path': `url(#${clipId})`, style: 'pointer-events:none'
+    });
+    tx.textContent = displayTitle; svg.appendChild(tx);
+    // Milestone marker
+    if (/\(milestone\)/i.test(rawTitle)) {
+      const ms = h / 2;
+      const mx = x + drawW + ms + 4, my = y + h / 2;
+      const pts = `${mx},${my - ms} ${mx + ms},${my} ${mx},${my + ms} ${mx - ms},${my}`;
+      const diamond = svgEl('polygon', { points: pts, fill: 'var(--status-waiting)', stroke: 'var(--status-waiting)', 'stroke-width': 1.5, style: 'cursor:default' });
+      diamond.addEventListener('mousemove', e => showSimpleTooltip(e, 'Milestone Task'));
+      diamond.addEventListener('mouseleave', hideTooltip);
+      svg.appendChild(diamond);
+      const mt = svgEl('text', {
+        x: mx, y: my + 4, 'text-anchor': 'middle', fill: '#fff', 'font-size': 12, 'font-weight': '700',
+        'font-family': 'var(--font)', style: 'pointer-events:none'
+      }, 'M');
+      svg.appendChild(mt);
+    }
+
+    // Closed Dependency Attention Icon (same behaviour as renderChart)
+    if (t.Dependency) {
+      const depId = String(t.Dependency).trim();
+      if (!idToRow[depId] && !isDoneTask(t)) {
+        const realParent = AppState.currentTasks.find(pt => getTaskId(pt) === depId);
+        if (realParent && (AppState.collapsed['p:' + realParent.Phase] || AppState.collapsed['c:' + realParent.Phase + ':' + realParent.Category])) {
+          const iconX = x - 13;
+          const iconY = y + h / 2;
+          const attG = svgEl('g', { style: 'cursor:pointer' });
+          attG.appendChild(svgEl('circle', { cx: iconX, cy: iconY, r: 10, fill: 'var(--status-behind)' }));
+          const ex = svgEl('text', { x: iconX, y: iconY + 4, 'text-anchor': 'middle', fill: '#fff', 'font-size': 10, 'font-weight': 'bold' });
+          ex.textContent = '!';
+          attG.appendChild(ex);
+          attG.onclick = () => {
+            AppState.collapsed['p:' + realParent.Phase] = false;
+            AppState.collapsed['c:' + realParent.Phase + ':' + realParent.Category] = false;
+            render();
+            setTimeout(() => scrollToTask(realParent), 60);
+          };
+          const _depPColor = catColor(realParent.Category || '');
+          const _depHtml = `Hidden dependency:<br/><span style="color:var(--text-lt);font-size:0.7rem;">${escHtml(realParent.Phase)} › <span style="color:${_depPColor};font-weight:600;">${escHtml(realParent.Category)}</span> › </span><b>${escHtml(realParent.Title)}</b>`;
+          attG.onmousemove = (e) => showHTMLTooltip(e, _depHtml);
+          attG.onmouseleave = hideTooltip;
+          svg.appendChild(attG);
+        }
+      }
+    }
+
+    // Hit rect: tooltip + hover overlay (edit/comments) + click-to-highlight / dblclick-to-edit
+    const hit = svgEl('rect', { x, y, width: drawW, height: h, fill: 'transparent', rx, style: 'cursor:pointer' });
+    hit.addEventListener('mousemove', e => { showTooltip(e, t, r.snapshotLabel, partner, false); _updateBarHoverPosition(e.clientX, hit.getBoundingClientRect()); });
+    hit.addEventListener('mouseleave', hideTooltip);
+    hit.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hideTooltip();
+      if (AppState._didDragScroll) return;
+      const taskId = id;
+      const now = Date.now();
+      if (AppState._lastClickTaskId === taskId && now - AppState._lastClickTime < 300) {
+        AppState._lastClickTaskId = null;
+        _removeBarHoverOverlay();
+        openTaskModal(t, 'edit');
+      } else {
+        AppState._lastClickTaskId = taskId;
+        AppState._lastClickTime = now;
+        highlightTask(t);
+      }
+    });
+    hit.addEventListener('mouseenter', (e) => { _showBarHoverOverlay(t, e.clientX, hit.getBoundingClientRect()); });
+    hit.addEventListener('mouseleave', _scheduleHideBarHover);
+    svg.appendChild(hit);
+  });
+
+  _renderFilterSummary();
+  _updateCenterArrow();
+}
+
 function _updateCenterArrow() {
+  const a1 = document.getElementById('center-view-arrow');
+  const a2 = document.getElementById('center-view-arrow-up');
+  // Flow view has no horizontal date scale, so there's no "viewport centre date" to mark
+  // — hide both triangle indicators and skip the positioning work entirely.
+  const isFlow = AppState.viewMode === 'flow';
+  if (a1) a1.style.display = isFlow ? 'none' : '';
+  if (a2) a2.style.display = isFlow ? 'none' : '';
+  if (isFlow) return;
   const ca = document.getElementById('chart-area');
   if (!ca) return;
   const x = ca.clientWidth / 2 + 'px';
-  const a1 = document.getElementById('center-view-arrow');
-  const a2 = document.getElementById('center-view-arrow-up');
   if (a1) a1.style.left = x;
   if (a2) a2.style.left = x;
 }
@@ -6406,21 +6873,30 @@ function scrollToTask(task, scrollVertical = true) {
   AppState._highlightId = getTaskId(task);
   if (AppState._highlightTimer) clearTimeout(AppState._highlightTimer);
   AppState._highlightTimer = setTimeout(() => { AppState._highlightId = null; render(); }, HIGHLIGHT_DURATION_MS);
-  if (AppState.view === 'year') {
-    AppState.viewportStart = new Date(start.getFullYear(), Math.max(start.getMonth() - 1, 0), 1);
-  } else {
-    if (AppState.view === 'month') AppState.viewportStart = addDays(new Date(start.getFullYear(), start.getMonth(), 1), -7);
-    else AppState.viewportStart = addDays(start, -7);
+  if (AppState.viewMode !== 'flow') {
+    if (AppState.view === 'year') {
+      AppState.viewportStart = new Date(start.getFullYear(), Math.max(start.getMonth() - 1, 0), 1);
+    } else {
+      if (AppState.view === 'month') AppState.viewportStart = addDays(new Date(start.getFullYear(), start.getMonth(), 1), -7);
+      else AppState.viewportStart = addDays(start, -7);
+    }
   }
   render();
   setTimeout(() => {
     const ca = document.getElementById('chart-area');
     const lr = document.getElementById('left-rows');
-    ca.scrollLeft = Math.max(0, dateToX(start) - ca.clientWidth / 2);
     const today2 = new Date(); today2.setHours(0, 0, 0, 0);
     const cmpT = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
     const allR = buildAllRows(AppState.currentTasks, cmpT, AppState.compareLabel, today2);
-    const vis = getVisibleRows(allR, today2);
+    let vis = getVisibleRows(allR, today2);
+    if (AppState.viewMode === 'flow') {
+      vis = _reorderVisibleForFlow(vis);
+      const layout = computeFlowLayout(vis, ca.clientWidth || 960);
+      const l = layout[AppState._highlightId];
+      if (l) ca.scrollLeft = Math.max(0, l.x - ca.clientWidth / 2);
+    } else {
+      ca.scrollLeft = Math.max(0, dateToX(start) - ca.clientWidth / 2);
+    }
     const rowIdx = vis.findIndex(r => r.type === 'task' && !r.ghost &&
       getTaskId(r.task) === AppState._highlightId);
     if (scrollVertical && rowIdx >= 0) {
@@ -6690,6 +7166,89 @@ function _showEasterEggPopup(asciiArt, btnLabel) {
   btn.addEventListener('click', _close);
 }
 
+// ── Flow-view dependency-aware row ordering ─────────────────────────────
+// Re-orders the task rows *within each category's contiguous block* of an already
+// phase/category-grouped `visible` row list (the same list getVisibleRows() produces,
+// and that renderLeft() / renderFlowChart() both consume) into dependency-tree
+// pre-order: a task is immediately followed by its own children (recursively, each
+// group of siblings sorted Priority desc then Start Date asc) before moving on to the
+// next sibling — e.g. Parent / Child(high) / Grandchild(early) / Grandchild(late) /
+// Child(low). Only called in Flow view — Timeline view's documented left-panel order
+// (Priority → most-overdue → earliest-start, ignoring dependencies) is untouched.
+// A task's Dependency only counts as a nesting parent when that parent is in the SAME
+// category — a cross-category/cross-phase dependency is just a root for this grouping.
+// Ghost (snapshot-comparison) rows aren't dependency-aware; each is reinserted directly
+// after its own current-task counterpart (mirroring buildAllRows' original placement),
+// so a ghost bar stays visually paired under its counterpart in Flow view. An "orphan"
+// ghost (no current counterpart in this category — e.g. a removed task) is appended at
+// the very end of the block, in its original relative order.
+function _reorderVisibleForFlow(visible) {
+  const PRIORITY_ORDER = { high: 0, medium: 1, low: 2, '': 3 };
+  const bySiblingSort = (a, b) => {
+    const pa = PRIORITY_ORDER[(a.task.Priority || '').toLowerCase()] ?? 3;
+    const pb = PRIORITY_ORDER[(b.task.Priority || '').toLowerCase()] ?? 3;
+    if (pa !== pb) return pa - pb;
+    const sa = parseDate(a.task['Start Date']), sb = parseDate(b.task['Start Date']);
+    if (sa && sb) return sa - sb;
+    return sa ? -1 : sb ? 1 : 0;
+  };
+
+  const out = [];
+  let i = 0;
+  while (i < visible.length) {
+    const r = visible[i];
+    if (r.type !== 'category') { out.push(r); i++; continue; }
+    out.push(r); i++;
+    const blockStart = i;
+    while (i < visible.length && visible[i].type === 'task') i++;
+    const block = visible.slice(blockStart, i);
+    const ghostRows = block.filter(row => row.ghost);
+    const normalRows = block.filter(row => !row.ghost);
+
+    const rowById = {};
+    normalRows.forEach(row => { const id = getTaskId(row.task); if (id) rowById[id] = row; });
+    // Group by resolved-parent-id-within-category; '' = root for this grouping.
+    const childrenOf = {};
+    normalRows.forEach(row => {
+      const myId = getTaskId(row.task);
+      const depId = row.task.Dependency ? String(row.task.Dependency).trim() : '';
+      const parentKey = (depId && depId !== myId && rowById[depId]) ? depId : '';
+      (childrenOf[parentKey] || (childrenOf[parentKey] = [])).push(row);
+    });
+    Object.values(childrenOf).forEach(list => list.sort(bySiblingSort));
+
+    const ordered = [];
+    const visited = new Set(); // also guards against a dependency cycle looping forever
+    function emit(row) {
+      const id = getTaskId(row.task);
+      if (visited.has(id)) return;
+      visited.add(id);
+      ordered.push(row);
+      (childrenOf[id] || []).forEach(emit);
+    }
+    (childrenOf[''] || []).forEach(emit);
+    // Anything not reached (only possible via a dependency cycle) still gets included.
+    normalRows.forEach(row => { if (!visited.has(getTaskId(row.task))) ordered.push(row); });
+
+    // Re-insert each ghost row directly after its current-task counterpart; an orphan
+    // ghost (no counterpart in this category) goes to the end, in its original order.
+    const ghostsById = {};
+    const orphanGhosts = [];
+    ghostRows.forEach(row => {
+      const id = getTaskId(row.task);
+      if (id && rowById[id]) (ghostsById[id] || (ghostsById[id] = [])).push(row);
+      else orphanGhosts.push(row);
+    });
+    ordered.forEach(row => {
+      out.push(row);
+      const id = getTaskId(row.task);
+      if (ghostsById[id]) out.push(...ghostsById[id]);
+    });
+    out.push(...orphanGhosts);
+  }
+  return out;
+}
+
 // ── Master render ─────────────────────────────────────────────────────
 function render() {
   if (AppState.viewPadLeft === 0) resetViewPadding();
@@ -6705,10 +7264,13 @@ function render() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const compareTasks = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
   const allRows = buildAllRows(AppState.currentTasks, compareTasks, AppState.compareLabel, today);
-  const visible = getVisibleRows(allRows, today);
+  let visible = getVisibleRows(allRows, today);
+  if (AppState.viewMode === 'flow') visible = _reorderVisibleForFlow(visible);
   const statsMap = buildStatsMap(AppState.currentTasks, today);
   renderLeft(visible, today, statsMap);
-  renderChart(visible, today);
+  if (AppState.viewMode === 'flow') renderFlowChart(visible, today);
+  else renderChart(visible, today);
+  _syncViewModeToolbar();
   updateToggleBtn();
   updateFlyout();
   // Easter egg: 42nd milestone
@@ -6746,6 +7308,17 @@ function setView(v) {
 }
 function navigate(dir) {
   _stopInertia();
+  if (AppState.viewMode === 'flow') {
+    // Flow view has no date-based paging — scroll horizontally by one "wide" item's width.
+    const ca = document.getElementById('chart-area');
+    const hd = document.getElementById('timeline-header');
+    if (!ca) return;
+    const chartViewportW = ca.clientWidth || 960;
+    const step = chartViewportW * FLOW_WIDE_FRAC;
+    ca.scrollLeft = Math.max(0, ca.scrollLeft + dir * step);
+    if (hd) hd.scrollLeft = ca.scrollLeft;
+    return;
+  }
   const d = AppState.viewportStart;
   if (AppState.view === 'week') AppState.viewportStart = addDays(d, dir * 7);
   else if (AppState.view === 'month') AppState.viewportStart = addDays(d, dir * 30);
@@ -6756,6 +7329,7 @@ function navigate(dir) {
 }
 function goToday() {
   _stopInertia();
+  if (AppState.viewMode === 'flow') { flowGoFirst(); return; } // no date scale in Flow view — 't' behaves like First
   const today = new Date(); today.setHours(0, 0, 0, 0);
   AppState.viewportStart = AppState.view === 'year' ? new Date(today.getFullYear(), today.getMonth(), 1) : startOf(today, AppState.view);
   if (AppState.view === 'month') AppState.viewportStart = addDays(AppState.viewportStart, -7);
@@ -6764,6 +7338,80 @@ function goToday() {
 
   const ca = document.getElementById('chart-area');
   ca.scrollLeft = Math.max(0, dateToX(today) - ca.clientWidth / 2);
+}
+
+// ── View mode toggle (Timeline <-> Flow) ───────────────────────────────
+function toggleViewMode() {
+  _stopInertia();
+  AppState.viewMode = AppState.viewMode === 'flow' ? 'timeline' : 'flow';
+  render();
+  _updateViewModeBtn();
+  const ca = document.getElementById('chart-area');
+  const hd = document.getElementById('timeline-header');
+  if (AppState.viewMode === 'flow') {
+    // Timeline and Flow scroll positions aren't comparable — start Flow view with the
+    // root bars flush at the viewport edge (same as flowGoFirst()), same as before the
+    // FLOW_SCROLL_PAD_PX buffer existed. scrollLeft=0 would sit exactly on the hard
+    // left boundary, leaving no room to drag-scroll further left; FLOW_SCROLL_PAD_PX
+    // is real blank canvas below that, so the same drag has somewhere to go.
+    if (ca) ca.scrollLeft = FLOW_SCROLL_PAD_PX;
+    if (hd) hd.scrollLeft = FLOW_SCROLL_PAD_PX;
+  } else {
+    updateScrollAnchoring();
+  }
+}
+
+function _updateViewModeBtn() {
+  const btn = document.getElementById('viewmode-btn');
+  if (!btn) return;
+  const isFlow = AppState.viewMode === 'flow';
+  btn.innerHTML = isFlow
+    ? '&#128197;<span class="txt-full"> Timeline View</span><span class="txt-short txt-min"> T</span>'
+    : '&#128279;<span class="txt-full"> Flow View</span><span class="txt-short txt-min"> F</span>';
+  btn.dataset.tooltip = isFlow ? 'Switch to Timeline view' : 'Switch to Dependency Flow view';
+}
+
+// Shows/hides the two mutually-exclusive toolbar-center button groups (Week/Month/Year +
+// Today for Timeline mode; All/Active/Overdue + First/Last for Flow mode). The prev/next
+// arrow buttons are shared between both modes (see navigate()).
+function _syncViewModeToolbar() {
+  const isFlow = AppState.viewMode === 'flow';
+  const viewBtns = document.getElementById('view-btns');
+  const todayBtn = document.getElementById('today-btn');
+  const flowFilterBtns = document.getElementById('flow-filter-btns');
+  const flowFirstLastBtns = document.getElementById('flow-first-last-btns');
+  if (viewBtns) viewBtns.style.display = isFlow ? 'none' : '';
+  if (todayBtn) todayBtn.style.display = isFlow ? 'none' : '';
+  if (flowFilterBtns) flowFilterBtns.style.display = isFlow ? '' : 'none';
+  if (flowFirstLastBtns) flowFirstLastBtns.style.display = isFlow ? '' : 'none';
+}
+
+// "First" scrolls to the dependency-chain roots (flush past the FLOW_SCROLL_PAD_PX
+// left buffer, not all the way to scrollLeft=0, which would just show blank canvas).
+// "Last" scrolls to the rightmost edge among all currently visible Flow-view bars
+// (end of the dependency chain).
+function flowGoFirst() {
+  _stopInertia();
+  const ca = document.getElementById('chart-area');
+  const hd = document.getElementById('timeline-header');
+  if (ca) ca.scrollLeft = FLOW_SCROLL_PAD_PX;
+  if (hd) hd.scrollLeft = FLOW_SCROLL_PAD_PX;
+}
+function flowGoLast() {
+  _stopInertia();
+  const ca = document.getElementById('chart-area');
+  const hd = document.getElementById('timeline-header');
+  if (!ca) return;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const compareTasks = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
+  const allRows = buildAllRows(AppState.currentTasks, compareTasks, AppState.compareLabel, today);
+  const visible = getVisibleRows(allRows, today);
+  const chartViewportW = ca.clientWidth || 960;
+  const layout = computeFlowLayout(visible, chartViewportW);
+  let maxRight = 0;
+  Object.keys(layout).forEach(id => { const l = layout[id]; if (l.x + l.w > maxRight) maxRight = l.x + l.w; });
+  ca.scrollLeft = Math.max(0, maxRight - chartViewportW + 40);
+  if (hd) hd.scrollLeft = ca.scrollLeft;
 }
 
 // ── Collapse / expand ─────────────────────────────────────────────────
@@ -6793,14 +7441,13 @@ function _updateFilterBtnState() {
   const filterBtn = document.getElementById('filter-btn');
   const active = hasCustomFilters();
   if (filterBtn) filterBtn.classList.toggle('active', active);
+  // .filter-mode-btn covers both the left-menu All/Active/Overdue buttons (fb-*) and
+  // their Flow-view toolbar duplicates (ffb-*) — keep both sets in sync.
   if (active) {
-    ['all', 'active', 'overdue'].forEach(m => {
-      const el = document.getElementById('fb-' + m); if (el) el.classList.remove('active');
-    });
+    document.querySelectorAll('.filter-mode-btn').forEach(el => el.classList.remove('active'));
   } else {
-    ['all', 'active', 'overdue'].forEach(m => {
-      const el = document.getElementById('fb-' + m);
-      if (el) el.classList.toggle('active', m === AppState.filterMode);
+    document.querySelectorAll('.filter-mode-btn').forEach(el => {
+      el.classList.toggle('active', el.dataset.value === AppState.filterMode);
     });
   }
 }
@@ -6881,7 +7528,7 @@ function setFilter(mode) {
   AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [], milestone: [] };
   const filterBtn = document.getElementById('filter-btn');
   if (filterBtn) filterBtn.classList.remove('active');
-  ['all', 'active', 'overdue'].forEach(m => document.getElementById('fb-' + m).classList.toggle('active', m === mode));
+  document.querySelectorAll('.filter-mode-btn').forEach(el => el.classList.toggle('active', el.dataset.value === mode));
   render();
 }
 
@@ -7315,6 +7962,9 @@ function initEvents() {
         case 'setView': setView(val); break;
         case 'navigate': navigate(Number(val)); break;
         case 'goToday': goToday(); break;
+        case 'toggleViewMode': toggleViewMode(); break;
+        case 'flowGoFirst': flowGoFirst(); break;
+        case 'flowGoLast': flowGoLast(); break;
         case 'toggleFlyout': toggleFlyout(); break;
         case 'toggleInfoPanel': toggleInfoPanel(); break;
         case 'toggleChangesOnly': toggleChangesOnly(); break;
@@ -7411,9 +8061,10 @@ function initEvents() {
       if (e.key === 'x') { e.preventDefault(); exportChart(); }
       if (e.key === 'i') { e.preventDefault(); toggleInfoPanel(); }
       if (e.key === 't') { e.preventDefault(); goToday(); }
+      if (e.key === 'f') { e.preventDefault(); toggleViewMode(); }
       if (e.key === 'm') { e.preventDefault(); toggleDarkMode(); }
       if (e.key === 'p') { e.preventDefault(); cycleTheme(); }
-      if (e.key === 'v') {
+      if (e.key === 'v' && AppState.viewMode !== 'flow') {
         e.preventDefault();
         const _views = ['week', 'month', 'year'];
         setView(_views[(_views.indexOf(AppState.view) + 1) % 3]);
@@ -7459,7 +8110,8 @@ function initEvents() {
         const today2 = new Date(); today2.setHours(0, 0, 0, 0);
         const compareTasks2 = AppState.compareLabel && DATA.snapshots[AppState.compareLabel] ? DATA.snapshots[AppState.compareLabel] : [];
         const allRows2 = buildAllRows(AppState.currentTasks, compareTasks2, AppState.compareLabel, today2);
-        const visRows2 = getVisibleRows(allRows2, today2);
+        let visRows2 = getVisibleRows(allRows2, today2);
+        if (AppState.viewMode === 'flow') visRows2 = _reorderVisibleForFlow(visRows2);
         let defPhase = null, defCat = null;
         if (ca && visRows2.length) {
           const caRect = ca.getBoundingClientRect();
@@ -7619,6 +8271,7 @@ function init() {
   _initSyncScroll();
   initDragScroll();
   initEvents();
+  _updateViewModeBtn();
   render();
   // Measure immediately with whatever fonts are available, then re-measure once
   // web fonts have finished loading (palette fonts vary widely in glyph widths).
