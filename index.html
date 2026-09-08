@@ -1218,6 +1218,16 @@ select#compare-sel {
   font-weight: 600
 }
 
+.filter-btn-x {
+  display: none;
+  margin-left: 4px;
+  font-weight: 700
+}
+
+.filter-btn.active .filter-btn-x {
+  display: inline
+}
+
 #filter-panel {
   position: fixed;
   z-index: 9998;
@@ -1226,13 +1236,17 @@ select#compare-sel {
   border-radius: 6px;
   box-shadow: 0 4px 18px rgba(0, 0, 0, .15);
   padding: 8px 10px;
-  min-width: 340px
+  min-width: 340px;
+  max-width: min(520px, 90vw);
+  max-height: min(480px, 80vh);
+  overflow-y: auto
 }
 
 .filter-panel-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 8px;
   margin-bottom: 5px;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--border)
@@ -1255,12 +1269,22 @@ select#compare-sel {
   font-size: .65rem;
   cursor: pointer;
   font-family: var(--font);
-  transition: background .1s
+  transition: background .1s, color .1s, border-color .1s
 }
 
 .filter-clear-btn:hover {
   background: var(--surface2);
   color: var(--text)
+}
+
+/* Red accent while any filter is active, toggled from _updateFilterBtnState() */
+.filter-clear-btn.active {
+  color: var(--status-behind);
+  border-color: var(--status-behind)
+}
+
+.filter-clear-btn.active:hover {
+  background: color-mix(in srgb, var(--status-behind) 15%, var(--bg))
 }
 
 .filter-panel-row {
@@ -1270,6 +1294,17 @@ select#compare-sel {
   padding: 3px 0;
   flex-wrap: nowrap;
   white-space: nowrap
+}
+
+/* Tags row: the tag list is open-ended and can grow large, so it wraps onto
+   multiple lines instead of forcing the panel to grow wider. */
+.filter-panel-row--wrap {
+  flex-wrap: wrap;
+  white-space: normal;
+  align-items: flex-start;
+  border-top: 1px solid var(--border);
+  margin-top: 3px;
+  padding-top: 6px
 }
 
 .filter-prop-label {
@@ -1398,6 +1433,20 @@ select#compare-sel {
   border-color: var(--status-done)
 }
 
+/* Tag chip colors — same rotating palette as the Tags filter-summary pills
+   (tagColor(), set per-chip as --tag-color since values are unbounded/dynamic,
+   unlike the fixed Status/Priority enums above). */
+.filter-chip[data-prop="tags"] {
+  color: var(--tag-color);
+  border-color: var(--tag-color)
+}
+
+.filter-chip[data-prop="tags"].active {
+  background: var(--tag-color);
+  color: var(--pill-text-active);
+  border-color: var(--tag-color)
+}
+
 #filter-summary {
   position: fixed;
   top: calc(var(--toolbar-h) + var(--head-h));
@@ -1483,12 +1532,17 @@ select#compare-sel {
 }
 
 .filter-summary-chip {
-  background: rgba(217, 119, 6, .12);
-  color: #d97706;
+  /* Opaque background (mixed against --bg, not transparent) so chart gridlines
+     behind the fixed-position summary bar don't bleed through and hurt legibility.
+     Text is mostly --text (not the raw accent) so it stays readable against the
+     pale tinted background in either theme, with just enough accent mixed in to
+     keep the color-coding. */
+  background: color-mix(in srgb, #d97706 15%, var(--bg));
+  color: color-mix(in srgb, var(--text) 65%, #d97706 35%);
   border: 1px solid rgba(217, 119, 6, .35);
   border-radius: 4px;
   padding: 2px 8px;
-  font-size: .68rem;
+  font-size: .72rem;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -1496,100 +1550,102 @@ select#compare-sel {
 }
 
 .filter-summary-chip:hover {
-  background: rgba(217, 119, 6, .25)
+  background: color-mix(in srgb, #d97706 30%, var(--bg))
 }
 
 [data-theme='dark'] .filter-summary-chip {
-  background: rgba(251, 191, 36, .1);
-  color: #fbbf24;
+  background: color-mix(in srgb, #fbbf24 15%, var(--bg));
+  color: color-mix(in srgb, var(--text) 65%, #fbbf24 35%);
   border-color: rgba(251, 191, 36, .35)
 }
 
 [data-theme='dark'] .filter-summary-chip:hover {
-  background: rgba(251, 191, 36, .22)
+  background: color-mix(in srgb, #fbbf24 28%, var(--bg))
 }
 
-/* Summary chip colors matching filter-chip colors */
+/* Summary chip colors matching filter-chip colors. Text mixes mostly with --text
+   (not the raw status/priority accent) so it stays readable against the pale
+   tinted background in either theme, while keeping a hint of the accent hue. */
 .filter-summary-chip[data-prop="status"][data-value="done"] {
-  background: color-mix(in srgb, var(--status-done) 12%, transparent);
-  color: var(--status-done);
+  background: color-mix(in srgb, var(--status-done) 15%, var(--bg));
+  color: color-mix(in srgb, var(--text) 65%, var(--status-done) 35%);
   border-color: color-mix(in srgb, var(--status-done) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="done"]:hover {
-  background: color-mix(in srgb, var(--status-done) 25%, transparent)
+  background: color-mix(in srgb, var(--status-done) 28%, var(--bg))
 }
 
 .filter-summary-chip[data-prop="status"][data-value="on track"] {
-  background: color-mix(in srgb, var(--status-on-track) 12%, transparent);
-  color: var(--status-on-track);
+  background: color-mix(in srgb, var(--status-on-track) 15%, var(--bg));
+  color: color-mix(in srgb, var(--text) 65%, var(--status-on-track) 35%);
   border-color: color-mix(in srgb, var(--status-on-track) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="on track"]:hover {
-  background: color-mix(in srgb, var(--status-on-track) 25%, transparent)
+  background: color-mix(in srgb, var(--status-on-track) 28%, var(--bg))
 }
 
 .filter-summary-chip[data-prop="status"][data-value="behind"] {
-  background: color-mix(in srgb, var(--status-behind) 12%, transparent);
-  color: var(--status-behind);
+  background: color-mix(in srgb, var(--status-behind) 15%, var(--bg));
+  color: color-mix(in srgb, var(--text) 65%, var(--status-behind) 35%);
   border-color: color-mix(in srgb, var(--status-behind) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="behind"]:hover {
-  background: color-mix(in srgb, var(--status-behind) 25%, transparent)
+  background: color-mix(in srgb, var(--status-behind) 28%, var(--bg))
 }
 
 .filter-summary-chip[data-prop="status"][data-value="waiting"] {
-  background: color-mix(in srgb, var(--status-waiting) 12%, transparent);
-  color: var(--status-waiting);
+  background: color-mix(in srgb, var(--status-waiting) 15%, var(--bg));
+  color: color-mix(in srgb, var(--text) 65%, var(--status-waiting) 35%);
   border-color: color-mix(in srgb, var(--status-waiting) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="waiting"]:hover {
-  background: color-mix(in srgb, var(--status-waiting) 25%, transparent)
+  background: color-mix(in srgb, var(--status-waiting) 28%, var(--bg))
 }
 
 .filter-summary-chip[data-prop="status"][data-value="on hold"],
 .filter-summary-chip[data-prop="status"][data-value=""] {
-  background: color-mix(in srgb, var(--status-on-hold) 12%, transparent);
-  color: var(--status-on-hold);
+  background: color-mix(in srgb, var(--status-on-hold) 15%, var(--bg));
+  color: color-mix(in srgb, var(--text) 65%, var(--status-on-hold) 35%);
   border-color: color-mix(in srgb, var(--status-on-hold) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="status"][data-value="on hold"]:hover,
 .filter-summary-chip[data-prop="status"][data-value=""]:hover {
-  background: color-mix(in srgb, var(--status-on-hold) 25%, transparent)
+  background: color-mix(in srgb, var(--status-on-hold) 28%, var(--bg))
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="High"] {
-  background: color-mix(in srgb, var(--status-behind) 12%, transparent);
-  color: var(--status-behind);
+  background: color-mix(in srgb, var(--status-behind) 15%, var(--bg));
+  color: color-mix(in srgb, var(--text) 65%, var(--status-behind) 35%);
   border-color: color-mix(in srgb, var(--status-behind) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="High"]:hover {
-  background: color-mix(in srgb, var(--status-behind) 25%, transparent)
+  background: color-mix(in srgb, var(--status-behind) 28%, var(--bg))
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="Medium"] {
-  background: color-mix(in srgb, var(--status-waiting) 12%, transparent);
-  color: var(--status-waiting);
+  background: color-mix(in srgb, var(--status-waiting) 15%, var(--bg));
+  color: color-mix(in srgb, var(--text) 65%, var(--status-waiting) 35%);
   border-color: color-mix(in srgb, var(--status-waiting) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="Medium"]:hover {
-  background: color-mix(in srgb, var(--status-waiting) 25%, transparent)
+  background: color-mix(in srgb, var(--status-waiting) 28%, var(--bg))
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="Low"] {
-  background: color-mix(in srgb, var(--status-done) 12%, transparent);
-  color: var(--status-done);
+  background: color-mix(in srgb, var(--status-done) 15%, var(--bg));
+  color: color-mix(in srgb, var(--text) 65%, var(--status-done) 35%);
   border-color: color-mix(in srgb, var(--status-done) 35%, transparent)
 }
 
 .filter-summary-chip[data-prop="priority"][data-value="Low"]:hover {
-  background: color-mix(in srgb, var(--status-done) 25%, transparent)
+  background: color-mix(in srgb, var(--status-done) 28%, var(--bg))
 }
 
 #left-rows {
@@ -3158,7 +3214,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="drop-card" id="drop-card" style="position: relative;">
     <div class="drop-title">&#128200; Gantt Chart Builder</div>
     <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
-    <div class="drop-version">v2.19</div>
+    <div class="drop-version">v2.24</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
       Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
@@ -3289,8 +3345,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       </label>
       <button class="btn" id="viewmode-btn" data-action="toggleViewMode"
         style="margin-right:12px; border-color:var(--accent); color:var(--accent);"
-        data-tooltip="Switch to Dependency Flow view" data-shortcut="f: toggle view">&#128279;<span
-          class="txt-full"> Flow View</span><span class="txt-short txt-min"> F</span></button>
+        data-tooltip="Switch to Dependency Linked view" data-shortcut="l: toggle view">&#128279;<span
+          class="txt-full"> Linked View</span><span class="txt-short txt-min"> L</span></button>
       <button class="btn" id="save-btn" data-action="saveSnapshot"
         style="margin-right:12px; border-color:var(--status-done); color:var(--status-done);"
         data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file."
@@ -3316,7 +3372,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
           <button class="fbtn filter-mode-btn" id="fb-overdue" data-action="setFilter" data-value="overdue"
             data-tooltip="Show only items past their end date that are not 100% complete">Overdue</button>
         </div>
-        <button class="filter-btn" id="filter-btn" data-tooltip="Filter tasks">Filter</button>
+        <button class="filter-btn" id="filter-btn" data-tooltip="Filter tasks" data-shortcut="f: toggle filter panel">Filter<span class="filter-btn-x">&#215;</span></button>
       </div>
       <div id="left-subheader">
         <button class="compact-btn" id="toggle-all-btn" data-action="toggleAll"
@@ -3329,7 +3385,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     </div>
     <div id="right-panel">
       <div id="timeline-header"></div>
-      <div id="flow-title-label" aria-hidden="true">Dependency Flow View</div>
+      <div id="flow-title-label" aria-hidden="true">Dependency Linked View</div>
       <div id="center-view-arrow" aria-hidden="true"></div>
       <div id="center-view-arrow-up" aria-hidden="true"></div>
       <button id="new-task-fab" class="new-task-fab" data-action="openTaskModalNew"
@@ -3369,7 +3425,10 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             side. Hovering a task row in the left panel also reveals the same shortcuts.</li>
           <li><strong>Add:</strong> Click the floating <strong>+</strong> button at the top-left of the chart (above
             the first phase row), hover a Phase/Category row to reveal an inline "+" button, or press <kbd>n</kbd>
-            while hovering a Phase or Category row. Works identically in Timeline and Flow view.</li>
+            while hovering a Phase or Category row. Works identically in Timeline and Linked view.</li>
+          <li><strong>Tags:</strong> Underneath Progress in the Edit modal, type comma-separated tags and/or pick from
+            the dropdown of tags already used elsewhere &mdash; selecting a tag from the dropdown adds it to the list
+            instead of replacing what you've typed.</li>
           <li><strong>Duplicate / Chain:</strong> Inside the Edit modal, use <em>Duplicate Task</em> to copy (comments
             are copied too), or <em>Dependent Task</em> to create a follow-on task pre-linked to the current one
             (comments are <em>not</em> copied). The main view scrolls to the new task after creation.</li>
@@ -3419,9 +3478,12 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             Click the glowing pills at the timeline edges to extend past or future range.</li>
           <li><strong>Views:</strong> Toggle between Week, Month, and Year timelines. Week mode aligns to Mondays. Press <kbd>v</kbd> to cycle through views, or <kbd>t</kbd> to jump back to today.</li>
           <li><strong>Filters:</strong> Use "All", "Active" (excludes On Hold), and "Overdue" to focus on specific
-            tasks. Empty categories are automatically hidden. The <strong>Filter</strong> button opens a panel with
-            toggleable chips to filter by Status, Priority, Comments, Dependency, and Overdue state &mdash; active
-            filter values appear in a summary bar below the timeline header.</li>
+            tasks. Empty categories are automatically hidden. The <strong>Filter</strong> button (or press
+            <kbd>f</kbd> to open it centred in the main view) opens a panel with toggleable chips to filter by
+            Status, Priority, Comments, Dependency, Overdue state, Milestone, and Tags (listed at the bottom, since
+            the tag list can grow large) &mdash; active filter values appear in a summary bar below the timeline
+            header. Multiple selected tags are combined as OR; every other filter combines with them as AND. The
+            panel stays open briefly if the cursor briefly leaves it, so you have time to move back in.</li>
           <li><strong>Compact Mode:</strong> Narrows the left panel and stacks filters vertically to maximise chart
             space. Hover any row for a full-detail tooltip.</li>
           <li><strong>Reload:</strong> Click the Date Pill in the top-left to reload from the source file without
@@ -3432,12 +3494,12 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       </details>
 
       <details class="info-section">
-        <summary class="info-section-heading">Flow (Dependency) View</summary>
+        <summary class="info-section-heading">Linked (Dependency) View</summary>
         <ul>
-          <li><strong>Toggle:</strong> Click the &#128279;/&#128197; button in the toolbar (or press <kbd>f</kbd>) to
-            switch between the date-based <strong>Timeline</strong> view and the <strong>Flow</strong> view, which
+          <li><strong>Toggle:</strong> Click the &#128279;/&#128197; button in the toolbar (or press <kbd>l</kbd>) to
+            switch between the date-based <strong>Timeline</strong> view and the <strong>Linked</strong> view, which
             lays tasks out left-to-right by dependency chain instead of by date. The header bar gets a distinct
-            tinted background and a large centred title in Flow view so it's always obvious which view is active.</li>
+            tinted background and a large centred title in Linked view so it's always obvious which view is active.</li>
           <li><strong>Layout:</strong> Tasks with no dependency start near the left edge; a dependent task always
             starts a little after its parent ends, so it never overlaps it and every dependency arrow is a simple
             elbow connector. Bars come in three fixed widths &mdash; small, normal, and wide &mdash; based on how
@@ -3528,12 +3590,17 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             <tr>
               <td style="padding:3px 6px;">Main view (no modal open)</td>
               <td style="padding:3px 6px;"><kbd>t</kbd></td>
-              <td style="padding:3px 6px;">Jump to Today (or First, in Flow view)</td>
+              <td style="padding:3px 6px;">Jump to Today (or First, in Linked view)</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Main view (no modal open)</td>
+              <td style="padding:3px 6px;"><kbd>l</kbd></td>
+              <td style="padding:3px 6px;">Toggle Timeline / Linked view</td>
             </tr>
             <tr>
               <td style="padding:3px 6px;">Main view (no modal open)</td>
               <td style="padding:3px 6px;"><kbd>f</kbd></td>
-              <td style="padding:3px 6px;">Toggle Timeline / Flow view</td>
+              <td style="padding:3px 6px;">Toggle the filter panel, centred in the main view</td>
             </tr>
             <tr>
               <td style="padding:3px 6px;">Main view (no modal open)</td>
@@ -3603,7 +3670,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
       &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.19</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.24</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
         <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
@@ -3664,6 +3731,10 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <span class="filter-prop-label">Milestone</span>
     <button class="filter-chip" data-action="toggleFilterChip" data-prop="milestone" data-value="yes">Is milestone</button>
     <button class="filter-chip" data-action="toggleFilterChip" data-prop="milestone" data-value="no">Not milestone</button>
+  </div>
+  <div class="filter-panel-row filter-panel-row--wrap" id="filter-tags-row" style="display:none;">
+    <span class="filter-prop-label">Tags</span>
+    <div id="filter-tags-chips" style="display:contents"></div>
   </div>
 </div>
 
@@ -3752,12 +3823,19 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
           <div class="form-group">
             <label>Progress</label>
             <div style="display:flex; align-items:center; gap:8px;">
-              <input type="range" id="modal-task-progress-range" min="0" max="100" style="flex:1"
-                oninput="document.getElementById('modal-task-progress-num').value = this.value">
-              <input type="number" id="modal-task-progress-num" min="0" max="100" style="width:60px"
-                oninput="document.getElementById('modal-task-progress-range').value = this.value">
+              <input type="range" id="modal-task-progress-range" min="0" max="100" style="flex:1">
+              <input type="number" id="modal-task-progress-num" min="0" max="100" style="width:60px">
               <span>%</span>
             </div>
+          </div>
+          <div class="form-group">
+            <label>Tags</label>
+            <input type="text" id="modal-task-tags"
+              style="border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:-1px; z-index:1;"
+              placeholder="Type tags separated by commas...">
+            <select id="modal-tags-sel"
+              style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;"
+              title="Select an existing tag to add it"></select>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -3880,7 +3958,7 @@ function getExampleData() {
     };
 
     const tasks = [
-        { ID: "A1", Title: "Project Kickoff (milestone)", Phase: "Initiation", Category: "Management", "Start Date": addDays(-14), "End Date": addDays(-14), Status: "Done", Progress: 100, Priority: "High", Description: "Initial meeting to align stakeholders and define project scope for the upcoming quarters.",
+        { ID: "A1", Title: "Project Kickoff (milestone)", Phase: "Initiation", Category: "Management", "Start Date": addDays(-14), "End Date": addDays(-14), Status: "Done", Progress: 100, Priority: "High", Tags: "kickoff, stakeholders", Description: "Initial meeting to align stakeholders and define project scope for the upcoming quarters.",
           Comments: [
             { date: fmtComment(13), name: "Alice", text: "Kickoff went well! All stakeholders present, charter signed." },
             { date: fmtComment(12), name: "Bob", text: "Action points distributed. Follow-up scheduled for next week." }
@@ -3891,20 +3969,20 @@ function getExampleData() {
             { date: fmtComment(4), name: "Charlie", text: "All requirements collected and baseline documented in Confluence." }
           ]},
         { ID: "A3", Title: "Architecture Review", Phase: "Planning", Category: "Development", "Start Date": addDays(-2), "End Date": addDays(2), Status: "Done", Progress: 100, Priority: "High", Description: "Technical audit of the proposed system architecture and scalability plans." },
-        { ID: "A10", Title: "Vendor Selection", Phase: "Planning", Category: "Management", "Start Date": addDays(-10), "End Date": addDays(-2), Status: "Behind", Progress: 75, Priority: "Medium", Description: "Evaluating third-party service providers for the cloud infrastructure migration.",
+        { ID: "A10", Title: "Vendor Selection", Phase: "Planning", Category: "Management", "Start Date": addDays(-10), "End Date": addDays(-2), Status: "Behind", Progress: 75, Priority: "Medium", Tags: "vendor, at-risk", Description: "Evaluating third-party service providers for the cloud infrastructure migration.",
           Comments: [
             { date: fmtComment(7), name: "Bob", text: "Shortlisted 3 vendors. Awaiting security compliance docs from Vendor B." },
             { date: fmtComment(2), name: "Alice", text: "Vendor B docs received. Decision expected by end of week." }
           ]},
-        { ID: "A4", Title: "API Design", Phase: "Planning", Category: "Development", "Start Date": addDays(3), "End Date": addDays(10), Status: "On Track", Progress: 40, Dependency: "A3", Priority: "High", Description: "Defining RESTful endpoints and data schemas for the internal microservices layer.",
+        { ID: "A4", Title: "API Design", Phase: "Planning", Category: "Development", "Start Date": addDays(3), "End Date": addDays(10), Status: "On Track", Progress: 40, Dependency: "A3", Priority: "High", Tags: "backend, api", Description: "Defining RESTful endpoints and data schemas for the internal microservices layer.",
           Comments: [
             { date: fmtComment(1), name: "Charlie", text: "Authentication endpoints drafted. Review meeting set for Thursday." }
           ]},
         { ID: "A11", Title: "Hardware Procurement", Phase: "Planning", Category: "Management", "Start Date": addDays(-5), "End Date": addDays(-1), Status: "Waiting", Progress: 10, Dependency: "A10", Priority: "Low", Description: "Ordering server hardware and network components for the on-premise datacenter." },
         { ID: "A5", Title: "Design Approval (milestone)", Phase: "Planning", Category: "Management", "Start Date": addDays(10), "End Date": addDays(10), Status: "Waiting", Progress: 0, Priority: "Medium", Description: "Final sign-off on the UI design and user experience flows by the product owner." },
-        { ID: "A6", Title: "Backend Implementation", Phase: "Execution", Category: "Development", "Start Date": addDays(11), "End Date": addDays(20), Status: "Waiting", Progress: 0, Dependency: "A4", Priority: "High", Description: "Developing the core logic and database integration for the application backend." },
-        { ID: "A7", Title: "Frontend Integration", Phase: "Execution", Category: "Development", "Start Date": addDays(21), "End Date": addDays(30), Status: "Waiting", Progress: 0, Dependency: "A6", Priority: "Medium", Description: "Building the responsive user interface and connecting it to the backend APIs." },
-        { ID: "A8", Title: "Testing", Phase: "Execution", Category: "Analysis", "Start Date": addDays(25), "End Date": addDays(40), Status: "Waiting", Progress: 0, Priority: "High", Description: "Comprehensive quality assurance testing, including unit, integration, and user acceptance tests." },
+        { ID: "A6", Title: "Backend Implementation", Phase: "Execution", Category: "Development", "Start Date": addDays(11), "End Date": addDays(20), Status: "Waiting", Progress: 0, Dependency: "A4", Priority: "High", Tags: "backend", Description: "Developing the core logic and database integration for the application backend." },
+        { ID: "A7", Title: "Frontend Integration", Phase: "Execution", Category: "Development", "Start Date": addDays(21), "End Date": addDays(30), Status: "Waiting", Progress: 0, Dependency: "A6", Priority: "Medium", Tags: "frontend", Description: "Building the responsive user interface and connecting it to the backend APIs." },
+        { ID: "A8", Title: "Testing", Phase: "Execution", Category: "Analysis", "Start Date": addDays(25), "End Date": addDays(40), Status: "Waiting", Progress: 0, Priority: "High", Tags: "qa, frontend, backend", Description: "Comprehensive quality assurance testing, including unit, integration, and user acceptance tests." },
         { ID: "A9", Title: "Go Live (milestone)", Phase: "Closure", Category: "Management", "Start Date": addDays(45), "End Date": addDays(45), Status: "Waiting", Progress: 0, Priority: "High", Description: "Official production launch and handover to the operations team." }
     ];
 
@@ -3962,7 +4040,7 @@ const HEAD_H = 44;
 const COL_W  = { week: 56, month: 22 };
 const MIN_BAR_W = 48;  // min width to fit 3 chars + status circle
 const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const DIFF_FIELDS = ['Progress','Status','Start Date','End Date','Title','Priority','Dependency'];
+const DIFF_FIELDS = ['Progress','Status','Start Date','End Date','Title','Priority','Dependency','Tags'];
 
 // ── Named timing / layout constants ──────────────────────────────────
 const HIGHLIGHT_DURATION_MS   = 2500; // ms: row highlight after expand or task create/scroll
@@ -3975,6 +4053,7 @@ const VIEW_PAD_YEAR_MONTHS_R  = 24;   // months: default right pad in year view
 const BAR_HOVER_HIDE_DELAY_MS = 500;  // ms: delay before hiding the bar-hover overlay
 const BAR_HOVER_BTN_W         = 68;   // px: approx total width of the bar-hover button group
 const BAR_HOVER_CURSOR_GAP    = 20;   // px: clearance between cursor and hover buttons
+const FILTER_PANEL_CLOSE_DELAY_MS = 350; // ms: grace period before the filter panel closes after the cursor leaves the button or panel
 
 // ── Flow (dependency) view layout constants ────────────────────────────
 const FLOW_LEFT_OFFSET_FRAC = 0.2;  // fraction of chart viewport width: left-edge x for root (no-dependency) tasks
@@ -4007,12 +4086,18 @@ const AppState = {
   _cursorInChartArea: false,
   _chartCursorClientY: 0,
 
+  // Last known mouse position anywhere in the document (updated on every mousemove
+  // in initEvents()); used to anchor the filter panel at the cursor when opened via
+  // the `f` key.
+  _lastMouseClientX: 0,
+  _lastMouseClientY: 0,
+
   // Session preferences
   _commenterName: '',
   _modalLayout: 'both',
 
   // Filters
-  _customFilters: { status: [], priority: [], comments: [], dependency: [], due: [], milestone: [] },
+  _customFilters: { status: [], priority: [], comments: [], dependency: [], due: [], milestone: [], tags: [] },
   _filterPanelOpen: false,
   _filterCloseTimeout: null,
 
@@ -4029,6 +4114,7 @@ const AppState = {
   _commentsDirty: false,
   _pendingDuplicateComments: null,
   _modalIdInit: false,
+  _modalMouseDownOnOverlay: false,
 
   // UI panel state
   _flyoutOpen: false,
@@ -4055,6 +4141,7 @@ const AppState = {
   // Color maps (reset on each file load via _resetColorMaps())
   _catMap: {}, _catIdx: 0,
   _commenterMap: {}, _commenterIdx: 0,
+  _tagColorMap: {}, _tagColorIdx: 0,
 
   // Easter egg state
   _easterClickCount: 0,
@@ -4119,12 +4206,20 @@ function commenterColor(name) {
   if (!AppState._commenterMap[name]) AppState._commenterMap[name] = CAT_COLORS[AppState._commenterIdx++ % CAT_COLORS.length];
   return AppState._commenterMap[name];
 }
+// Tags are free-form/dynamic (not a fixed enum like Status/Priority), so they get
+// rotating colors assigned on first use, same pattern as catColor()/commenterColor().
+function tagColor(tag) {
+  if (!AppState._tagColorMap[tag]) AppState._tagColorMap[tag] = CAT_COLORS[AppState._tagColorIdx++ % CAT_COLORS.length];
+  return AppState._tagColorMap[tag];
+}
 // Call at the start of each file load to ensure consistent color assignment per session.
 function _resetColorMaps() {
   for (const k in AppState._catMap) delete AppState._catMap[k];
   AppState._catIdx = 0;
   for (const k in AppState._commenterMap) delete AppState._commenterMap[k];
   AppState._commenterIdx = 0;
+  for (const k in AppState._tagColorMap) delete AppState._tagColorMap[k];
+  AppState._tagColorIdx = 0;
 }
 
 // ── Column width ──────────────────────────────────────────────────────
@@ -4166,7 +4261,21 @@ function overdueInfo(task, today) {
 }
 function hasCustomFilters() {
   const f = AppState._customFilters;
-  return f.status.length > 0 || f.priority.length > 0 || f.comments.length > 0 || f.dependency.length > 0 || f.due.length > 0 || f.milestone.length > 0;
+  return f.status.length > 0 || f.priority.length > 0 || f.comments.length > 0 || f.dependency.length > 0 || f.due.length > 0 || f.milestone.length > 0 || f.tags.length > 0;
+}
+
+// ── Tags helpers ───────────────────────────────────────────────────────
+// Splits a comma-separated Tags string into a clean, deduped array. Tags may
+// contain letters, numbers, dashes and spaces — commas are the only separator.
+function normalizeTagsList(str) {
+  if (!str) return [];
+  const seen = new Set();
+  const out = [];
+  String(str).split(',').forEach(raw => {
+    const tag = normalizeText(raw).replace(/[^a-zA-Z0-9\- ]/g, '').replace(/\s+/g, ' ').trim();
+    if (tag && !seen.has(tag)) { seen.add(tag); out.push(tag); }
+  });
+  return out;
 }
 
 function isCustomFilterMatch(task, today) {
@@ -4196,6 +4305,11 @@ function isCustomFilterMatch(task, today) {
   if (f.milestone.length > 0) {
     const isMs = /\(milestone\)/i.test(task.Title || '');
     if (!f.milestone.some(v => (v === 'yes' && isMs) || (v === 'no' && !isMs))) return false;
+  }
+  if (f.tags.length > 0) {
+    const taskTags = normalizeTagsList(task.Tags);
+    // OR within tags (any selected tag matches), AND with every other property above.
+    if (!f.tags.some(v => taskTags.includes(v))) return false;
   }
   return true;
 }
@@ -4467,6 +4581,7 @@ function startEmptyChart() {
         'End Date': formatDateStr(addDays(today, 7)),
         Progress: 0,
         Dependency: '',
+        Tags: '',
         Comments: []
     };
 
@@ -4595,6 +4710,7 @@ function processTasksList(rawArray) {
             'End Date': formatDateStr(r['End Date']),
             'Progress': progress,
             'Dependency': normalizeText(r['Dependency']) || '',
+            'Tags': normalizeTagsList(r['Tags']).join(', '),
             'Description': normalizeText(r['Description']) || '',
             'Comments': parseComments(normalizeText(r['Comments']) || '')
         });
@@ -4719,14 +4835,14 @@ function _findSheetName(wb, ...aliases) {
 const _CP_HEADERS = [
     'ID (Optional)', 'Phase (Optional)', 'Category (Optional)', 'Title (Required)',
     'Priority (Optional)', 'Status (Optional)', 'Start Date (Optional)', 'End Date (Optional)',
-    'Progress (Optional)', 'Dependency (Optional)', 'Description (Optional)', 'Comments (Optional)'
+    'Progress (Optional)', 'Dependency (Optional)', 'Tags (Optional)', 'Description (Optional)', 'Comments (Optional)'
 ];
 function _buildCPRows(tasks) {
     const rows = [_CP_HEADERS];
     tasks.forEach(t => {
         rows.push([
             t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+            t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Tags||'', t.Description||'',
             serializeComments(t.Comments||[])
         ]);
     });
@@ -4735,13 +4851,13 @@ function _buildCPRows(tasks) {
 
 const _LOG_HEADERS = [
     'Saved On Date', 'ID', 'Phase', 'Category', 'Title', 'Priority', 'Status',
-    'Start Date', 'End Date', 'Progress', 'Dependency', 'Description', 'Comments'
+    'Start Date', 'End Date', 'Progress', 'Dependency', 'Tags', 'Description', 'Comments'
 ];
 function _buildLogNewRows(tasks, timestamp) {
     return tasks.map(t => [
         timestamp,
         t.ID||'', t.Phase||'', t.Category||'', t.Title||'', t.Priority||'', t.Status||'',
-        t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Description||'',
+        t['Start Date']||'', t['End Date']||'', t.Progress||'', t.Dependency||'', t.Tags||'', t.Description||'',
         serializeComments(t.Comments||[])
     ]);
 }
@@ -4780,6 +4896,7 @@ function downloadDataAsExcel(data, fileName) {
         ['End Date', 'Optional', 'DD-Mon-YYYY (e.g., 15-Mar-2026) — or use a proper Excel date cell', 'Date the task ends.'],
         ['Progress', 'Optional', '0 – 100', 'Completion percentage (shown as a filled bar on the task).'],
         ['Dependency', 'Optional', 'A valid Task ID', 'ID of another task this task depends on. Draws a dependency arrow.'],
+        ['Tags', 'Optional', 'Comma-separated words', 'Free-form labels for filtering (letters, numbers, dashes, spaces — no commas within a tag). e.g. "urgent, needs-review".'],
         ['Description', 'Optional', 'Any text', 'Free-form notes or details shown in the Edit modal.'],
         ['Comments', 'Optional', 'Managed by the app', 'Timestamped comments in format: [DD-Mon-YYYY HH:MM:Name] text. Best managed via the app UI.'],
     ];
@@ -4832,7 +4949,7 @@ function buildGanttFileName(sourceName, date) {
 // Returns true if the two task arrays differ in any meaningful field.
 function _tasksDiffer(tasks, snapTasks) {
     if (tasks.length !== snapTasks.length) return true;
-    const FIELDS = ['Title','Phase','Category','Start Date','End Date','Status','Priority','Progress','Description','Dependency'];
+    const FIELDS = ['Title','Phase','Category','Start Date','End Date','Status','Priority','Progress','Description','Dependency','Tags'];
     const byId = {};
     const _taskKey = t => t.ID || (t.Phase + '||' + t.Category + '||' + t.Title);
     snapTasks.forEach(t => { byId[_taskKey(t)] = t; });
@@ -5213,13 +5330,44 @@ function buildAllRows(current, compareTasks, snapLabel, today) {
       const grp = {};
       orphans.forEach(t => { const ph=t.Phase||'(No Phase)',ca=t.Category||'(No Category)';
         if(!grp[ph]) grp[ph]={}; if(!grp[ph][ca]) grp[ph][ca]=[]; grp[ph][ca].push(t); });
+      // Where an orphan task's Phase (and/or Category) still exists among current tasks,
+      // splice its ghost row(s) into that existing block instead of appending a second,
+      // duplicate phase/category header at the end of `rows` — a stray orphan used to
+      // produce a disconnected "phantom" section for a phase that's already rendered
+      // earlier in the list.
+      const findCategoryBlockEnd = (ph, ca) => {
+        const start = rows.findIndex(r => r.type === 'category' && r.phase === ph && r.cat === ca);
+        if (start === -1) return -1;
+        let i = start + 1;
+        while (i < rows.length && rows[i].type === 'task' && rows[i].phase === ph && rows[i].cat === ca) i++;
+        return i;
+      };
+      const findPhaseBlockEnd = (ph) => {
+        const start = rows.findIndex(r => r.type === 'phase' && r.phase === ph);
+        if (start === -1) return -1;
+        let i = start + 1;
+        while (i < rows.length && rows[i].type !== 'phase') i++;
+        return i;
+      };
       Object.entries(grp).forEach(([ph,cats]) => Object.entries(cats).forEach(([ca,tasks]) => {
         const key = ph+'||'+ca;
-        if (!currentCatSet.has(key)) {
+        const taskRows = tasks.map(t => ({type:'task',phase:ph,cat:ca,color:catColor(ca),task:t,ghost:true,orphan:true,snapshotLabel:snapLabel}));
+        if (currentCatSet.has(key)) {
+          // Category still exists (just not this task's ID) — drop the ghost rows in
+          // right after that category's existing tasks, no new header needed.
+          rows.splice(findCategoryBlockEnd(ph, ca), 0, ...taskRows);
+        } else if (phaseOrder.includes(ph)) {
+          // Phase still exists but this exact category is orphaned — add a ghost
+          // category header for it at the end of the phase's existing block, without
+          // duplicating the (non-ghost) phase header that's already in place.
+          rows.splice(findPhaseBlockEnd(ph), 0, {type:'category',phase:ph,cat:ca,color:catColor(ca),ghost:true}, ...taskRows);
+        } else {
+          // Wholly orphaned phase (no current tasks under it at all) — append its own
+          // ghost phase/category header, guarding against duplicates across multiple
+          // orphaned categories under the same new phase.
           if (!rows.find(r=>r.type==='phase'&&r.phase===ph&&r.ghost)) rows.push({type:'phase',phase:ph,ghost:true});
-          rows.push({type:'category',phase:ph,cat:ca,color:catColor(ca),ghost:true});
+          rows.push({type:'category',phase:ph,cat:ca,color:catColor(ca),ghost:true}, ...taskRows);
         }
-        tasks.forEach(t => rows.push({type:'task',phase:ph,cat:ca,color:catColor(ca),task:t,ghost:true,orphan:true,snapshotLabel:snapLabel}));
       }));
     }
   }
@@ -5525,39 +5673,55 @@ function getColWidth() {
 }
 
 function getVisibleRows(rows, today) {
+  // Pair up each task ID's current and ghost (snapshot) representations so
+  // "changed" and "matches filter" can each be decided once per ID rather
+  // than separately for the current row and its ghost row.
+  const taskMap = {};
+  rows.filter(r => r.type === 'task').forEach(r => {
+    const id = getTaskId(r.task);
+    if (!taskMap[id]) taskMap[id] = {};
+    if (r.ghost) taskMap[id].ghost = r.task;
+    else taskMap[id].current = r.task;
+  });
+
   // Compute changed IDs for AppState.changesOnly mode
   let changedIds = null;
   if (AppState.changesOnly && AppState.compareLabel) {
     changedIds = new Set();
-    const taskMap = {};
-    rows.filter(r => r.type === 'task').forEach(r => {
-      const id = getTaskId(r.task);
-      if (!taskMap[id]) taskMap[id] = {};
-      if (r.ghost) taskMap[id].ghost = r.task;
-      else taskMap[id].current = r.task;
-    });
     Object.entries(taskMap).forEach(([id, p]) => {
       // Show: changed tasks (both exist, fields differ), added tasks (current only), removed tasks (ghost only)
       if (!p.current || !p.ghost || hasDifferences(p.current, p.ghost)) changedIds.add(id);
     });
   }
 
+  // Compute filter-matching IDs (filterMode + custom filters). A task's current
+  // data is tested when it still exists; a ghost with no current counterpart
+  // (removed since the snapshot) is tested against its own last-known data, so
+  // both a task's current row and its ghost row share one visibility decision.
+  let filterMatchIds = null;
+  if (AppState.filterMode !== 'all' || hasCustomFilters()) {
+    filterMatchIds = new Set();
+    Object.entries(taskMap).forEach(([id, p]) => {
+      const testTask = p.current || p.ghost;
+      if (testTask && isTaskVisible(testTask, today)) filterMatchIds.add(id);
+    });
+  }
+
+  const anyRestriction = changedIds !== null || filterMatchIds !== null;
+  const idIsVisible = id => {
+    if (changedIds !== null && !changedIds.has(id)) return false;
+    if (filterMatchIds !== null && !filterMatchIds.has(id)) return false;
+    return true;
+  };
+
   // 1. Pre-calculate which phases and categories actually hold matching tasks
   const validPhases = new Set();
   const validCats = new Set();
-  if (changedIds !== null || AppState.filterMode !== 'all' || hasCustomFilters()) {
+  if (anyRestriction) {
     rows.forEach(r => {
-      if (r.type === 'task') {
-        let isMatch = false;
-        if (changedIds !== null) {
-          isMatch = changedIds.has(getTaskId(r.task));
-        } else {
-          isMatch = r.ghost ? true : isTaskVisible(r.task, today);
-        }
-        if (isMatch) {
-          validPhases.add(r.phase);
-          validCats.add(r.phase + '||' + r.cat);
-        }
+      if (r.type === 'task' && idIsVisible(getTaskId(r.task))) {
+        validPhases.add(r.phase);
+        validCats.add(r.phase + '||' + r.cat);
       }
     });
   }
@@ -5565,23 +5729,19 @@ function getVisibleRows(rows, today) {
   // 2. Filter rows, handling visibility logic and collapse state
   return rows.filter(r => {
     if (r.type === 'phase') {
-      if (changedIds !== null || AppState.filterMode !== 'all' || hasCustomFilters()) return validPhases.has(r.phase);
+      if (anyRestriction) return validPhases.has(r.phase);
       return true;
     }
     if (AppState.collapsed['p:' + r.phase]) return false;
 
     if (r.type === 'category') {
-      if (changedIds !== null || AppState.filterMode !== 'all' || hasCustomFilters()) return validCats.has(r.phase + '||' + r.cat);
+      if (anyRestriction) return validCats.has(r.phase + '||' + r.cat);
       return true;
     }
     if (AppState.collapsed['c:' + r.phase + ':' + r.cat]) return false;
 
     // Remaining must be task
-    if (changedIds !== null) {
-      return changedIds.has(getTaskId(r.task));
-    }
-    if (r.ghost) return true;
-    return isTaskVisible(r.task, today);
+    return idIsVisible(getTaskId(r.task));
   });
 }
 
@@ -5620,17 +5780,19 @@ function svgEl(tag, attrs = {}, text = '') {
 function renderLeft(visible, today, statsMap) {
   const _leftDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const c = document.getElementById('left-rows'); c.innerHTML = '';
-  // Empty state when filter gives no results
-  let taskCount = 0;
-  if (AppState.filterMode === 'all' && !hasCustomFilters()) {
-    taskCount = visible.filter(r => r.type === 'task' && !r.ghost).length;
-  } else {
-    taskCount = AppState.currentTasks.filter(t => isTaskVisible(t, today)).length;
-  }
-  if (taskCount === 0 && (AppState.filterMode !== 'all' || hasCustomFilters())) {
+  // Empty state when filtering (and/or "changes only" comparison) gives no results.
+  // `visible` already reflects filterMode, custom filters, and changesOnly together
+  // (see getVisibleRows), so it's the single source of truth for this count. Ghost
+  // (snapshot) rows count too — e.g. a removed task can be the only visible row
+  // for its ID in "changes only" mode, and that's a real result, not an empty one.
+  const taskCount = visible.filter(r => r.type === 'task').length;
+  const changesActive = AppState.changesOnly && AppState.compareLabel;
+  if (taskCount === 0 && (AppState.filterMode !== 'all' || hasCustomFilters() || changesActive)) {
     const msg = document.createElement('div'); msg.className = 'empty-state';
     if (hasCustomFilters()) {
       msg.innerHTML = '\uD83D\uDD0D No items match the active filters';
+    } else if (changesActive) {
+      msg.innerHTML = '\u2705 No changes since snapshot';
     } else {
       msg.innerHTML = AppState.filterMode === 'overdue' ? '\uD83C\uDF89 No overdue items!' : '\uD83D\uDCCB No active items';
     }
@@ -6715,6 +6877,7 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
     { label: 'Progress', key: 'Progress' },
     { label: 'Priority', key: 'Priority' },
     { label: 'Dependency', key: 'Dependency' },
+    { label: 'Tags', key: 'Tags' },
   ];
 
   const currentList = AppState.currentTasks || [];
@@ -7367,8 +7530,8 @@ function _updateViewModeBtn() {
   const isFlow = AppState.viewMode === 'flow';
   btn.innerHTML = isFlow
     ? '&#128197;<span class="txt-full"> Timeline View</span><span class="txt-short txt-min"> T</span>'
-    : '&#128279;<span class="txt-full"> Flow View</span><span class="txt-short txt-min"> F</span>';
-  btn.dataset.tooltip = isFlow ? 'Switch to Timeline view' : 'Switch to Dependency Flow view';
+    : '&#128279;<span class="txt-full"> Linked View</span><span class="txt-short txt-min"> L</span>';
+  btn.dataset.tooltip = isFlow ? 'Switch to Timeline view' : 'Switch to Dependency Linked view';
 }
 
 // Shows/hides the two mutually-exclusive toolbar-center button groups (Week/Month/Year +
@@ -7441,6 +7604,8 @@ function _updateFilterBtnState() {
   const filterBtn = document.getElementById('filter-btn');
   const active = hasCustomFilters();
   if (filterBtn) filterBtn.classList.toggle('active', active);
+  const clearBtn = document.querySelector('.filter-clear-btn');
+  if (clearBtn) clearBtn.classList.toggle('active', active);
   // .filter-mode-btn covers both the left-menu All/Active/Overdue buttons (fb-*) and
   // their Flow-view toolbar duplicates (ffb-*) — keep both sets in sync.
   if (active) {
@@ -7468,7 +7633,10 @@ function _renderFilterSummary() {
   if (existing) existing.remove();
   if (!hasCustomFilters()) return;
   const f = AppState._customFilters;
-  const propLabels = { status: 'Status', priority: 'Priority', comments: 'Comments', dependency: 'Dependency', due: 'Overdue', milestone: 'Milestone' };
+  const propLabels = { status: 'Status', priority: 'Priority', tags: 'Tag' };
+  // Comments/Dependency/Overdue/Milestone values already read clearly on their own
+  // ("Has comments", "Overdue", etc.) so they skip the "PROP: " prefix that
+  // Status/Priority/Tag need for disambiguation.
   const valDisplay = (prop, v) => {
     if (v === '') return 'none';
     if (prop === 'comments') return v === 'yes' ? 'Has comments' : 'No comments';
@@ -7482,13 +7650,27 @@ function _renderFilterSummary() {
   Object.entries(f).forEach(([prop, vals]) => {
     if (!vals.length) return;
     vals.forEach(v => {
-      const label = propLabels[prop] + ': ' + valDisplay(prop, v);
+      const prefix = propLabels[prop] ? propLabels[prop].toUpperCase() + ': ' : '';
+      const label = prefix + valDisplay(prop, v);
       const chip = document.createElement('span');
       chip.className = 'filter-summary-chip';
       chip.dataset.prop = prop;
       chip.dataset.value = v;
       chip.title = 'Click to remove this filter';
       chip.textContent = label + ' \u00d7';
+      // Tags are free-form/unbounded, so they get a dynamically-assigned rotating
+      // color (tagColor(), mirrors catColor()) via inline style rather than a fixed
+      // CSS class per value like the Status/Priority chips above. Text is mixed
+      // mostly with --text (not the raw accent) so it stays readable against the
+      // pale tinted background regardless of theme.
+      if (prop === 'tags') {
+        const tc = tagColor(v);
+        chip.style.background = `color-mix(in srgb, ${tc} 15%, var(--bg))`;
+        chip.style.color = `color-mix(in srgb, var(--text) 65%, ${tc} 35%)`;
+        chip.style.borderColor = `color-mix(in srgb, ${tc} 35%, transparent)`;
+        chip.addEventListener('mouseenter', () => { chip.style.background = `color-mix(in srgb, ${tc} 28%, var(--bg))`; });
+        chip.addEventListener('mouseleave', () => { chip.style.background = `color-mix(in srgb, ${tc} 15%, var(--bg))`; });
+      }
       chip.addEventListener('click', () => {
         AppState._customFilters[prop] = AppState._customFilters[prop].filter(x => x !== v);
         _updateFilterBtnState();
@@ -7502,8 +7684,8 @@ function _renderFilterSummary() {
   if (app) app.appendChild(wrap);
 }
 
-function toggleFilterPanel() {
-  if (AppState._filterPanelOpen) _closeFilterPanel(); else _openFilterPanel();
+function toggleFilterPanel(atCursor) {
+  if (AppState._filterPanelOpen) _closeFilterPanel(); else _openFilterPanel(!!atCursor);
 }
 
 function toggleFilterChip(prop, value) {
@@ -7517,7 +7699,7 @@ function toggleFilterChip(prop, value) {
 }
 
 function clearAllFilters() {
-  AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [], milestone: [] };
+  AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [], milestone: [], tags: [] };
   _updateFilterBtnState();
   _refreshFilterChips();
   render();
@@ -7525,9 +7707,11 @@ function clearAllFilters() {
 
 function setFilter(mode) {
   AppState.filterMode = mode;
-  AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [], milestone: [] };
+  AppState._customFilters = { status: [], priority: [], comments: [], dependency: [], due: [], milestone: [], tags: [] };
   const filterBtn = document.getElementById('filter-btn');
   if (filterBtn) filterBtn.classList.remove('active');
+  const clearBtn = document.querySelector('.filter-clear-btn');
+  if (clearBtn) clearBtn.classList.remove('active');
   document.querySelectorAll('.filter-mode-btn').forEach(el => el.classList.toggle('active', el.dataset.value === mode));
   render();
 }
@@ -7926,22 +8110,91 @@ function deletePhaseOrCategory() {
 }
 
 // ── Init Events ───────────────────────────────────────────────────────
-function _openFilterPanel() {
+// Collects the distinct set of tags in use across all current tasks, sorted
+// alphabetically — used to populate both the Tags filter chips and the
+// tags dropdown in the task modal.
+function _collectAllTags() {
+  const set = new Set();
+  AppState.currentTasks.forEach(t => normalizeTagsList(t.Tags).forEach(tag => set.add(tag)));
+  return Array.from(set).sort((a, b) => a.localeCompare(b));
+}
+
+// Rebuilds the Tags row of the filter panel from the tags currently in use.
+// Hides the row entirely when there are no tags to filter by.
+function _populateTagFilterChips() {
+  const row = document.getElementById('filter-tags-row');
+  const wrap = document.getElementById('filter-tags-chips');
+  if (!row || !wrap) return;
+  const tags = _collectAllTags();
+  row.style.display = tags.length ? '' : 'none';
+  wrap.innerHTML = '';
+  tags.forEach(tag => {
+    const chip = document.createElement('button');
+    chip.className = 'filter-chip';
+    chip.dataset.action = 'toggleFilterChip';
+    chip.dataset.prop = 'tags';
+    chip.dataset.value = tag;
+    chip.textContent = tag;
+    // Same rotating color as the Tags filter-summary pills (tagColor(), mirrors
+    // catColor()). Set as a custom property rather than inline color/background so
+    // the existing [data-prop="tags"] / [data-prop="tags"].active CSS rules (which
+    // mirror the Status/Priority chip pattern) can react to toggling `.active`.
+    chip.style.setProperty('--tag-color', tagColor(tag));
+    wrap.appendChild(chip);
+  });
+}
+
+// Opens the filter panel. Pass atCursor=true to position the panel's top-left
+// corner at the last known mouse cursor position (used by the `f` keyboard
+// shortcut) instead of anchored below the Filter button (used by hover).
+function _openFilterPanel(atCursor) {
   const panel = document.getElementById('filter-panel');
   const btn = document.getElementById('filter-btn');
-  if (!panel || !btn) return;
+  if (!panel) return;
+  if (!atCursor && !btn) return;
+  _populateTagFilterChips();
   AppState._filterPanelOpen = true;
-  const rect = btn.getBoundingClientRect();
-  panel.style.top = (rect.bottom + 2) + 'px';
-  panel.style.left = rect.left + 'px';
+  if (atCursor) {
+    panel.style.transform = '';
+    // Measure the panel's actual rendered size (it's display:none until now) so it
+    // can be clamped fully on-screen with its top-left corner at the cursor.
+    panel.style.display = 'block';
+    const pw = panel.getBoundingClientRect().width;
+    const ph = panel.getBoundingClientRect().height;
+    let left = AppState._lastMouseClientX;
+    let top = AppState._lastMouseClientY;
+    if (left + pw > window.innerWidth) left = Math.max(0, window.innerWidth - pw);
+    if (top + ph > window.innerHeight) top = Math.max(0, window.innerHeight - ph);
+    panel.style.left = left + 'px';
+    panel.style.top = top + 'px';
+  } else {
+    const rect = btn.getBoundingClientRect();
+    panel.style.top = (rect.bottom + 2) + 'px';
+    panel.style.left = rect.left + 'px';
+    panel.style.transform = '';
+  }
   panel.style.display = 'block';
   _refreshFilterChips();
 }
 function _closeFilterPanel() {
   const panel = document.getElementById('filter-panel');
   if (!panel) return;
+  clearTimeout(AppState._filterCloseTimeout);
   AppState._filterPanelOpen = false;
   panel.style.display = 'none';
+  panel.style.transform = '';
+}
+// Shared hover-intent close: gives the cursor FILTER_PANEL_CLOSE_DELAY_MS to
+// move from the button to the panel (or back) before actually closing.
+function _scheduleFilterPanelClose() {
+  clearTimeout(AppState._filterCloseTimeout);
+  AppState._filterCloseTimeout = setTimeout(() => {
+    const btn = document.getElementById('filter-btn');
+    const panel = document.getElementById('filter-panel');
+    const btnHover = btn && btn.matches(':hover');
+    const panelHover = panel && panel.matches(':hover');
+    if (!btnHover && !panelHover) _closeFilterPanel();
+  }, FILTER_PANEL_CLOSE_DELAY_MS);
 }
 function toggleAutoSave(checkbox) {
   if (!checkbox) return;
@@ -8061,7 +8314,8 @@ function initEvents() {
       if (e.key === 'x') { e.preventDefault(); exportChart(); }
       if (e.key === 'i') { e.preventDefault(); toggleInfoPanel(); }
       if (e.key === 't') { e.preventDefault(); goToday(); }
-      if (e.key === 'f') { e.preventDefault(); toggleViewMode(); }
+      if (e.key === 'l') { e.preventDefault(); toggleViewMode(); }
+      if (e.key === 'f') { e.preventDefault(); toggleFilterPanel(true); }
       if (e.key === 'm') { e.preventDefault(); toggleDarkMode(); }
       if (e.key === 'p') { e.preventDefault(); cycleTheme(); }
       if (e.key === 'v' && AppState.viewMode !== 'flow') {
@@ -8139,6 +8393,8 @@ function initEvents() {
       _onModalEndDateChange();
     } else if (e.target.id === 'modal-task-milestone-toggle') {
       toggleMilestoneModal();
+    } else if (e.target.id === 'modal-tags-sel') {
+      _addTagFromDropdown();
     }
   });
 
@@ -8150,6 +8406,18 @@ function initEvents() {
     if (e.target.id === 'comments-text-input') {
       _markCommentsDirty();
     }
+    if (e.target.id === 'modal-task-progress-range') {
+      _onModalProgressInput(e.target.value, 'modal-task-progress-num');
+    } else if (e.target.id === 'modal-task-progress-num') {
+      _onModalProgressInput(e.target.value, 'modal-task-progress-range');
+    }
+  });
+
+  // Track the last known cursor position anywhere in the document so the filter
+  // panel can be anchored at the cursor when opened via the `f` key.
+  document.addEventListener('mousemove', (e) => {
+    AppState._lastMouseClientX = e.clientX;
+    AppState._lastMouseClientY = e.clientY;
   });
 
   document.body.addEventListener('mousemove', (e) => {
@@ -8169,8 +8437,21 @@ function initEvents() {
     if (e.target.closest('#toolbar')) onToolbarOut(e);
   });
   // ── Click outside modal to close ──────────────────────────────────
+  // Only close when BOTH the mousedown and the mouseup/click happened on the
+  // backdrop itself. A click event's target is the nearest common ancestor
+  // of the mousedown and mouseup targets, so a text-selection drag that
+  // starts inside the modal box and is released outside it (over the
+  // backdrop) would otherwise report e.target === overlay and incorrectly
+  // close the modal (issue #9).
   const _modalOverlay = document.getElementById('modal-overlay');
-  if (_modalOverlay) _modalOverlay.addEventListener('click', e => { if (e.target === _modalOverlay) closeModalConfirm(); });
+  if (_modalOverlay) {
+    _modalOverlay.addEventListener('mousedown', e => {
+      AppState._modalMouseDownOnOverlay = (e.target === _modalOverlay);
+    });
+    _modalOverlay.addEventListener('click', e => {
+      if (e.target === _modalOverlay && AppState._modalMouseDownOnOverlay) closeModalConfirm();
+    });
+  }
 
   // ── Hover open/close filter panel ────────────────────────────────
   const _filterBtnEl = document.getElementById('filter-btn');
@@ -8181,13 +8462,19 @@ function initEvents() {
       if (!AppState._filterPanelOpen) _openFilterPanel();
     });
     _filterBtnEl.addEventListener('mouseleave', () => {
-      AppState._filterCloseTimeout = setTimeout(() => { if (!AppState._filterPanelOpen || !_filterPanelEl.matches(':hover')) _closeFilterPanel(); }, 120);
+      _scheduleFilterPanelClose();
+    });
+    // Clicking the Filter button while any filter is active clears all filters
+    // (the 'x' shown on the button, see .filter-btn-x). Hover already manages
+    // opening/closing the panel, so this is a no-op when nothing is active.
+    _filterBtnEl.addEventListener('click', () => {
+      if (hasCustomFilters()) clearAllFilters();
     });
     _filterPanelEl.addEventListener('mouseenter', () => {
       clearTimeout(AppState._filterCloseTimeout);
     });
     _filterPanelEl.addEventListener('mouseleave', () => {
-      _closeFilterPanel();
+      _scheduleFilterPanelClose();
     });
   }
 
@@ -8297,6 +8584,7 @@ function _getEditFieldValues() {
     start: document.getElementById('modal-task-start')?.value ?? '',
     end: document.getElementById('modal-task-end')?.value ?? '',
     progress: document.getElementById('modal-task-progress-range')?.value ?? '0',
+    tags: document.getElementById('modal-task-tags')?.value ?? '',
     dep: document.getElementById('modal-task-dependency')?.value ?? '',
     id: document.getElementById('modal-task-id')?.value ?? '',
     priority: document.getElementById('modal-priority-container')?.dataset.value ?? 'medium',
@@ -8316,7 +8604,7 @@ function _updateEditDirtyHighlights() {
   const cur = _getEditFieldValues();
   [['title', 'modal-task-title'], ['phase', 'modal-task-phase'], ['cat', 'modal-task-cat'],
   ['desc', 'modal-task-desc'], ['start', 'modal-task-start'], ['end', 'modal-task-end'],
-  ['progress', 'modal-task-progress-range'], ['dep', 'modal-task-dependency'],
+  ['progress', 'modal-task-progress-range'], ['tags', 'modal-task-tags'], ['dep', 'modal-task-dependency'],
   ['id', 'modal-task-id'], ['priority', 'modal-priority-container'], ['status', 'modal-status-container']
   ].forEach(([key, elId]) => {
     const el = document.getElementById(elId); if (!el) return;
@@ -8346,6 +8634,34 @@ function _onModalStartDateChange() {
     endEl.value = addDays(newStart, intervalDays).toISOString().split('T')[0];
   }
   _syncModalDatePrevValues();
+  _updateEditDirtyHighlights();
+}
+// Progress <-> Status QOL sync:
+// - Progress reaching 100% always sets Status to Done.
+// - Status only ever flips back off Done (to On Track) automatically when
+//   Progress is lowered starting from a previously-committed value of 100%;
+//   any other progress change leaves the current Status untouched.
+// `data-prev-value` on the range input tracks the last-committed Progress so
+// the "lowered from 100%" check has something to compare against.
+function _syncModalProgressPrevValue() {
+  const rangeEl = document.getElementById('modal-task-progress-range');
+  if (rangeEl) rangeEl.dataset.prevValue = rangeEl.value;
+}
+function _onModalProgressInput(val, otherId) {
+  const other = document.getElementById(otherId);
+  if (other) other.value = val;
+  const num = Number(val);
+  const rangeEl = document.getElementById('modal-task-progress-range');
+  const prevNum = Number(rangeEl ? rangeEl.dataset.prevValue : NaN);
+  const statusContainer = document.getElementById('modal-status-container');
+  if (statusContainer && !isNaN(num)) {
+    if (num === 100 && statusContainer.dataset.value !== 'done') {
+      renderPills('modal-status-container', PREDEFINED_STATUSES, 'done');
+    } else if (num < 100 && prevNum === 100 && statusContainer.dataset.value === 'done') {
+      renderPills('modal-status-container', PREDEFINED_STATUSES, 'on track');
+    }
+  }
+  _syncModalProgressPrevValue();
   _updateEditDirtyHighlights();
 }
 function _onModalEndDateChange() {
@@ -8399,6 +8715,13 @@ function openTaskModal(task, mode, defaultPhase, defaultCat) {
   const prog = isEdit ? (Number(task.Progress) || 0) : 0;
   document.getElementById('modal-task-progress-range').value = prog;
   document.getElementById('modal-task-progress-num').value = prog;
+  _syncModalProgressPrevValue();
+
+  // Tags
+  document.getElementById('modal-task-tags').value = isEdit ? (task.Tags || '') : '';
+  const tgl = document.getElementById('modal-tags-sel');
+  tgl.innerHTML = '<option value="" disabled selected hidden>&mdash; Or select existing &mdash;</option>';
+  _collectAllTags().forEach(tag => { const o = document.createElement('option'); o.value = tag; o.textContent = tag; tgl.appendChild(o); });
 
   // Setup datalists
   const phaseSet = new Set(), catSet = new Set();
@@ -8493,9 +8816,31 @@ function renderPills(containerId, options, currentValue) {
     pill.onclick = () => {
       c.dataset.value = optLower;
       renderPills(containerId, options, optLower);
+      // Status set to Done => Progress jumps to 100% (QOL sync, issue #9)
+      if (containerId === 'modal-status-container' && optLower === 'done') {
+        const rangeEl = document.getElementById('modal-task-progress-range');
+        const numEl = document.getElementById('modal-task-progress-num');
+        if (rangeEl) rangeEl.value = 100;
+        if (numEl) numEl.value = 100;
+        _syncModalProgressPrevValue();
+      }
     };
     c.appendChild(pill);
   });
+}
+
+// Selecting a tag from the modal's dropdown APPENDS it to the comma-separated
+// Tags input rather than replacing it (unlike the Phase/Category selects).
+function _addTagFromDropdown() {
+  const sel = document.getElementById('modal-tags-sel');
+  if (!sel || !sel.value) return;
+  const newTag = sel.value;
+  sel.value = '';
+  const input = document.getElementById('modal-task-tags');
+  const tags = normalizeTagsList(input.value);
+  if (!tags.includes(newTag)) tags.push(newTag);
+  input.value = tags.join(', ');
+  _updateEditDirtyHighlights();
 }
 
 function toggleMilestoneModal() {
@@ -8557,6 +8902,7 @@ function saveTaskModal() {
   if (edInput) t['End Date'] = edInput;
 
   t.Progress = document.getElementById('modal-task-progress-range').value;
+  t.Tags = normalizeTagsList(document.getElementById('modal-task-tags').value).join(', ');
   t.Dependency = document.getElementById('modal-task-dependency').value;
 
   let idVal = normalizeText(document.getElementById('modal-task-id').value);
