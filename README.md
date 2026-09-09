@@ -1,6 +1,6 @@
 # Gantt Chart Tool
 
-***Last updated: 8 Sep 2026: v2.24***
+***Last updated: 9 Sep 2026: v2.28***
 
 **Live App:** [https://kolfers.github.io/public_excel_to_gantt_standalone/](https://kolfers.github.io/public_excel_to_gantt_standalone/)
 **GitHub Repository:** [https://github.com/kolfers/public_excel_to_gantt_standalone](https://github.com/kolfers/public_excel_to_gantt_standalone)
@@ -34,7 +34,7 @@ Each row defines a single task:
 | `End Date` | **[Required]** Format: `30-Apr-2026` |
 | `Progress` | A number 0–100 (percent complete). |
 | `Priority` | `High`, `Medium`, or `Low`. |
-| `Dependency` | The `ID` of another task that must complete before this one starts. |
+| `Dependency` | The `ID` of another task that must complete before this one starts. A task can depend on more than one other task — list multiple IDs separated by commas. |
 | `Tags` | Comma-separated labels for filtering, e.g. `urgent, needs-review` (letters, numbers, dashes, and spaces allowed within a tag; commas separate tags). |
 | `Description` | Any extra notes, visible in the hover tooltip. |
 
@@ -52,10 +52,11 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 ### Task Management
 - Click any task bar to open the Edit Task modal. Hovering a bar shows ✎ Edit and 💬 Comments buttons. The same options are available by hovering task rows in the left panel.
 - Add tasks via the **Add Task** button in the top bar, the inline `+` button on Phase/Category rows, or by pressing `n` while hovering a Phase or Category row.
-- In the Edit Task modal, **Dependent Task** creates a follow-on task pre-linked by dependency; **Duplicate Task** copies the task along with its comments.
+- In the Edit Task modal, **New Dependent** creates a follow-on task pre-linked by dependency; **New Duplicate** copies the task along with its comments. Either one first saves any unsaved edits on the task you're currently viewing, so nothing is lost when you switch.
+- A task can now depend on **multiple other tasks** — pick as many as needed from the dependency dropdown in the Edit Task modal, shown as removable chips colored by each dependency's status. The chart draws one arrow per dependency, and arrows converging on the same task merge into a single shared line instead of crossing.
 - **Tags**: A full-width field below Progress in the Edit Task modal. Type comma-separated tags and/or pick from a dropdown of tags already used elsewhere — picking one from the dropdown adds it to the list instead of replacing what's typed.
 - Comments support author names, timestamps, and inline edit/delete.
-- **Keyboard shortcuts** (while hovering a bar or left-panel row): `e` Edit · `c` Comments · `d` Dependent · `n` Duplicate. On Phase/Category hover: `n` adds a task, `e` or `r` renames. `s` saves the Excel from anywhere.
+- **Keyboard shortcuts** (while hovering a bar or left-panel row): `e` Edit · `c` Comments · `d` Dependent · `n` Duplicate · `s` creates a new predecessor task in the same Phase/Category, automatically linked as a dependency of the hovered task once saved (the reverse of `d`). On Phase/Category hover: `n` adds a task, `e` or `r` renames. Use the **Save Excel** button to save — `s` is no longer a save shortcut.
 
 ### Filtering
 - **Active** hides On Hold tasks. **Overdue** shows only overdue items. Both collapse empty categories automatically.
@@ -70,6 +71,14 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 - **Export Chart** packages the current view into a single self-contained `.html` file that can be opened on any computer without the original Excel file.
 
 ## Changelog
+
+### v2.28 — 9 Sep 2026
+- **Fixed Export Chart producing a broken, unopenable file.** Exported charts now open correctly every time, with all tasks, bars, and toolbar behavior intact.
+- **A task can now depend on more than one other task.** Pick as many dependencies as needed from the dropdown in the Edit Task modal — each is shown as a removable chip colored by that dependency's status. The chart draws one arrow per dependency, and arrows converging on the same task now merge into a single shared line instead of crossing.
+- The Edit Task modal is reorganized into separate Properties, Description, and Comments panels, and the hover panel got a matching layout with a new Settings toggle to show/hide each section. **New Dependent** and **New Duplicate** now save any unsaved edits on the task you're viewing before switching, instead of silently discarding them.
+- New keyboard shortcut: hovering a task and pressing `s` creates a new predecessor task in the same Phase/Category, pre-filled and automatically linked as a dependency of the hovered task once saved (the reverse of the `d` shortcut). Note that `s` no longer saves to Excel — use the **Save Excel** button instead.
+- Reworked the top toolbar: the Timeline/Linked view toggle is now a slider switch instead of swapping button text, spacing between toolbar buttons is now even, and the toolbar no longer shifts position when the unsaved-changes indicator appears or the view is switched.
+- Timeline header dates (day names/numbers, week numbers) are easier to read in several dark color palettes.
 
 ### v2.24 — 8 Sep 2026
 - Active-filter pills: Comments, Dependency, Overdue, and Milestone no longer show a redundant "COMMENTS:"/"DEPENDENCY:"/etc. prefix (Status, Priority, and Tag still do, since their values need it for context).
