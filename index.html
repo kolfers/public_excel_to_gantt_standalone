@@ -51,12 +51,16 @@ html {
   --font: 'Segoe UI', system-ui, sans-serif;
 
   /* Semantic tokens */
+  /* Timeline-header date labels (day names, day numbers, week numbers) used
+     to reuse --text-lt/--text-mu directly — fine in light mode, but several
+     dark palettes define those quite dim (they're also used for genuinely
+     decorative things like dependency-arrow strokes and ghost-bar dashes,
+     which want to stay subtle) leaving the actual dates hard to read. This
+     recomputes per-palette automatically since it's expressed in terms of
+     --text/--text-mu rather than a fixed color. */
+  --header-date-text: color-mix(in srgb, var(--text) 55%, var(--text-mu) 45%);
   --header-bg: var(--slate-700);
   --header-text: #ffffff;
-  /* Flow-view timeline-header background. Derived from --accent/--surface (both already
-     redefined per palette/theme below) rather than hardcoded per palette, so it adapts
-     automatically under every palette without needing its own per-palette declaration. */
-  --flow-header-bg: color-mix(in srgb, var(--accent) 14%, var(--surface));
   --pill-date-bg: var(--green-800);
   --pill-date-hover: var(--green-900);
   --btn-active-bg: var(--slate-700);
@@ -776,7 +780,11 @@ body {
   display: flex;
   align-items: center;
   gap: 0;
-  flex: 1;
+  /* Content-sized rather than growing — see the centering comment on
+     .toolbar-center. Can still shrink (and clip via overflow:hidden) as a
+     last resort at extreme widths, below where compact mode has already
+     kicked in and shrunk the app-title/pills explicitly. */
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   height: 100%
@@ -786,25 +794,76 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  position: absolute;
-  left: calc(50% + var(--left-w) / 2);
-  transform: translateX(-50%);
-  pointer-events: auto;
-  z-index: 2
+  /* True-centering via auto margins instead of position:absolute. The old
+     absolute+z-index approach floated this block ON TOP of toolbar-left/
+     toolbar-right, so whenever their combined content grew (e.g. the
+     unsaved-changes chip appearing) it didn't push this block out of the
+     way — it just silently covered whatever toolbar-right rendered
+     underneath. Normal flex flow can never let siblings overlap, and with
+     toolbar-left/toolbar-right both content-sized (not flex-growing), these
+     auto margins soak up all the leftover space evenly, keeping the block
+     centred over the chart area in the common case while guaranteeing it
+     never overlaps or hides anything.
+
+     Because this block is centred on its own width, anything that changes its
+     width also slides it sideways. Two things therefore keep that width
+     constant while the window size doesn't change: the .mode-slot wrappers
+     below (Timeline vs Flow controls share one grid cell) and the
+     unsaved-changes indicator reserving its space via visibility rather than
+     display. Toggling the view mode or dirtying the document must never make
+     the toolbar jump. */
+  flex: 0 0 auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-#toolbar.compact-mode .toolbar-center {
-  left: calc(50% + var(--lp-compact-w, 135px) / 2)
+/* Holds a Timeline-mode control and its Flow-mode counterpart stacked in the
+   same grid cell. Both children are always laid out (the inactive one is only
+   visibility:hidden, see _syncViewModeToolbar()), so the slot is permanently
+   as wide as the wider of the two and switching modes can't resize
+   .toolbar-center — the view toggle and the buttons after it stay anchored
+   exactly where they were. Left-aligned so the visible group always starts at
+   the same x, right next to the view toggle. */
+.mode-slot {
+  display: grid;
+  align-items: center;
+  justify-items: start;
+}
+
+.mode-slot>* {
+  grid-area: 1 / 1;
+}
+
+/* The prev/next arrows bracket this slot, so the narrower of its two controls
+   (Today) reads best centred in the reserved width rather than pushed against
+   the left arrow. */
+.mode-slot--nav {
+  justify-items: center;
 }
 
 .toolbar-right {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex: 1;
-  position: relative;
-  z-index: 1;
+  /* Single source of spacing for this section — the items deliberately carry
+     no margins of their own, so every gap between them is identical. */
+  gap: 10px;
+  flex: 0 1 auto;
+  min-width: 0;
+  /* No overflow:hidden here (unlike .toolbar-left) — it was clipping the
+     unsaved-glow box-shadow on #save-btn, since that shadow extends beyond
+     the button's own border box and this container's box has no extra
+     height/width margin beyond its buttons for the shadow to render into.
+     The true-centering layout above (.toolbar-center's auto margins) keeps
+     this section from ever needing to shrink below its content in normal
+     use, so clipping isn't needed as a safety net; verified across
+     ~900-2200px with every right-section item visible. */
   justify-content: flex-end
+}
+
+.toolbar-right .btn,
+.toolbar-right #autosave-wrapper,
+.toolbar-right .unsaved-warning {
+  flex-shrink: 0
 }
 
 /* Title & pills */
@@ -947,6 +1006,109 @@ body {
   font-size: 1rem;
 }
 
+/* Timeline/Linked view switch — a slider flanked by the two mode icons:
+   calendar on the left, link on the right. Reads left-to-right as
+   "[timeline] (o——) [linked]", so the icon the thumb sits next to is the
+   active mode. Clicking anywhere toggles; clicking an icon selects that mode
+   directly (data-action="setViewMode" on the icons themselves).
+
+   align-self:stretch rather than a hard-coded height: .toolbar-center is
+   sized by its tallest child (the Week/Month/Year group), so stretching makes
+   this exactly as tall as the view buttons next to it and keeps matching them
+   automatically when their font-size or padding changes at a breakpoint. */
+.viewmode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: stretch;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg));
+}
+
+.viewmode-btn:hover {
+  background: color-mix(in srgb, var(--accent) 20%, var(--bg))
+}
+
+/* Deliberately NOT tinted like the button around it: it takes the plain
+   unselected-button surface so the slider reads as a separate control sunk
+   into the tinted button, the way a physical switch sits in its housing. */
+.viewmode-track {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 21px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--border-md);
+  flex-shrink: 0;
+  transition: border-color .2s
+}
+
+.viewmode-btn:hover .viewmode-track {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border-md))
+}
+
+.viewmode-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .35);
+  transition: transform .2s ease
+}
+
+/* Track padding box is 40px wide (42 − 2×1px border); 40 − 2 (left) − 15
+   (thumb) − 2 (right inset) = 21px of travel. */
+.viewmode-btn.flow .viewmode-thumb {
+  transform: translateX(21px)
+}
+
+/* The icons are emoji — fixed multi-colour glyphs that ignore `color` — so
+   opacity plus a small scale step is what separates active from inactive. */
+.viewmode-icon {
+  font-size: .95rem;
+  line-height: 1;
+  opacity: .35;
+  filter: grayscale(.6);
+  transition: opacity .2s, filter .2s, transform .2s
+}
+
+.viewmode-btn:not(.flow) .viewmode-icon--timeline,
+.viewmode-btn.flow .viewmode-icon--flow {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.1)
+}
+
+.viewmode-icon:hover {
+  opacity: .8;
+  filter: none
+}
+
+/* Unsaved-changes indicator — plain text (no chip/pill), living in
+   .toolbar-right immediately before #save-btn. Toggled with `visibility`, not
+   `display` (see setUnsavedChanges()): it keeps its slot in the layout at all
+   times, so the toolbar doesn't shuffle sideways the moment the document
+   becomes dirty. It's dropped from the layout entirely — a real width change,
+   which is allowed to move things — only at the ≤1050px breakpoint below,
+   before the right section's content would risk crowding. */
+.unsaved-warning {
+  color: color-mix(in srgb, var(--status-waiting) 75%, black);
+  font-weight: 700;
+  font-size: .82rem;
+  white-space: nowrap
+}
+
+[data-theme='dark'] .unsaved-warning {
+  color: var(--status-waiting);
+}
+
 /* Flow (dependency) view toolbar buttons — All/Active/Overdue duplicated from the
    left-menu filter buttons, colour-coded to match their meaning. */
 .flow-filter-group .btn.filter-mode-btn[data-value="all"].active {
@@ -1045,32 +1207,22 @@ select#compare-sel {
   color: #fff;
 }
 
-.unsaved-warning {
-  color: #5d5d5d;
-  font-weight: 700;
-  font-size: 0.88rem;
-  margin-right: 12px;
-  padding: 2px 8px;
-  white-space: nowrap;
-}
-
+/* Colours follow --status-waiting (the same semantic "amber" used elsewhere,
+   e.g. the Info button) so the unsaved-changes accent adapts to every colour
+   palette and light/dark mode instead of a single hardcoded yellow. */
 .toolbar-unsaved {
-  background-color: #fefce8 !important;
+  background-color: color-mix(in srgb, var(--status-waiting) 14%, var(--bg)) !important;
   transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .toolbar-unsaved #save-btn {
-  box-shadow: 0 0 0 2px #fbbf24, 0 0 8px rgba(251, 191, 36, 0.45);
+  box-shadow: 0 0 0 2px var(--status-waiting), 0 0 8px color-mix(in srgb, var(--status-waiting) 45%, transparent);
   transition: box-shadow 0.3s;
 }
 
 [data-theme='dark'] .toolbar-unsaved {
   background-color: transparent !important;
-  box-shadow: inset 0 2px 8px rgba(253, 211, 77, 0.85);
-}
-
-[data-theme='dark'] .toolbar-unsaved .unsaved-warning {
-  color: #fbbf24;
+  box-shadow: inset 0 2px 8px color-mix(in srgb, var(--status-waiting) 55%, transparent);
 }
 
 /* Layout */
@@ -1512,10 +1664,6 @@ select#compare-sel {
   display: none;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: .3px;
-  color: var(--text);
   pointer-events: none;
   z-index: 2
 }
@@ -1524,11 +1672,29 @@ select#compare-sel {
   display: flex
 }
 
+/* Pill badge, echoing the same rounded-chip language used by .unsaved-warning
+   and the toolbar pills, instead of plain bold text floating on the tinted bar. */
+.flow-title-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: .3px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  border-radius: 999px;
+  padding: 5px 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .08)
+}
+
 /* Flow-view header background — visually distinguishes Flow mode from Timeline mode.
    Derived from --accent/--surface (both already redefined per palette/theme) rather
    than a new hardcoded colour per palette, so it adapts automatically everywhere. */
 #timeline-header.flow-header {
-  background: var(--flow-header-bg)
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, var(--surface)), color-mix(in srgb, var(--accent) 7%, var(--surface)));
+  border-bottom: 2px solid color-mix(in srgb, var(--accent) 55%, var(--border))
 }
 
 .filter-summary-chip {
@@ -1942,8 +2108,11 @@ select#compare-sel {
   pointer-events: none;
   display: none;
   z-index: 10001;
-  max-width: 340px;
-  box-shadow: 0 4px 16px var(--shadow)
+  max-width: 640px;
+  box-shadow: 0 4px 16px var(--shadow);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
 }
 
 #tooltip .tt-title {
@@ -1960,11 +2129,50 @@ select#compare-sel {
   font-style: italic
 }
 
+/* Two-column layout: Properties (with Comments folded into its bottom) |
+   Description. Either column can be absent (toggled off via Settings), in
+   which case the tooltip simply shrinks to fit the remaining column.
+   align-items defaults to 'stretch' here (deliberately not overridden) so
+   both columns share the taller column's height and the divider between
+   them runs the full height of the panel, regardless of how much content
+   either column actually has. */
+#tooltip .tt-grid {
+  display: flex;
+}
+
+#tooltip .tt-col {
+  flex: 0 0 300px;
+  max-width: 300px;
+  min-width: 0;
+}
+
+#tooltip .tt-col+.tt-col {
+  border-left: 1px solid var(--border);
+  margin-left: 12px;
+  padding-left: 12px;
+}
+
+#tooltip .tt-hotkeys {
+  color: var(--text-mu);
+  font-size: .85em;
+  margin-top: 6px;
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+}
+
 #tooltip .tt-row {
   display: flex;
   align-items: center;
   gap: 4px;
   flex-wrap: wrap
+}
+
+/* Used by the Dependency row, which can stack several lines (one per
+   dependency) — top-aligns the label to the first line instead of the
+   default .tt-row centering, which would otherwise center it on the
+   full stack's height. */
+#tooltip .tt-row--top {
+  align-items: flex-start
 }
 
 #tooltip .tt-label {
@@ -1983,6 +2191,24 @@ select#compare-sel {
   flex-shrink: 0
 }
 
+/* One stacked line per dependency in the Dependency row — status-colored dot
+   prefix instead of coloring the category text. align-items:flex-start (not
+   center) keeps the dot pinned to the first line even when a long title
+   wraps onto a second line — centering would otherwise center it against
+   the full wrapped height. The dot's margin-top nudges it down to the
+   vertical middle of that first line (#tooltip's line-height: 1.75 @
+   .74rem ≈ 20.7px, dot is 10px, so (20.7-10)/2 ≈ 5px). */
+#tooltip .tt-dep-item {
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+#tooltip .tt-dep-item .tt-sc {
+  margin-left: 0;
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
 #tooltip .tt-diff-curr {
   color: var(--green-old);
   font-weight: 700;
@@ -1998,6 +2224,36 @@ select#compare-sel {
 /* Responsive toolbar */
 .txt-short {
   display: none;
+}
+
+/* Intermediate step before the hard compact-mode cutover at 1465px (which also
+   shrinks the left panel via JS toggleCompact()). Without this, toolbar-left's
+   full-width app-title/pills plus toolbar-right's full-text buttons could both
+   still be at full size while the window narrows, so their combined width
+   could exceed the space either side of the centred view controls — this
+   trims gaps/padding and drops the lower-priority Auto-save label a bit early
+   so the three toolbar sections keep clearing each other right up to 1465px. */
+@media(max-width:1780px) {
+  .toolbar-left,
+  .toolbar-center {
+    gap: 4px;
+  }
+
+  .toolbar-right {
+    gap: 7px;
+  }
+
+  .toolbar-right .btn {
+    padding: 4px 8px;
+  }
+
+  #autosave-wrapper .txt-full {
+    display: none;
+  }
+
+  #autosave-wrapper .txt-short {
+    display: inline;
+  }
 }
 
 @media(max-width:1465px) {
@@ -2026,12 +2282,17 @@ select#compare-sel {
   }
 }
 
-@media(max-width:960px) {
-  .toolbar-center {
-    position: static;
-    transform: none
+/* Hidden outright rather than shortened — measured to start overlapping
+   .toolbar-center around 960px (with the full unsaved-changes text and
+   every other right-section button also present, the highest-content-width
+   state), so this clears out of the way with a safety margin before that. */
+@media(max-width:1050px) {
+  .unsaved-warning {
+    display: none !important;
   }
+}
 
+@media(max-width:960px) {
   .compare-label {
     display: none
   }
@@ -2175,6 +2436,52 @@ select#compare-sel {
 
 #info-panel.open {
   transform: translateX(0)
+}
+
+/* Settings panel (reuses the Info panel's flyout chrome) */
+#settings-panel {
+  position: fixed;
+  right: 0;
+  top: var(--toolbar-h);
+  width: 280px;
+  height: calc(100vh - var(--toolbar-h));
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  z-index: 9999;
+  transform: translateX(100%);
+  transition: transform .25s ease;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, .06)
+}
+
+#settings-panel.open {
+  transform: translateX(0)
+}
+
+.settings-section-heading {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--text-mu);
+  margin-bottom: 6px;
+}
+
+.settings-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: .85rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.settings-toggle-row input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
 }
 
 .flyout-close {
@@ -2620,70 +2927,6 @@ details.info-section[open] .info-section-heading::after {
   color: var(--text);
 }
 
-#modal-btn-dependent {
-  margin-right: 8px;
-  border: 1px solid #fde047;
-  background: #fef9c3;
-  color: #854d0e;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.68rem;
-  cursor: pointer;
-  font-family: var(--font);
-  white-space: nowrap;
-  transition: all 0.15s;
-}
-
-#modal-btn-dependent:hover {
-  background: #fef08a;
-  border-color: #facc15;
-  color: #713f12;
-}
-
-[data-theme='dark'] #modal-btn-dependent {
-  background: #1c1400;
-  border-color: #a16207;
-  color: #fde68a;
-}
-
-[data-theme='dark'] #modal-btn-dependent:hover {
-  background: #2d1f00;
-  border-color: #ca8a04;
-  color: #fef08a;
-}
-
-#modal-btn-duplicate {
-  margin-right: 12px;
-  border: 1px solid #bae6fd;
-  background: #e0f2fe;
-  color: #0369a1;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.68rem;
-  cursor: pointer;
-  font-family: var(--font);
-  white-space: nowrap;
-  transition: all 0.15s;
-}
-
-#modal-btn-duplicate:hover {
-  background: #bae6fd;
-  border-color: #38bdf8;
-  color: #075985;
-}
-
-[data-theme='dark'] #modal-btn-duplicate {
-  background: #001c2d;
-  border-color: #0369a1;
-  color: #7dd3fc;
-}
-
-[data-theme='dark'] #modal-btn-duplicate:hover {
-  background: #002a40;
-  border-color: #38bdf8;
-  color: #bae6fd;
-}
-
 .modal-close {
   cursor: pointer;
   font-size: 1.2rem;
@@ -2775,6 +3018,68 @@ details.info-section[open] .info-section-heading::after {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2);
+}
+
+/* Dependency chips — removable pills showing a task's currently selected
+   dependencies above the #modal-dep-sel picker (mirrors the Tags input's
+   comma-list, but Dependency values must resolve to real tasks, so each
+   selection is rendered with its friendly Phase › Category › Title label).
+   The border color is set inline per-chip (js_render.js) to the parent
+   task's Status color, so done/behind/etc. dependencies are distinguishable
+   at a glance — intentionally NOT applied to the #modal-dep-sel dropdown
+   options, which stay plain so the selected/unselected highlight reads
+   clearly (see _updateDepDropdown()). */
+.dep-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dep-chip-list:empty {
+  display: none;
+}
+
+.dep-chip-list:not(:empty) {
+  margin-bottom: 6px;
+}
+
+.dep-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px 2px 8px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 2px solid var(--border-md);
+  font-size: 0.75rem;
+  color: var(--text);
+  max-width: 100%;
+}
+
+.dep-chip>span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dep-chip-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-mu);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.dep-chip-x:hover {
+  color: #fff;
+  background: var(--status-behind);
 }
 
 .pill-container {
@@ -3127,7 +3432,13 @@ details.info-section[open] .info-section-heading::after {
 
 /* ── Unified modal (edit panel + comments panel, side-by-side or single) ── */
 #modal-container {
-  height: min(90vh, 740px);
+  /* Reserve clearance below the modal so its (now full-width, since the
+     shared edit footer spans #modal-panels) bottom-right corner can't end up
+     under the always-on-top .floating-btn-group (dark mode / theme toggle,
+     position:fixed bottom-right, z-index above the modal) on shorter
+     viewports — without this, its Save & Close button could render right
+     underneath those fixed buttons and be unclickable. */
+  height: min(max(90vh - 90px, 320px), 740px);
   overflow: hidden;
 }
 
@@ -3137,7 +3448,8 @@ details.info-section[open] .info-section-heading::after {
   overflow: hidden;
 }
 
-#modal-edit-panel {
+#modal-edit-panel,
+#modal-desc-panel {
   flex: 1;
   border-right: 1px solid var(--border);
   display: flex;
@@ -3153,9 +3465,20 @@ details.info-section[open] .info-section-heading::after {
 }
 
 #modal-edit-panel .modal-body,
+#modal-desc-panel .modal-body,
 #modal-comments-panel .modal-body {
   flex: 1;
   overflow-y: auto;
+}
+
+#modal-desc-panel textarea {
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  border: none;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  outline: none;
 }
 
 .modal-body::-webkit-scrollbar,
@@ -3170,29 +3493,45 @@ details.info-section[open] .info-section-heading::after {
 }
 
 #modal-edit-panel .modal-header,
+#modal-desc-panel .modal-header,
 #modal-comments-panel .modal-header {
   border-radius: 0;
 }
 
 /* View modes: applied as class on #modal-container */
+/* Edit view: Task properties + Task description panels */
 #modal-container.view-edit {
-  width: 480px;
+  width: 960px;
 }
 
 #modal-container.view-edit #modal-comments-panel {
   display: none;
 }
 
+#modal-container.view-edit #modal-desc-panel {
+  border-right: none;
+}
+
 #modal-container.view-comments {
   width: 500px;
 }
 
-#modal-container.view-comments #modal-edit-panel {
+#modal-container.view-comments #modal-edit-panel,
+#modal-container.view-comments #modal-desc-panel {
   display: none;
 }
 
+/* The shared edit footer (Delete/New Dependent/New Duplicate/Cancel/Save & Close)
+   spans the full modal width below #modal-panels — hidden in Comments-only view
+   since there's no edit form open to save there. */
+#modal-container.view-comments #modal-edit-footer {
+  display: none;
+}
+
+/* Both view: Task properties + Task description + Comments panels, 1.5x the
+   width of the (now two-panel) Edit view so panels aren't squashed */
 #modal-container.view-both {
-  width: 960px;
+  width: 1440px;
   max-width: 96%;
 }
 </style>
@@ -3214,7 +3553,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="drop-card" id="drop-card" style="position: relative;">
     <div class="drop-title">&#128200; Gantt Chart Builder</div>
     <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
-    <div class="drop-version">v2.24</div>
+    <div class="drop-version">v2.28</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
       Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
@@ -3308,55 +3647,67 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       </div>
     </div>
     <div class="toolbar-center">
-      <div class="btn-group" id="view-btns">
-        <button class="btn" id="btn-week" data-action="setView" data-value="week" data-tooltip="Week view" data-shortcut="v: cycle views"><span
-            class="txt-full">Week</span><span class="txt-short">W</span></button>
-        <button class="btn active" id="btn-month" data-action="setView" data-value="month"
-          data-tooltip="Month view" data-shortcut="v: cycle views"><span class="txt-full">Month</span><span class="txt-short">M</span></button>
-        <button class="btn" id="btn-year" data-action="setView" data-value="year" data-tooltip="Year view" data-shortcut="v: cycle views"><span
-            class="txt-full">Year</span><span class="txt-short">Y</span></button>
-      </div>
-      <div class="btn-group flow-filter-group" id="flow-filter-btns" style="display:none;">
-        <button class="btn filter-mode-btn active" id="ffb-all" data-action="setFilter" data-value="all"
-          data-tooltip="Show all items">All</button>
-        <button class="btn filter-mode-btn" id="ffb-active" data-action="setFilter" data-value="active"
-          data-tooltip="Show only active (non-completed) items">Active</button>
-        <button class="btn filter-mode-btn" id="ffb-overdue" data-action="setFilter" data-value="overdue"
-          data-tooltip="Show only items past their end date that are not 100% complete">Overdue</button>
+      <button class="btn viewmode-btn" id="viewmode-btn" data-action="toggleViewMode"
+        role="switch" aria-label="View mode" data-shortcut="l: toggle view">
+        <span class="viewmode-icon viewmode-icon--timeline" data-action="setViewMode" data-value="timeline"
+          data-tooltip="Timeline view — tasks placed on a calendar" data-shortcut="l: toggle view">&#128197;</span>
+        <span class="viewmode-track" aria-hidden="true"><span class="viewmode-thumb"></span></span>
+        <span class="viewmode-icon viewmode-icon--flow" data-action="setViewMode" data-value="flow"
+          data-tooltip="Dependency Linked view — tasks placed by dependency chain" data-shortcut="l: toggle view">&#128279;</span>
+      </button>
+      <!-- Each .mode-slot stacks the Timeline-mode control and its Flow-mode
+           counterpart in one grid cell, so the slot is always as wide as the
+           wider of the two and the toolbar-centre width never changes when the
+           view mode is toggled (see .mode-slot in style.css). -->
+      <div class="mode-slot">
+        <div class="btn-group" id="view-btns">
+          <button class="btn" id="btn-week" data-action="setView" data-value="week" data-tooltip="Week view" data-shortcut="v: cycle views"><span
+              class="txt-full">Week</span><span class="txt-short">W</span></button>
+          <button class="btn active" id="btn-month" data-action="setView" data-value="month"
+            data-tooltip="Month view" data-shortcut="v: cycle views"><span class="txt-full">Month</span><span class="txt-short">M</span></button>
+          <button class="btn" id="btn-year" data-action="setView" data-value="year" data-tooltip="Year view" data-shortcut="v: cycle views"><span
+              class="txt-full">Year</span><span class="txt-short">Y</span></button>
+        </div>
+        <div class="btn-group flow-filter-group" id="flow-filter-btns" style="visibility:hidden;">
+          <button class="btn filter-mode-btn active" id="ffb-all" data-action="setFilter" data-value="all"
+            data-tooltip="Show all items"><span class="txt-full">All</span><span class="txt-short">A</span></button>
+          <button class="btn filter-mode-btn" id="ffb-active" data-action="setFilter" data-value="active"
+            data-tooltip="Show only active (non-completed) items"><span class="txt-full">Active</span><span class="txt-short">Ac</span></button>
+          <button class="btn filter-mode-btn" id="ffb-overdue" data-action="setFilter" data-value="overdue"
+            data-tooltip="Show only items past their end date that are not 100% complete"><span class="txt-full">Overdue</span><span class="txt-short">Ov</span></button>
+        </div>
       </div>
       <button class="btn icon-btn" data-action="navigate" data-value="-1"
         data-tooltip="Previous time period / scroll left one item">&#8592;</button>
-      <button class="btn today-btn" id="today-btn" data-action="goToday" data-tooltip="Jump to today" data-shortcut="t: today"><span
-          class="txt-full">Today</span><span class="txt-short">T</span></button>
-      <div class="btn-group flow-first-last-group" id="flow-first-last-btns" style="display:none;">
-        <button class="btn" data-action="flowGoFirst" data-tooltip="Scroll to first tasks (dependency roots)">First</button>
-        <button class="btn" data-action="flowGoLast" data-tooltip="Scroll to last tasks (end of dependency chain)">Last</button>
+      <div class="mode-slot mode-slot--nav">
+        <button class="btn today-btn" id="today-btn" data-action="goToday" data-tooltip="Jump to today" data-shortcut="t: today"><span
+            class="txt-full">Today</span><span class="txt-short">T</span></button>
+        <div class="btn-group flow-first-last-group" id="flow-first-last-btns" style="visibility:hidden;">
+          <button class="btn" data-action="flowGoFirst" data-tooltip="Scroll to first tasks (dependency roots)"><span class="txt-full">First</span><span class="txt-short">F</span></button>
+          <button class="btn" data-action="flowGoLast" data-tooltip="Scroll to last tasks (end of dependency chain)"><span class="txt-full">Last</span><span class="txt-short">L</span></button>
+        </div>
       </div>
       <button class="btn icon-btn" data-action="navigate" data-value="1"
         data-tooltip="Next time period / scroll right one item">&#8594;</button>
     </div>
     <div class="toolbar-right">
-      <span id="unsaved-warning" class="unsaved-warning" style="display:none;"><span class="txt-full">Unsaved
-          Changes</span><span class="txt-short">Unsaved</span></span>
       <label id="autosave-wrapper"
-        style="display:none; align-items:center; gap:6px; margin-right:12px; font-size:0.8rem; color:var(--text-mu); cursor:pointer;"
+        style="display:none; align-items:center; gap:6px; font-size:0.8rem; color:var(--text-mu); cursor:pointer;"
         data-tooltip="Automatically save changes to Excel">
-        <input type="checkbox" id="autosave-toggle" data-action="toggleAutoSave"> Auto-save
+        <input type="checkbox" id="autosave-toggle" data-action="toggleAutoSave"><span class="txt-full">Auto-save</span><span class="txt-short">Auto</span>
       </label>
-      <button class="btn" id="viewmode-btn" data-action="toggleViewMode"
-        style="margin-right:12px; border-color:var(--accent); color:var(--accent);"
-        data-tooltip="Switch to Dependency Linked view" data-shortcut="l: toggle view">&#128279;<span
-          class="txt-full"> Linked View</span><span class="txt-short txt-min"> L</span></button>
+      <span id="unsaved-warning" class="unsaved-warning" style="visibility:hidden;">Unsaved Changes</span>
       <button class="btn" id="save-btn" data-action="saveSnapshot"
-        style="margin-right:12px; border-color:var(--status-done); color:var(--status-done);"
-        data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file."
-        data-shortcut="s: save">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short txt-min"> S</span></button>
+        style="border-color:var(--status-done); color:var(--status-done);"
+        data-tooltip="Append the current planning data as a new dated snapshot to the Log sheet and download the updated Excel file.">&#128190;<span class="txt-full"> Save Excel</span><span class="txt-short txt-min"> S</span></button>
       <button class="btn" id="export-btn" data-action="exportChart"
-        style="margin-right:12px; border-color:var(--status-on-track); color:var(--status-on-track);"
+        style="border-color:var(--status-on-track); color:var(--status-on-track);"
         data-tooltip="Export a read-only, pre-filled standalone HTML version of this Gantt chart." data-shortcut="x: export">&#128228;<span
           class="txt-full"> Export Chart</span><span class="txt-short txt-min"> E</span></button>
       <button class="btn" id="info-btn" data-action="toggleInfoPanel" style="border-color:var(--status-waiting); color:var(--status-waiting);"
         data-tooltip="View application info and version" data-shortcut="i: info">&#10067;<span class="txt-full"> Info</span><span class="txt-short txt-min"> I</span></button>
+      <button class="btn" id="settings-btn" data-action="toggleSettingsPanel" style="border-color:var(--text-mu); color:var(--text-mu);"
+        data-tooltip="Preferences">&#9881;<span class="txt-full"> Settings</span><span class="txt-short txt-min"> P</span></button>
     </div>
   </header>
 
@@ -3385,7 +3736,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     </div>
     <div id="right-panel">
       <div id="timeline-header"></div>
-      <div id="flow-title-label" aria-hidden="true">Dependency Linked View</div>
+      <div id="flow-title-label" aria-hidden="true"><span class="flow-title-pill">&#128279; Dependency Linked View</span></div>
       <div id="center-view-arrow" aria-hidden="true"></div>
       <div id="center-view-arrow-up" aria-hidden="true"></div>
       <button id="new-task-fab" class="new-task-fab" data-action="openTaskModalNew"
@@ -3432,6 +3783,10 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
           <li><strong>Duplicate / Chain:</strong> Inside the Edit modal, use <em>Duplicate Task</em> to copy (comments
             are copied too), or <em>Dependent Task</em> to create a follow-on task pre-linked to the current one
             (comments are <em>not</em> copied). The main view scrolls to the new task after creation.</li>
+          <li><strong>Source / Parent task:</strong> Hover a task bar or left-panel row and press <kbd>s</kbd> to
+            create a new task in the same Phase &amp; Category, defaulting to a one-week range that ends the day
+            before the hovered task starts. Saving it adds the new task as a dependency of the task you started
+            from &mdash; the reverse of <em>Dependent Task</em>.</li>
           <li><strong>Delete:</strong> Click "Delete" inside the task's Edit modal.</li>
           <li><strong>Rename Phase / Category:</strong> Hover a Phase or Category row to reveal a &#x270F; pencil
             button, then click to rename (or press <kbd>e</kbd> / <kbd>r</kbd>). If the new name already exists you will
@@ -3463,6 +3818,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
           <li>Every task modal has a <strong>view bar</strong> at the top with three buttons: <strong>&#9999;
               Edit</strong>, <strong>&#9645;&#9645; Both</strong> (side-by-side), and <strong>&#x1F4AC;
               Comments</strong>. Switch between them freely &mdash; the current task is preserved.</li>
+          <li><strong>Edit</strong> shows two panels side by side &mdash; Task properties and Task description.
+            <strong>Both</strong> adds a third panel for Comments alongside them.</li>
           <li>While a modal is open, use keyboard shortcuts to switch views instantly: <kbd>e</kbd> Edit &nbsp;|&nbsp;
             <kbd>b</kbd> Both &nbsp;|&nbsp; <kbd>c</kbd> Comments.
           </li>
@@ -3488,8 +3845,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             space. Hover any row for a full-detail tooltip.</li>
           <li><strong>Reload:</strong> Click the Date Pill in the top-left to reload from the source file without
             creating a new snapshot.</li>
-          <li><strong>Dependency arrows:</strong> Hovering a task bar with a dependency highlights its incoming arrow in
-            amber.</li>
+          <li><strong>Dependency arrows:</strong> A task can depend on any number of other tasks &mdash; one arrow is
+            drawn per dependency. Hovering a task bar highlights all of its incoming arrows in amber.</li>
         </ul>
       </details>
 
@@ -3501,12 +3858,13 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
             lays tasks out left-to-right by dependency chain instead of by date. The header bar gets a distinct
             tinted background and a large centred title in Linked view so it's always obvious which view is active.</li>
           <li><strong>Layout:</strong> Tasks with no dependency start near the left edge; a dependent task always
-            starts a little after its parent ends, so it never overlaps it and every dependency arrow is a simple
-            elbow connector. Bars come in three fixed widths &mdash; small, normal, and wide &mdash; based on how
-            long the task runs.</li>
+            starts a little after the latest-ending of its parents, so it never overlaps them. A task can depend on
+            several other tasks &mdash; one arrow is drawn per dependency. Bars come in three fixed widths &mdash;
+            small, normal, and wide &mdash; based on how long the task runs.</li>
           <li><strong>Row order:</strong> Within each category, tasks are grouped by dependency: a task is followed
-            immediately by its own dependents, before moving on to the next unrelated task in that category. Sibling
-            tasks (at the same nesting level) are ordered by Priority, then Start Date.</li>
+            immediately by its own dependents, before moving on to the next unrelated task in that category. When a
+            task has multiple dependencies, it nests under the first one (in selection order) that's in the same
+            category. Sibling tasks (at the same nesting level) are ordered by Priority, then Start Date.</li>
           <li><strong>Snapshot comparison:</strong> Same as Timeline view &mdash; when a Compare snapshot is active,
             faded dashed "ghost" bars for the snapshot's version of each task appear directly under their current
             counterpart, with the same diff-highlighted tooltip.</li>
@@ -3528,6 +3886,10 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
               Light</em>, <em>Ayu</em>, and <em>Kanagawa</em>. Dark mode offers: <em>High Contrast</em>,
             <em>Catppuccin</em>, <em>Frapp&eacute;</em>, <em>Monokai</em>, <em>Dracula</em>, <em>Ayu</em>, and
             <em>Kanagawa</em>. Each mode remembers its own palette independently.</li>
+          <li><strong>Hover panel:</strong> Hovering a task bar or row shows Properties and Description side by
+            side, with Comments appearing at the bottom of Properties when the task has any (hidden automatically
+            otherwise). Click the &#9881; <strong>Settings</strong> button to toggle Properties or Description on
+            or off &mdash; your choice is remembered across sessions.</li>
         </ul>
       </details>
 
@@ -3563,6 +3925,11 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
               <td style="padding:3px 6px;">Duplicate the task</td>
             </tr>
             <tr>
+              <td style="padding:3px 6px;">Hovering a task bar or left-panel task row</td>
+              <td style="padding:3px 6px;"><kbd>s</kbd></td>
+              <td style="padding:3px 6px;">Create a new source/parent task in the same Phase &amp; Category, added as a dependency of the hovered task once saved</td>
+            </tr>
+            <tr>
               <td style="padding:3px 6px;">Hovering Phase/Category row</td>
               <td style="padding:3px 6px;"><kbd>e</kbd> / <kbd>r</kbd></td>
               <td style="padding:3px 6px;">Open Rename modal</td>
@@ -3571,11 +3938,6 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
               <td style="padding:3px 6px;">Hovering Phase/Category row</td>
               <td style="padding:3px 6px;"><kbd>n</kbd></td>
               <td style="padding:3px 6px;">Add a new task to that group</td>
-            </tr>
-            <tr>
-              <td style="padding:3px 6px;">Main view (no modal open)</td>
-              <td style="padding:3px 6px;"><kbd>s</kbd></td>
-              <td style="padding:3px 6px;">Save Excel</td>
             </tr>
             <tr>
               <td style="padding:3px 6px;">Main view (no modal open)</td>
@@ -3606,6 +3968,16 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
               <td style="padding:3px 6px;">Main view (no modal open)</td>
               <td style="padding:3px 6px;"><kbd>m</kbd></td>
               <td style="padding:3px 6px;">Toggle Light / Dark mode</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Main view (no modal open)</td>
+              <td style="padding:3px 6px;"><kbd>p</kbd></td>
+              <td style="padding:3px 6px;">Cycle colour palette</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 6px;">Main view (no modal open)</td>
+              <td style="padding:3px 6px;"><kbd>x</kbd></td>
+              <td style="padding:3px 6px;">Export Chart</td>
             </tr>
             <tr>
               <td style="padding:3px 6px;">Any task modal open</td>
@@ -3670,7 +4042,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
       &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.24</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.28</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
         <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
@@ -3682,6 +4054,29 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
           style="color:var(--accent); text-decoration:none;">Kerwin Olfers</a> &middot; Released under the <a
           href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">MIT License</a>.</p>
+    </div>
+  </div>
+</div>
+<div id="settings-panel">
+  <button class="flyout-close" data-action="toggleSettingsPanel" title="Close">&times;</button>
+  <div class="info-header" style="padding-left:24px;">
+    <span class="info-title">Preferences</span>
+  </div>
+  <div class="info-content">
+    <div class="settings-section">
+      <div class="settings-section-heading">Hover Panel</div>
+      <p style="margin:0 0 10px 0; font-size:0.8em; color:var(--text-mu);">Choose what's shown when hovering a task
+        bar or row. Comments appear at the bottom of Properties when present.</p>
+      <label class="settings-toggle-row">
+        <input type="checkbox" id="settings-hover-properties" data-action="toggleHoverPanelSetting"
+          data-key="properties" checked>
+        <span>Properties</span>
+      </label>
+      <label class="settings-toggle-row">
+        <input type="checkbox" id="settings-hover-description" data-action="toggleHoverPanelSetting"
+          data-key="description" checked>
+        <span>Description</span>
+      </label>
     </div>
   </div>
 </div>
@@ -3758,11 +4153,6 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <div id="modal-edit-panel">
         <div class="modal-header" style="display:flex; align-items:center;">
           <h3 id="modal-title" style="margin:0;">Edit Task</h3>
-          <div style="flex:1;"></div>
-          <button id="modal-btn-dependent" data-action="createDependentTask" style="display:none;">Dependent
-            Task</button>
-          <button id="modal-btn-duplicate" data-action="duplicateTaskFromModal" style="display:none;">Duplicate
-            Task</button>
         </div>
         <div class="modal-body">
           <div class="form-row">
@@ -3837,15 +4227,17 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
               style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;"
               title="Select an existing tag to add it"></select>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Dependency</label>
-              <select id="modal-task-dependency"></select>
-            </div>
-            <div class="form-group">
-              <label>ID</label>
-              <input type="text" id="modal-task-id">
-            </div>
+          <div class="form-group">
+            <label>Dependency</label>
+            <div id="modal-dep-chips" class="dep-chip-list"></div>
+            <select id="modal-dep-sel"
+              style="cursor:pointer;"
+              title="Select a task to toggle it as a dependency"></select>
+            <input type="hidden" id="modal-task-dependency">
+          </div>
+          <div class="form-group">
+            <label>ID</label>
+            <input type="text" id="modal-task-id">
           </div>
           <div class="form-group" id="modal-comment-info" style="display:none; flex-direction:column; gap:2px;">
             <label>Comments</label>
@@ -3855,19 +4247,15 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
               <span id="modal-comment-latest" style="color:var(--text-mu); font-size:0.8rem;"></span>
             </div>
           </div>
-          <div class="form-group" style="margin-bottom:0px;">
-            <label>Description</label>
-            <textarea id="modal-task-desc" rows="4" style="resize:vertical;"></textarea>
-          </div>
         </div>
-        <div class="modal-footer">
-          <button id="modal-btn-delete" class="btn btn-delete" data-action="deleteTaskFromModal"
-            style="display:none;">Delete</button>
-          <div style="flex:1"></div>
-          <button class="btn" data-action="closeModalConfirm">Cancel</button>
-          <button id="modal-btn-save" class="btn btn-primary" data-action="saveTaskModal">Save</button>
-          <button id="modal-btn-save-close" class="btn btn-primary" data-action="saveTaskModalAndClose">Save &amp;
-            Close</button>
+      </div>
+      <div id="modal-desc-panel">
+        <div class="modal-header">
+          <h3 style="margin:0; font-size:1rem;">Description</h3>
+        </div>
+        <div class="modal-body">
+          <textarea id="modal-task-desc" style="flex:1; resize:none; width:100%;"
+            placeholder="Add a description..."></textarea>
         </div>
       </div>
       <div id="modal-comments-panel">
@@ -3889,6 +4277,18 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
           <div id="comments-list" class="comments-list"></div>
         </div>
       </div>
+    </div>
+    <div class="modal-footer" id="modal-edit-footer">
+      <button id="modal-btn-delete" class="btn btn-delete" data-action="deleteTaskFromModal"
+        style="display:none;">Delete</button>
+      <button id="modal-btn-dependent" class="btn" data-action="createDependentTask"
+        style="display:none;">New Dependent</button>
+      <button id="modal-btn-duplicate" class="btn" data-action="duplicateTaskFromModal"
+        style="display:none;">New Duplicate</button>
+      <div style="flex:1"></div>
+      <button class="btn" data-action="closeModalConfirm">Cancel</button>
+      <button id="modal-btn-save-close" class="btn btn-primary" data-action="saveTaskModalAndClose">Save &amp;
+        Close</button>
     </div>
   </div>
 </div>
@@ -3926,7 +4326,21 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
 <script>
 
 window.IS_EXPORTED = false;
-let DATA = /*__GANTT_DATA__*/{ tasks: [], snapshots: {}, meta: { source_file: 'None' } };
+// exportChart() string-replaces the placeholder expression on the next line —
+// the token comment AND the `null` after it, as one search string — with the
+// serialized data blob, so the whole right-hand side becomes the exported
+// chart's data. In the un-exported app it stays null and DATA falls back to the
+// empty default below.
+//
+// The placeholder must be the ENTIRE right-hand side of its own statement, and
+// exportChart() must consume all of it. An earlier version put the token comment
+// directly in front of the default object literal and replaced only the comment,
+// leaving BOTH in place (`= {...data...}{ tasks: [], ... }`) — a syntax error
+// that killed the whole script block, so every exported chart rendered blank.
+// Note the token is deliberately not repeated anywhere above this line: the
+// substitution is a plain string replace, which hits the first occurrence only.
+const EXPORTED_DATA = /*__GANTT_DATA__*/null;
+let DATA = EXPORTED_DATA || { tasks: [], snapshots: {}, meta: { source_file: 'None' } };
 const STATUS_COLORS = {"done": "var(--status-done)", "on track": "var(--status-on-track)", "behind": "var(--status-behind)", "waiting": "var(--status-waiting)", "on hold": "var(--status-on-hold)"};
 const CAT_COLORS    = ["var(--cat-1)", "var(--cat-2)", "var(--cat-3)", "var(--cat-4)", "var(--cat-5)", "var(--cat-6)", "var(--cat-7)", "var(--cat-8)", "var(--cat-9)", "var(--cat-10)"];
 const PRIORITY_COLORS = {"high": "var(--status-behind)", "medium": "var(--status-waiting)", "low": "var(--status-done)"};
@@ -3978,12 +4392,20 @@ function getExampleData() {
           Comments: [
             { date: fmtComment(1), name: "Charlie", text: "Authentication endpoints drafted. Review meeting set for Thursday." }
           ]},
+        { ID: "A12", Title: "Database Schema Design", Phase: "Planning", Category: "Development", "Start Date": addDays(3), "End Date": addDays(8), Status: "On Track", Progress: 60, Dependency: "A3", Priority: "Medium", Tags: "backend, database", Description: "Designing the normalized schema and migration scripts for the primary application database, running in parallel with API Design.",
+          Comments: [
+            { date: fmtComment(1), name: "Bob", text: "Core tables modeled. Indexing strategy still needs a pass before handoff to Backend." }
+          ]},
         { ID: "A11", Title: "Hardware Procurement", Phase: "Planning", Category: "Management", "Start Date": addDays(-5), "End Date": addDays(-1), Status: "Waiting", Progress: 10, Dependency: "A10", Priority: "Low", Description: "Ordering server hardware and network components for the on-premise datacenter." },
         { ID: "A5", Title: "Design Approval (milestone)", Phase: "Planning", Category: "Management", "Start Date": addDays(10), "End Date": addDays(10), Status: "Waiting", Progress: 0, Priority: "Medium", Description: "Final sign-off on the UI design and user experience flows by the product owner." },
-        { ID: "A6", Title: "Backend Implementation", Phase: "Execution", Category: "Development", "Start Date": addDays(11), "End Date": addDays(20), Status: "Waiting", Progress: 0, Dependency: "A4", Priority: "High", Tags: "backend", Description: "Developing the core logic and database integration for the application backend." },
+        { ID: "A6", Title: "Backend Implementation", Phase: "Execution", Category: "Development", "Start Date": addDays(11), "End Date": addDays(20), Status: "Waiting", Progress: 0, Dependency: "A4, A12", Priority: "High", Tags: "backend", Description: "Developing the core logic and database integration for the application backend — needs both the API contracts and the schema finalized first." },
         { ID: "A7", Title: "Frontend Integration", Phase: "Execution", Category: "Development", "Start Date": addDays(21), "End Date": addDays(30), Status: "Waiting", Progress: 0, Dependency: "A6", Priority: "Medium", Tags: "frontend", Description: "Building the responsive user interface and connecting it to the backend APIs." },
-        { ID: "A8", Title: "Testing", Phase: "Execution", Category: "Analysis", "Start Date": addDays(25), "End Date": addDays(40), Status: "Waiting", Progress: 0, Priority: "High", Tags: "qa, frontend, backend", Description: "Comprehensive quality assurance testing, including unit, integration, and user acceptance tests." },
-        { ID: "A9", Title: "Go Live (milestone)", Phase: "Closure", Category: "Management", "Start Date": addDays(45), "End Date": addDays(45), Status: "Waiting", Progress: 0, Priority: "High", Description: "Official production launch and handover to the operations team." }
+        { ID: "A8", Title: "Testing", Phase: "Execution", Category: "Analysis", "Start Date": addDays(31), "End Date": addDays(46), Status: "Waiting", Progress: 0, Dependency: "A6, A7", Priority: "High", Tags: "qa, frontend, backend", Description: "Comprehensive quality assurance testing, including unit, integration, and user acceptance tests — can't start until both Backend and Frontend are done." },
+        { ID: "A13", Title: "User Training", Phase: "Execution", Category: "Management", "Start Date": addDays(31), "End Date": addDays(44), Status: "Waiting", Progress: 0, Dependency: "A7", Priority: "Low", Tags: "training", Description: "Preparing training materials and scheduling onboarding sessions for end users ahead of launch.",
+          Comments: [
+            { date: fmtComment(1), name: "Alice", text: "Outline drafted based on the current Frontend flows — will need a pass once Testing surfaces any UX fixes." }
+          ]},
+        { ID: "A9", Title: "Go Live (milestone)", Phase: "Closure", Category: "Management", "Start Date": addDays(48), "End Date": addDays(48), Status: "Waiting", Progress: 0, Dependency: "A8, A13", Priority: "High", Description: "Official production launch and handover to the operations team — gated on both QA sign-off and user training being complete." }
     ];
 
     const snapshotTasks = [
@@ -4113,12 +4535,18 @@ const AppState = {
   _modalOriginal: null,
   _commentsDirty: false,
   _pendingDuplicateComments: null,
+  _pendingParentChildId: null,
   _modalIdInit: false,
   _modalMouseDownOnOverlay: false,
 
   // UI panel state
   _flyoutOpen: false,
   _infoPanelOpen: false,
+  _settingsPanelOpen: false,
+
+  // Hover panel (tooltip) section visibility — persisted to localStorage,
+  // see _loadHoverPanelPrefs() / _saveHoverPanelPrefs() in js_render.js
+  hoverPanelPrefs: { properties: true, description: true },
 
   // Init flags
   _dragScrollInit: false,
@@ -4278,6 +4706,20 @@ function normalizeTagsList(str) {
   return out;
 }
 
+// ── Dependency helpers ────────────────────────────────────────────────
+// Splits a comma-separated Dependency string (Task IDs) into a clean,
+// deduped array — a task can now depend on any number of other tasks.
+function normalizeDependencyList(str) {
+  if (!str) return [];
+  const seen = new Set();
+  const out = [];
+  String(str).split(',').forEach(raw => {
+    const id = normalizeText(raw).trim();
+    if (id && !seen.has(id)) { seen.add(id); out.push(id); }
+  });
+  return out;
+}
+
 function isCustomFilterMatch(task, today) {
   const f = AppState._customFilters;
   if (f.status.length > 0) {
@@ -4350,7 +4792,10 @@ function setUnsavedChanges(val) {
   AppState.unsavedChanges = val;
   const warning = document.getElementById('unsaved-warning');
   if (warning) {
-      warning.style.display = val ? 'inline' : 'none';
+      // visibility, not display: the indicator keeps its slot in the toolbar
+      // either way, so becoming dirty doesn't shove the centred view controls
+      // sideways. See .unsaved-warning in style.css.
+      warning.style.visibility = val ? 'visible' : 'hidden';
   }
   const toolbar = document.getElementById('toolbar');
   if (toolbar) {
@@ -4709,7 +5154,7 @@ function processTasksList(rawArray) {
             'Start Date': formatDateStr(r['Start Date']),
             'End Date': formatDateStr(r['End Date']),
             'Progress': progress,
-            'Dependency': normalizeText(r['Dependency']) || '',
+            'Dependency': normalizeDependencyList(r['Dependency']).join(', '),
             'Tags': normalizeTagsList(r['Tags']).join(', '),
             'Description': normalizeText(r['Description']) || '',
             'Comments': parseComments(normalizeText(r['Comments']) || '')
@@ -4895,7 +5340,7 @@ function downloadDataAsExcel(data, fileName) {
         ['Start Date', 'Optional', 'DD-Mon-YYYY (e.g., 15-Mar-2026) — or use a proper Excel date cell', 'Date the task begins.'],
         ['End Date', 'Optional', 'DD-Mon-YYYY (e.g., 15-Mar-2026) — or use a proper Excel date cell', 'Date the task ends.'],
         ['Progress', 'Optional', '0 – 100', 'Completion percentage (shown as a filled bar on the task).'],
-        ['Dependency', 'Optional', 'A valid Task ID', 'ID of another task this task depends on. Draws a dependency arrow.'],
+        ['Dependency', 'Optional', 'One or more valid Task IDs, comma-separated', 'IDs of other tasks this task depends on (e.g. "A3, A6"). Draws one dependency arrow per link.'],
         ['Tags', 'Optional', 'Comma-separated words', 'Free-form labels for filtering (letters, numbers, dashes, spaces — no commas within a tag). e.g. "urgent, needs-review".'],
         ['Description', 'Optional', 'Any text', 'Free-form notes or details shown in the Edit modal.'],
         ['Comments', 'Optional', 'Managed by the app', 'Timestamped comments in format: [DD-Mon-YYYY HH:MM:Name] text. Best managed via the app UI.'],
@@ -5228,10 +5673,23 @@ function exportChart(asTemplate = false) {
         // Set IS_EXPORTED to true
         htmlStr = htmlStr.replace("window.IS_EXPORTED = false;", "window.IS_EXPORTED = true;");
 
-        // Inject current DATA via the unique token embedded by the build script.
+        // Inject current DATA via the unique placeholder embedded by the build script.
         // Simple string replace — no regex — so it cannot accidentally match task content.
+        //
+        // The search string covers the placeholder's WHOLE expression (token comment
+        // *and* the `null` after it), not just the token comment, so what's left is
+        // exactly the data blob. Replacing only the comment leaves whatever followed
+        // it in place, which is what broke every exported chart before: the build
+        // script used to emit the token immediately in front of the default object
+        // literal, so exports ended up with `let DATA = {…data…}{ tasks: [], … };` —
+        // a syntax error that killed the entire script block and rendered a blank
+        // chart. Keep the two in sync (see build_standalone.py).
+        //
+        // Passed as a REPLACER FUNCTION rather than a string, because a string
+        // replacement treats `$&`, `$'` and `$$` as special — and this one is task
+        // data, so a title containing `$&` would otherwise corrupt the export.
         const safeJsonStr = JSON.stringify(DATA).replace(/</g, '\\u003c');
-        htmlStr = htmlStr.replace('/*__GANTT_DATA__*/', safeJsonStr);
+        htmlStr = htmlStr.replace('/*__GANTT_DATA__*/null', () => safeJsonStr);
     }
 
     const blob = new Blob([htmlStr], {type: "text/html;charset=utf-8"});
@@ -5644,11 +6102,12 @@ function toggleChangesOnly() {
   render();
 }
 
-function restoreFromSnapshot() {
+async function restoreFromSnapshot() {
   const label = AppState.compareLabel;
   if (!label || !DATA.snapshots[label]) return;
 
-  if (!confirm(`Restore to snapshot "${label}"?\n\nThis will overwrite the current planning data with the snapshot. This cannot be undone unless you save first.`)) return;
+  const ok = await showConfirmDialog(`Restore to snapshot "${label}"?\n\nThis will overwrite the current planning data with the snapshot. This cannot be undone unless you save first.`, 'Restore Snapshot');
+  if (!ok) return;
 
   DATA.tasks = DATA.snapshots[label].map(t => ({ ...t, Comments: (t.Comments || []).map(c => ({ ...c })) }));
   AppState.currentTasks = DATA.tasks.map(t => ({ ...t }));
@@ -5946,8 +6405,8 @@ function renderLeft(visible, today, statsMap) {
         }
         if (r.task.Status) htmlContext += `<br/><span style="display:inline-block;padding:2px 8px;border-radius:10px;color:var(--pill-text);background:${sc};font-size:0.65rem;font-weight:bold;margin-top:6px;margin-bottom:2px;">${escHtml(r.task.Status)}</span>`;
         if (ov) { htmlContext += ` <span style="color:${ov.color};font-weight:bold;font-size:0.65rem;">(${ov.label})</span>`; }
-        htmlContext += `<div style="color:var(--text-mu); font-size:0.85em; margin-top:3px; border-top:1px solid var(--border); padding-top:2px;">e: edit  \u2022  c: comments  \u2022  d: dependent  \u2022  n: duplicate</div>`;
-        titleSpan.dataset.shortcut = 'e: edit  \u2022  c: comments  \u2022  d: dependent  \u2022  n: duplicate';
+        htmlContext += `<div style="color:var(--text-mu); font-size:0.85em; margin-top:3px; border-top:1px solid var(--border); padding-top:2px;">e: edit  \u2022  c: comments  \u2022  d: dependent  \u2022  n: duplicate  \u2022  s: parent</div>`;
+        titleSpan.dataset.shortcut = 'e: edit  \u2022  c: comments  \u2022  d: dependent  \u2022  n: duplicate  \u2022  s: parent';
         div.onmousemove = e => showHTMLTooltip(e, htmlContext);
         div.onmouseleave = hideTooltip;
       }
@@ -5985,10 +6444,38 @@ function renderLeft(visible, today, statsMap) {
   c.appendChild(_leftSpacer);
 }
 
-// ── Dependency dropdown helper ─────────────────────────────────────────
-function _buildDepOptions(depSel, excludeId) {
-  depSel.innerHTML = '<option value="">-- None --</option>';
-  const sorted = AppState.currentTasks
+// ── Multi-dependency arrow routing ──────────────────────────────────────
+// A task can have several incoming dependency arrows. Rather than routing
+// each one to its own vertical bend (which reads as chaotic once more than
+// one converges on the same child), all of them share a single vertical
+// trunk line at x = vx — anchored at the x a LONE arrow from the CLOSEST
+// parent (the one with the latest end date, i.e. the largest x1) would use
+// for its own vertical bend: (criticalX1 + x2) / 2 when there's room for a
+// simple elbow, or x2 - 12 (the same near-child vertical a single jogged
+// arrow already bends at) when the closest parent is close enough to need
+// one. Parents with more room than that simply run a longer horizontal leg
+// out to the shared trunk before turning; a parent tight enough that even
+// its own leg would run backwards past the trunk gets the same jog shape a
+// lone arrow uses, just ending at the shared trunk instead of x2 - 12.
+function _routeDepArrowPaths(parentPoints, x2, y2) {
+  const criticalX1 = Math.max(...parentPoints.map(p => p.x1));
+  const vx = criticalX1 < x2 - 12 ? (criticalX1 + x2) / 2 : x2 - 12;
+  return parentPoints.map(({ x1, y1 }) => {
+    if (x1 < vx) return `M${x1},${y1} H${vx} V${y2} H${x2}`;
+    const gY = y1 + (y2 > y1 ? 16 : -16);
+    return `M${x1},${y1} H${x1 + 6} V${gY} H${vx} V${y2} H${x2}`;
+  });
+}
+
+// ── Dependency dropdown/chip helpers ────────────────────────────────────
+// A task can depend on any number of other tasks (comma-separated IDs in
+// task.Dependency). The modal's #modal-task-dependency hidden input holds
+// the canonical comma list; #modal-dep-sel is a toggle-style picker
+// (selecting an option adds it if absent, removes it if already present —
+// same pattern as the Tags dropdown) and #modal-dep-chips renders the
+// current selection as removable chips.
+function _sortedDepCandidates(excludeId) {
+  return AppState.currentTasks
     .filter(t => !excludeId || getTaskId(t) !== excludeId)
     .slice()
     .sort((a, b) => {
@@ -5998,23 +6485,91 @@ function _buildDepOptions(depSel, excludeId) {
       if (ca !== cb) return ca < cb ? -1 : 1;
       return (a.Title || '').toLowerCase() < (b.Title || '').toLowerCase() ? -1 : 1;
     });
-  sorted.forEach(t => {
+}
+
+function _updateDepDropdown(excludeId) {
+  const sel = document.getElementById('modal-dep-sel');
+  if (!sel) return;
+  const input = document.getElementById('modal-task-dependency');
+  const selectedIds = normalizeDependencyList(input ? input.value : '');
+  sel.innerHTML = '<option value="" disabled selected hidden>\u2014 Select or deselect dependencies \u2014</option>';
+  _sortedDepCandidates(excludeId).forEach(t => {
+    const id = getTaskId(t);
     const op = document.createElement('option');
-    op.value = getTaskId(t);
-    op.textContent = `${t.Phase} \u203a ${t.Category} \u203a ${t.Title}`;
-    op.style.color = catColor(t.Category);
-    depSel.appendChild(op);
+    op.value = id;
+    const label = `${t.Phase} \u203a ${t.Category} \u203a ${t.Title}`;
+    const isSelected = selectedIds.includes(id);
+    op.textContent = isSelected ? `\u2713 ${label}` : `   ${label}`;
+    if (isSelected) {
+      op.style.fontWeight = 'bold';
+      op.style.color = 'var(--accent)';
+    } else {
+      op.style.fontWeight = 'normal';
+      op.style.color = 'var(--text)';
+    }
+    sel.appendChild(op);
   });
+}
+
+// Renders the current Dependency selection as removable chips into #modal-dep-chips.
+function _renderDepChips() {
+  const container = document.getElementById('modal-dep-chips');
+  const input = document.getElementById('modal-task-dependency');
+  if (!container || !input) return;
+  const deps = normalizeDependencyList(input.value);
+  container.innerHTML = '';
+  deps.forEach(id => {
+    const parent = AppState.currentTasks.find(pt => getTaskId(pt) === id);
+    const chip = document.createElement('span');
+    chip.className = 'dep-chip';
+    // Border color reflects the parent task's Status, so it's clear at a glance
+    // which dependencies are done/behind/etc — dropdown options stay uncolored.
+    chip.style.borderColor = STATUS_COLORS[(parent && parent.Status || '').toLowerCase()] || 'var(--border-md)';
+    const label = document.createElement('span');
+    label.textContent = parent ? `${parent.Phase} \u203a ${parent.Category} \u203a ${parent.Title}` : id;
+    chip.appendChild(label);
+    const x = document.createElement('span');
+    x.className = 'dep-chip-x';
+    x.textContent = '\u00d7';
+    x.title = 'Remove dependency';
+    x.onclick = () => {
+      input.value = normalizeDependencyList(input.value).filter(d => d !== id).join(', ');
+      const excludeId = AppState._modalMode === 'edit' && AppState._modalTask ? getTaskId(AppState._modalTask) : null;
+      _updateDepDropdown(excludeId);
+      _renderDepChips();
+      _updateEditDirtyHighlights();
+    };
+    chip.appendChild(x);
+    container.appendChild(chip);
+  });
+}
+
+// Selecting an option in #modal-dep-sel toggles that task in/out of the
+// comma-separated Dependency list (mirrors _addTagFromDropdown()).
+function _toggleDepFromDropdown() {
+  const sel = document.getElementById('modal-dep-sel');
+  if (!sel || !sel.value) return;
+  const id = sel.value;
+  sel.value = '';
+  const input = document.getElementById('modal-task-dependency');
+  let deps = normalizeDependencyList(input.value);
+  if (deps.includes(id)) deps = deps.filter(d => d !== id);
+  else deps.push(id);
+  input.value = deps.join(', ');
+  const excludeId = AppState._modalMode === 'edit' && AppState._modalTask ? getTaskId(AppState._modalTask) : null;
+  _updateDepDropdown(excludeId);
+  _renderDepChips();
+  _updateEditDirtyHighlights();
 }
 
 // ── Bar hover overlay helpers ─────────────────────────────────────────
 function _clearDepArrowHighlight() {
-  if (AppState._highlightedDepArrow) {
-    AppState._highlightedDepArrow.setAttribute('stroke', 'var(--text-lt)');
-    AppState._highlightedDepArrow.setAttribute('stroke-width', '1.5');
-    AppState._highlightedDepArrow.setAttribute('marker-end', 'url(#arr)');
-    AppState._highlightedDepArrow = null;
-  }
+  (AppState._highlightedDepArrow || []).forEach(a => {
+    a.setAttribute('stroke', 'var(--text-lt)');
+    a.setAttribute('stroke-width', '1.5');
+    a.setAttribute('marker-end', 'url(#arr)');
+  });
+  AppState._highlightedDepArrow = null;
 }
 
 function _removeBarHoverOverlay() {
@@ -6036,12 +6591,13 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
   // If already showing for the same task, just keep it — don't move the buttons
   if (AppState._hoveredTask === task && document.getElementById('bar-hover-overlay')) return;
 
-  // Highlight the dependency arrow for this task (amber) if it has a parent
+  // Highlight the dependency arrow(s) for this task (amber) if it has any parents
   _clearDepArrowHighlight();
   if (task.Dependency) {
     const childId = getTaskId(task);
     const svg = document.getElementById('gantt-svg');
     if (svg) {
+      const highlighted = [];
       const allArrows = svg.querySelectorAll('[data-dep-child-id]');
       allArrows.forEach(a => {
         if (a.getAttribute('data-dep-child-id') === childId) {
@@ -6049,9 +6605,10 @@ function _showBarHoverOverlay(task, cursorClientX, hitClientRect) {
           a.setAttribute('stroke-width', '2.5');
           a.setAttribute('marker-end', 'url(#arr-hi)');
           a.parentNode.appendChild(a); // bring to front
-          AppState._highlightedDepArrow = a;
+          highlighted.push(a);
         }
       });
+      AppState._highlightedDepArrow = highlighted;
     }
   }
 
@@ -6211,8 +6768,8 @@ function renderChart(visible, today) {
         const dd = addDays(AppState.renderStart, wk * 7 + d);
         const dx = x + d * cw;
         hSvg.appendChild(svgEl('line', { x1: dx, y1: 16, x2: dx, y2: HEAD_H, stroke: _headMinor, 'stroke-width': 1 }));
-        hSvg.appendChild(svgEl('text', { x: dx + cw / 2, y: 27, 'text-anchor': 'middle', fill: 'var(--text-lt)', 'font-size': 9 }, dayNames[dd.getDay()]));
-        hSvg.appendChild(svgEl('text', { x: dx + cw / 2, y: 40, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 10 }, String(dd.getDate())));
+        hSvg.appendChild(svgEl('text', { x: dx + cw / 2, y: 27, 'text-anchor': 'middle', fill: 'var(--header-date-text)', 'font-size': 9 }, dayNames[dd.getDay()]));
+        hSvg.appendChild(svgEl('text', { x: dx + cw / 2, y: 40, 'text-anchor': 'middle', fill: 'var(--header-date-text)', 'font-size': 10 }, String(dd.getDate())));
         svg.appendChild(svgEl('line', { x1: dx, y1: 0, x2: dx, y2: totalH, stroke: _gridMinor, 'stroke-width': 1 }));
       }
     }
@@ -6226,7 +6783,7 @@ function renderChart(visible, today) {
         if (dd.getDay() === 1) {
           const wx = x + (d - 1) / dim * cw;
           svg.appendChild(svgEl('line', { x1: wx, y1: 0, x2: wx, y2: totalH, stroke: _gridMinor, 'stroke-width': 1 }));
-          hSvg.appendChild(svgEl('text', { x: wx + 1, y: 40, fill: 'var(--text-lt)', 'font-size': 8 }, `W${getISOWeek(dd)}`));
+          hSvg.appendChild(svgEl('text', { x: wx + 1, y: 40, fill: 'var(--header-date-text)', 'font-size': 8 }, `W${getISOWeek(dd)}`));
         }
       }
       if (ci > 0) {
@@ -6241,8 +6798,8 @@ function renderChart(visible, today) {
       svg.appendChild(svgEl('line', { x1: x, y1: 0, x2: x, y2: totalH, stroke: _gridMinor, 'stroke-width': 1 }));
       if (AppState.view === 'week') {
         const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        hSvg.appendChild(svgEl('text', { x: x + cw / 2, y: 15, 'text-anchor': 'middle', fill: 'var(--text-lt)', 'font-size': 9 }, days[col.date.getDay()]));
-        hSvg.appendChild(svgEl('text', { x: x + cw / 2, y: 32, 'text-anchor': 'middle', fill: 'var(--text-mu)', 'font-size': 10 }, String(col.date.getDate())));
+        hSvg.appendChild(svgEl('text', { x: x + cw / 2, y: 15, 'text-anchor': 'middle', fill: 'var(--header-date-text)', 'font-size': 9 }, days[col.date.getDay()]));
+        hSvg.appendChild(svgEl('text', { x: x + cw / 2, y: 32, 'text-anchor': 'middle', fill: 'var(--header-date-text)', 'font-size': 10 }, String(col.date.getDate())));
       } else {
         const ml = `${MONTH_ABBR[col.date.getMonth()]} ${col.date.getFullYear()}`;
         if (ml !== prevMonth) {
@@ -6254,7 +6811,7 @@ function renderChart(visible, today) {
           }
         }
         if (col.date.getDate() % 5 === 0 || col.date.getDate() === 1)
-          hSvg.appendChild(svgEl('text', { x: x + 1, y: 34, fill: 'var(--text-lt)', 'font-size': 9 }, String(col.date.getDate())));
+          hSvg.appendChild(svgEl('text', { x: x + 1, y: 34, fill: 'var(--header-date-text)', 'font-size': 9 }, String(col.date.getDate())));
       }
     });
   }
@@ -6288,22 +6845,24 @@ function renderChart(visible, today) {
   taskRows.forEach(r => { const id = getTaskId(r.task); if (id) idToRow[id] = r; });
   const arrG = svgEl('g');
   taskRows.forEach(r => {
-    const dep = r.task.Dependency ? String(r.task.Dependency).trim() : ''; if (!dep) return;
-    const parent = idToRow[dep]; if (!parent) return;
-    const pEnd = parseDate(parent.task['End Date']); const cStart = parseDate(r.task['Start Date']);
-    if (!pEnd || !cStart) return;
-    const x1 = dateToX(addDays(pEnd, 1)), y1 = parent.ri * ROW_H + ROW_H / 2;
+    const deps = normalizeDependencyList(r.task.Dependency); if (!deps.length) return;
+    const myId = getTaskId(r.task);
+    const cStart = parseDate(r.task['Start Date']); if (!cStart) return;
     const x2 = dateToX(cStart), y2 = r.ri * ROW_H + ROW_H / 2;
-    let d = '';
-    if (x1 < x2 - 12) {
-      d = `M${x1},${y1} H${(x1 + x2) / 2} V${y2} H${x2}`;
-    } else {
-      const gY = y1 + (y2 > y1 ? 16 : -16);
-      d = `M${x1},${y1} H${x1 + 6} V${gY} H${x2 - 12} V${y2} H${x2}`;
-    }
-    const arrPath = svgEl('path', { d, fill: 'none', stroke: 'var(--text-lt)', 'stroke-width': 1.5, 'marker-end': 'url(#arr)', style: 'pointer-events:none' });
-    arrPath.dataset.depChildId = getTaskId(r.task);
-    arrG.appendChild(arrPath);
+    const parentPoints = deps
+      .filter(dep => dep !== myId)
+      .map(dep => {
+        const parent = idToRow[dep]; if (!parent) return null;
+        const pEnd = parseDate(parent.task['End Date']); if (!pEnd) return null;
+        return { x1: dateToX(addDays(pEnd, 1)), y1: parent.ri * ROW_H + ROW_H / 2 };
+      })
+      .filter(Boolean);
+    if (!parentPoints.length) return;
+    _routeDepArrowPaths(parentPoints, x2, y2).forEach(d => {
+      const arrPath = svgEl('path', { d, fill: 'none', stroke: 'var(--text-lt)', 'stroke-width': 1.5, 'marker-end': 'url(#arr)', style: 'pointer-events:none' });
+      arrPath.dataset.depChildId = myId;
+      arrG.appendChild(arrPath);
+    });
   });
 
   // ── Load More Buttons ──
@@ -6416,32 +6975,38 @@ function renderChart(visible, today) {
         svg.appendChild(mt);
       }
 
-      // Closed Dependency Attention Icon
-      if (t.Dependency) {
-        const depId = String(t.Dependency).trim();
-        if (!idToRow[depId] && !isDoneTask(t)) {
-          const realParent = AppState.currentTasks.find(pt => getTaskId(pt) === depId);
-          if (realParent && (AppState.collapsed['p:' + realParent.Phase] || AppState.collapsed['c:' + realParent.Phase + ':' + realParent.Category])) {
-            const iconX = x - 13;
-            const iconY = y + h / 2;
-            const attG = svgEl('g', { style: 'cursor:pointer' });
-            attG.appendChild(svgEl('circle', { cx: iconX, cy: iconY, r: 10, fill: 'var(--status-behind)' }));
-            const ex = svgEl('text', { x: iconX, y: iconY + 4, 'text-anchor': 'middle', fill: '#fff', 'font-size': 10, 'font-weight': 'bold' });
-            ex.textContent = '!';
-            attG.appendChild(ex);
+      // Closed Dependency Attention Icon — shown once per bar even when several
+      // dependencies are hidden behind a collapsed phase/category.
+      if (t.Dependency && !isDoneTask(t)) {
+        const hiddenParents = normalizeDependencyList(t.Dependency)
+          .filter(depId => depId !== getTaskId(t) && !idToRow[depId])
+          .map(depId => AppState.currentTasks.find(pt => getTaskId(pt) === depId))
+          .filter(rp => rp && (AppState.collapsed['p:' + rp.Phase] || AppState.collapsed['c:' + rp.Phase + ':' + rp.Category]));
+        if (hiddenParents.length) {
+          const iconX = x - 13;
+          const iconY = y + h / 2;
+          const attG = svgEl('g', { style: 'cursor:pointer' });
+          attG.appendChild(svgEl('circle', { cx: iconX, cy: iconY, r: 10, fill: 'var(--status-behind)' }));
+          const ex = svgEl('text', { x: iconX, y: iconY + 4, 'text-anchor': 'middle', fill: '#fff', 'font-size': 10, 'font-weight': 'bold' });
+          ex.textContent = '!';
+          attG.appendChild(ex);
 
-            attG.onclick = () => {
-              AppState.collapsed['p:' + realParent.Phase] = false;
-              AppState.collapsed['c:' + realParent.Phase + ':' + realParent.Category] = false;
-              render();
-              setTimeout(() => scrollToTask(realParent), 60);
-            };
-            const _depPColor = catColor(realParent.Category || '');
-            const _depHtml = `Hidden dependency:<br/><span style="color:var(--text-lt);font-size:0.7rem;">${escHtml(realParent.Phase)} \u203A <span style="color:${_depPColor};font-weight:600;">${escHtml(realParent.Category)}</span> \u203A </span><b>${escHtml(realParent.Title)}</b>`;
-            attG.onmousemove = (e) => showHTMLTooltip(e, _depHtml);
-            attG.onmouseleave = hideTooltip;
-            svg.appendChild(attG);
-          }
+          attG.onclick = () => {
+            hiddenParents.forEach(rp => {
+              AppState.collapsed['p:' + rp.Phase] = false;
+              AppState.collapsed['c:' + rp.Phase + ':' + rp.Category] = false;
+            });
+            render();
+            setTimeout(() => scrollToTask(hiddenParents[0]), 60);
+          };
+          const _depLines = hiddenParents.map(rp => {
+            const _depPColor = catColor(rp.Category || '');
+            return `<span style="color:var(--text-lt);font-size:0.7rem;">${escHtml(rp.Phase)} \u203A <span style="color:${_depPColor};font-weight:600;">${escHtml(rp.Category)}</span> \u203A </span><b>${escHtml(rp.Title)}</b>`;
+          }).join('<br/>');
+          const _depHtml = `Hidden dependenc${hiddenParents.length > 1 ? 'ies' : 'y'}:<br/>${_depLines}`;
+          attG.onmousemove = (e) => showHTMLTooltip(e, _depHtml);
+          attG.onmouseleave = hideTooltip;
+          svg.appendChild(attG);
         }
       }
     }
@@ -6492,12 +7057,16 @@ function renderChart(visible, today) {
 // add it separately. renderFlowChart() adds a matching FLOW_SCROLL_PAD_PX after the
 // rightmost bar when sizing the scrollable SVG width, so there's real empty canvas —
 // not just already-visible margin — on both sides for drag/inertia scrolling to use.
-// A dependent task always starts FLOW_DEP_GAP_PX after its parent ends, regardless of
-// the child's actual Start/End Date — this guarantees every dependency arrow is a
-// simple 2-elbow orthogonal path (see renderFlowChart()).
-// Resolution is a memoized DFS keyed by task ID (only one Dependency per task), which
-// naturally processes parents before children; a dependency cycle or an unresolved
-// parent (missing, or not in the currently visible row set) falls back to root.
+// A dependent task always starts FLOW_DEP_GAP_PX after the LATEST-ending of its
+// parents, regardless of the child's actual Start/End Date — this guarantees every
+// dependency arrow driven by that critical parent is a simple 2-elbow orthogonal path
+// (see renderFlowChart()); arrows from any other, non-driving parent may need a small
+// jog, which renderFlowChart() also handles.
+// Resolution is a memoized DFS keyed by task ID — a task may now have several
+// Dependency IDs (comma-separated), so it resolves every parent first and takes the
+// rightmost resulting edge — which naturally processes parents before children; a
+// dependency cycle or an unresolved parent (missing, or not in the currently visible
+// row set) is simply skipped for that parent, falling back to root if none resolve.
 //
 // Ghost (snapshot-comparison) tasks are positioned too, keyed as `'ghost:' + id` so they
 // never collide with a current task sharing the same ID: a ghost simply reuses its
@@ -6537,15 +7106,16 @@ function computeFlowLayout(visible, chartWidth) {
     const t = taskById[id];
     if (!t) return null;
     const w = widthFor(t);
-    const depId = t.Dependency ? String(t.Dependency).trim() : '';
+    const depIds = normalizeDependencyList(t.Dependency);
     let x = leftOffset;
-    if (depId && depId !== id && taskById[depId] && !path.has(depId)) {
+    depIds.forEach(depId => {
+      if (depId === id || !taskById[depId] || path.has(depId)) return;
       const parentPath = new Set(path); parentPath.add(id);
       const parentLayout = resolve(depId, parentPath);
       if (parentLayout) {
-        x = parentLayout.x + parentLayout.w + FLOW_DEP_GAP_PX;
+        x = Math.max(x, parentLayout.x + parentLayout.w + FLOW_DEP_GAP_PX);
       }
-    }
+    });
     layout[id] = { x, w };
     return layout[id];
   }
@@ -6633,7 +7203,7 @@ function renderFlowChart(visible, today) {
   // title is the separate #flow-title-label HTML overlay (kept outside #timeline-header
   // so clearing its innerHTML every render doesn't wipe it) — shown/hidden via the
   // .visible class, the same technique used for .changes-glow on this same element.
-  // The header itself gets a distinct background via .flow-header (--flow-header-bg).
+  // The header itself gets a distinct background via .flow-header (see style.css).
   const hdr = document.getElementById('timeline-header'); hdr.innerHTML = '';
   hdr.classList.remove('changes-glow');
   hdr.classList.add('flow-header');
@@ -6662,20 +7232,29 @@ function renderFlowChart(visible, today) {
   taskRows.forEach(r => { const id = getTaskId(r.task); if (id) idToRow[id] = r; });
   const arrG = svgEl('g');
   taskRows.forEach(r => {
-    const dep = r.task.Dependency ? String(r.task.Dependency).trim() : ''; if (!dep) return;
-    const parent = idToRow[dep]; if (!parent) return;
+    const deps = normalizeDependencyList(r.task.Dependency); if (!deps.length) return;
     const myId = getTaskId(r.task);
-    const pl = layout[dep], cl = layout[myId];
-    if (!pl || !cl) return;
-    const x1 = pl.x + pl.w, y1 = parent.ri * ROW_H + ROW_H / 2;
+    const cl = layout[myId]; if (!cl) return;
     const x2 = cl.x, y2 = r.ri * ROW_H + ROW_H / 2;
-    // computeFlowLayout() guarantees x2 >= x1 + FLOW_DEP_GAP_PX, so a child's start is
-    // always comfortably right of its parent's end — a simple 2-elbow orthogonal path
-    // (horizontal / vertical / horizontal) is always usable, no jog fallback needed.
-    const d = `M${x1},${y1} H${(x1 + x2) / 2} V${y2} H${x2}`;
-    const arrPath = svgEl('path', { d, fill: 'none', stroke: 'var(--text-lt)', 'stroke-width': 1.5, 'marker-end': 'url(#arr)', style: 'pointer-events:none' });
-    arrPath.dataset.depChildId = myId;
-    arrG.appendChild(arrPath);
+    // computeFlowLayout() guarantees x2 >= x1 + FLOW_DEP_GAP_PX for the dependency
+    // that actually drives this task's x position, but a task can have several
+    // dependencies — a non-driving one's parent may end further right, so
+    // _routeDepArrowPaths() falls back to the same jog path renderChart() uses
+    // when the simple 2-elbow path would run backwards.
+    const parentPoints = deps
+      .filter(dep => dep !== myId)
+      .map(dep => {
+        const parent = idToRow[dep]; if (!parent) return null;
+        const pl = layout[dep]; if (!pl) return null;
+        return { x1: pl.x + pl.w, y1: parent.ri * ROW_H + ROW_H / 2 };
+      })
+      .filter(Boolean);
+    if (!parentPoints.length) return;
+    _routeDepArrowPaths(parentPoints, x2, y2).forEach(d => {
+      const arrPath = svgEl('path', { d, fill: 'none', stroke: 'var(--text-lt)', 'stroke-width': 1.5, 'marker-end': 'url(#arr)', style: 'pointer-events:none' });
+      arrPath.dataset.depChildId = myId;
+      arrG.appendChild(arrPath);
+    });
   });
   svg.appendChild(arrG);
 
@@ -6758,30 +7337,35 @@ function renderFlowChart(visible, today) {
     }
 
     // Closed Dependency Attention Icon (same behaviour as renderChart)
-    if (t.Dependency) {
-      const depId = String(t.Dependency).trim();
-      if (!idToRow[depId] && !isDoneTask(t)) {
-        const realParent = AppState.currentTasks.find(pt => getTaskId(pt) === depId);
-        if (realParent && (AppState.collapsed['p:' + realParent.Phase] || AppState.collapsed['c:' + realParent.Phase + ':' + realParent.Category])) {
-          const iconX = x - 13;
-          const iconY = y + h / 2;
-          const attG = svgEl('g', { style: 'cursor:pointer' });
-          attG.appendChild(svgEl('circle', { cx: iconX, cy: iconY, r: 10, fill: 'var(--status-behind)' }));
-          const ex = svgEl('text', { x: iconX, y: iconY + 4, 'text-anchor': 'middle', fill: '#fff', 'font-size': 10, 'font-weight': 'bold' });
-          ex.textContent = '!';
-          attG.appendChild(ex);
-          attG.onclick = () => {
-            AppState.collapsed['p:' + realParent.Phase] = false;
-            AppState.collapsed['c:' + realParent.Phase + ':' + realParent.Category] = false;
-            render();
-            setTimeout(() => scrollToTask(realParent), 60);
-          };
-          const _depPColor = catColor(realParent.Category || '');
-          const _depHtml = `Hidden dependency:<br/><span style="color:var(--text-lt);font-size:0.7rem;">${escHtml(realParent.Phase)} › <span style="color:${_depPColor};font-weight:600;">${escHtml(realParent.Category)}</span> › </span><b>${escHtml(realParent.Title)}</b>`;
-          attG.onmousemove = (e) => showHTMLTooltip(e, _depHtml);
-          attG.onmouseleave = hideTooltip;
-          svg.appendChild(attG);
-        }
+    if (t.Dependency && !isDoneTask(t)) {
+      const hiddenParents = normalizeDependencyList(t.Dependency)
+        .filter(depId => depId !== id && !idToRow[depId])
+        .map(depId => AppState.currentTasks.find(pt => getTaskId(pt) === depId))
+        .filter(rp => rp && (AppState.collapsed['p:' + rp.Phase] || AppState.collapsed['c:' + rp.Phase + ':' + rp.Category]));
+      if (hiddenParents.length) {
+        const iconX = x - 13;
+        const iconY = y + h / 2;
+        const attG = svgEl('g', { style: 'cursor:pointer' });
+        attG.appendChild(svgEl('circle', { cx: iconX, cy: iconY, r: 10, fill: 'var(--status-behind)' }));
+        const ex = svgEl('text', { x: iconX, y: iconY + 4, 'text-anchor': 'middle', fill: '#fff', 'font-size': 10, 'font-weight': 'bold' });
+        ex.textContent = '!';
+        attG.appendChild(ex);
+        attG.onclick = () => {
+          hiddenParents.forEach(rp => {
+            AppState.collapsed['p:' + rp.Phase] = false;
+            AppState.collapsed['c:' + rp.Phase + ':' + rp.Category] = false;
+          });
+          render();
+          setTimeout(() => scrollToTask(hiddenParents[0]), 60);
+        };
+        const _depLines = hiddenParents.map(rp => {
+          const _depPColor = catColor(rp.Category || '');
+          return `<span style="color:var(--text-lt);font-size:0.7rem;">${escHtml(rp.Phase)} › <span style="color:${_depPColor};font-weight:600;">${escHtml(rp.Category)}</span> › </span><b>${escHtml(rp.Title)}</b>`;
+        }).join('<br/>');
+        const _depHtml = `Hidden dependenc${hiddenParents.length > 1 ? 'ies' : 'y'}:<br/>${_depLines}`;
+        attG.onmousemove = (e) => showHTMLTooltip(e, _depHtml);
+        attG.onmouseleave = hideTooltip;
+        svg.appendChild(attG);
       }
     }
 
@@ -6862,105 +7446,125 @@ function showTooltip(e, t, snapLabel, partnerTask, isGhost) {
   const tt = document.getElementById('tooltip');
   const sc = STATUS_COLORS[(t.Status || '').toLowerCase()] || '#94a3b8';
   const snap = snapLabel ? `<div class="tt-snap">Snapshot: ${escHtml(snapLabel)}</div>` : '';
-
-  const myPhase = t.Phase || '(No Phase)';
-  const myCat = t.Category || '(No Category)';
-  const cColor = catColor(myCat);
-  const phaseCatHtml = `<div style="font-size:0.7rem; color:#64748b; margin-top:-2px; margin-bottom:6px;">${escHtml(myPhase)} \xBB <span style="color:${cColor}; font-weight:600">${escHtml(myCat)}</span></div>`;
-
-  // Fields to render in the tooltip (Description moved to top)
-  const fields = [
-    { label: 'Description', key: 'Description', skip_diff: true },
-    { label: 'Status', key: 'Status', is_status: true },
-    { label: 'Start', key: 'Start Date' },
-    { label: 'End', key: 'End Date' },
-    { label: 'Progress', key: 'Progress' },
-    { label: 'Priority', key: 'Priority' },
-    { label: 'Dependency', key: 'Dependency' },
-    { label: 'Tags', key: 'Tags' },
-  ];
+  const prefs = AppState.hoverPanelPrefs || { properties: true, description: true };
 
   const currentList = AppState.currentTasks || [];
   const snapList = (snapLabel && DATA.snapshots[snapLabel]) ? DATA.snapshots[snapLabel] : [];
 
-  let rows = '';
-  fields.forEach(({ label, key, skip_diff, is_status }) => {
-    const myVal = _getVal(t, key);
-    let diffHtml = '';
-    if (!skip_diff && partnerTask) {
-      const partVal = _getVal(partnerTask, key);
-      if (myVal !== partVal) {
-        const cls = isGhost ? 'tt-diff-curr' : 'tt-diff-snap';
-        diffHtml = `<span class="${cls}">${escHtml(partVal)}</span>`;
+  // Column 1: Properties (title, phase/category, task fields, and — at the
+  // bottom — Comments, omitted entirely when there's nothing to show)
+  let propsCol = '';
+  if (prefs.properties) {
+    const myPhase = t.Phase || '(No Phase)';
+    const myCat = t.Category || '(No Category)';
+    const cColor = catColor(myCat);
+    const phaseCatHtml = `<div style="font-size:0.7rem; color:#64748b; margin-top:-2px; margin-bottom:6px;">${escHtml(myPhase)} \xBB <span style="color:${cColor}; font-weight:600">${escHtml(myCat)}</span></div>`;
+
+    const fields = [
+      { label: 'Status', key: 'Status', is_status: true },
+      { label: 'Start', key: 'Start Date' },
+      { label: 'End', key: 'End Date' },
+      { label: 'Progress', key: 'Progress' },
+      { label: 'Priority', key: 'Priority' },
+      { label: 'Dependency', key: 'Dependency' },
+      { label: 'Tags', key: 'Tags' },
+    ];
+
+    let rows = '';
+    fields.forEach(({ label, key, is_status }) => {
+      const myVal = _getVal(t, key);
+      let diffHtml = '';
+      if (partnerTask) {
+        const partVal = _getVal(partnerTask, key);
+        if (myVal !== partVal) {
+          const cls = isGhost ? 'tt-diff-curr' : 'tt-diff-snap';
+          diffHtml = `<span class="${cls}">${escHtml(partVal)}</span>`;
+        }
       }
-    }
-    // Build display HTML for this value
-    let valHtml;
-    if (key === 'Dependency' && myVal !== '\u2014') {
-      const ctxList = isGhost ? snapList : currentList;
-      const parent = ctxList.find(pt => getTaskId(pt) === myVal);
-      if (parent) {
-        const pColor = catColor(parent.Category || '');
-        valHtml = `${escHtml(parent.Phase)} \u203A <span style="color:${pColor};font-weight:600;">${escHtml(parent.Category)}</span> \u203A ${escHtml(parent.Title)} <span style="color:#94a3b8;font-size:0.7em;">(${escHtml(myVal)})</span>`;
+      let valHtml;
+      if (key === 'Dependency' && myVal !== '—') {
+        const ctxList = isGhost ? snapList : currentList;
+        const depIds = normalizeDependencyList(myVal);
+        valHtml = depIds.map(depId => {
+          const parent = ctxList.find(pt => getTaskId(pt) === depId);
+          if (parent) {
+            const depSc = STATUS_COLORS[(parent.Status || '').toLowerCase()] || '#94a3b8';
+            return `<span class="tt-dep-item"><span class="tt-sc" style="background:${depSc};"></span>${escHtml(parent.Title)} <span style="color:#94a3b8;font-size:0.7em;">(${escHtml(depId)})</span></span>`;
+          }
+          return `<span class="tt-dep-item">${escHtml(depId)}</span>`;
+        }).join('<br/>');
       } else {
         valHtml = escHtml(myVal);
       }
-    } else {
-      valHtml = escHtml(myVal);
-    }
-    if (is_status) {
-      rows += `<div class="tt-row"><span class="tt-label">${label}</span>${valHtml}<span class="tt-sc" style="background:${sc}"></span>${diffHtml}</div>`;
-    } else {
-      rows += `<div class="tt-row"><span class="tt-label">${label}</span>${valHtml}${diffHtml}</div>`;
-    }
-  });
+      if (is_status) {
+        rows += `<div class="tt-row"><span class="tt-label">${label}</span>${valHtml}<span class="tt-sc" style="background:${sc}"></span>${diffHtml}</div>`;
+      } else {
+        // Dependency can render several stacked lines (one per dependency), so
+        // its row top-aligns the label to the first item instead of the shared
+        // .tt-row centering (which would otherwise centre the label on the
+        // full stack's height).
+        const rowCls = key === 'Dependency' ? 'tt-row tt-row--top' : 'tt-row';
+        rows += `<div class="${rowCls}"><span class="tt-label">${label}</span><div style="flex:1; min-width:0; word-break:break-word; overflow-wrap:anywhere;">${valHtml}</div>${diffHtml}</div>`;
+      }
+    });
 
-  // Append note count and latest note at bottom
-  const ttComments = t.Comments || [];
-  const noteCountLabel = ttComments.length === 0 ? 'No notes yet' : `${ttComments.length} note${ttComments.length !== 1 ? 's' : ''}`;
-  rows += `<div class="tt-row" style="margin-top:4px;border-top:1px solid var(--border);padding-top:4px;"><span class="tt-label">Notes</span>${escHtml(noteCountLabel)}`;
-  // Comment count diff vs partner
-  if (partnerTask) {
-    const partnerComments = partnerTask.Comments || [];
-    const delta = ttComments.length - partnerComments.length;
-    if (delta !== 0) {
-      const diffCls = delta > 0 ? 'tt-diff-curr' : 'tt-diff-snap';
-      const sign = delta > 0 ? '+' : '';
-      rows += ` <span class="${diffCls}">${sign}${delta} vs snapshot</span>`;
+    // Comments, appended at the bottom of the Properties column (omitted
+    // entirely — no "0 notes" row — when there's nothing to show)
+    const ttComments = t.Comments || [];
+    const partnerComments = (partnerTask && partnerTask.Comments) || [];
+    let commentsHtml = '';
+    if (ttComments.length > 0 || partnerComments.length > 0) {
+      const noteCountLabel = `${ttComments.length} note${ttComments.length !== 1 ? 's' : ''}`;
+      commentsHtml += `<div class="tt-row" style="margin-top:4px;border-top:1px solid var(--border);padding-top:4px;"><span class="tt-label">Notes</span>${escHtml(noteCountLabel)}`;
+      const delta = ttComments.length - partnerComments.length;
+      if (partnerTask && delta !== 0) {
+        const diffCls = delta > 0 ? 'tt-diff-curr' : 'tt-diff-snap';
+        const sign = delta > 0 ? '+' : '';
+        commentsHtml += ` <span class="${diffCls}">${sign}${delta} vs snapshot</span>`;
+      }
+      commentsHtml += `</div>`;
+      if (ttComments.length > 0) {
+        const latest = ttComments.slice().sort((a, b) => { const da = parseDate(a.date), db = parseDate(b.date); return (da && db) ? db - da : 0; })[0];
+        const cColor = commenterColor(latest.name);
+        // Truncate at ~400 chars to avoid runaway tooltips (10 lines at ~40 chars each)
+        const shortText = latest.text.length > 400 ? latest.text.slice(0, 400) + '…' : latest.text;
+        commentsHtml += `<div class="tt-row" style="flex-direction:column;align-items:flex-start;gap:2px;">` +
+          `<div style="display:flex;align-items:center;"><span class="tt-label">Latest</span><span style="color:${cColor};font-weight:700">${escHtml(latest.name)}</span>&nbsp;<span style="color:var(--text-mu);font-size:0.75em;">${escHtml(latest.date)}</span></div>` +
+          `<div style="padding-left:78px;white-space:pre-wrap;word-break:break-word;line-height:1.5;max-height:calc(10 * 1.5em);overflow:hidden;">${escHtml(shortText)}</div>` +
+          `</div>`;
+      }
+      if (partnerComments.length > 0) {
+        const snapLatest = partnerComments.slice().sort((a, b) => { const da = parseDate(a.date), db = parseDate(b.date); return (da && db) ? db - da : 0; })[0];
+        const spColor = commenterColor(snapLatest.name);
+        const snapShort = snapLatest.text.length > 45 ? snapLatest.text.slice(0, 45) + '…' : snapLatest.text;
+        commentsHtml += `<div class="tt-row" style="flex-direction:column;align-items:flex-start;gap:2px;">` +
+          `<div style="display:flex;align-items:center;"><span class="tt-label">Snap note</span><span style="color:${spColor};font-weight:700">${escHtml(snapLatest.name)}</span>&nbsp;<span style="color:var(--text-mu);font-size:0.75em;">${escHtml(snapLatest.date)}</span></div>` +
+          `<div style="padding-left:78px;white-space:pre-wrap;word-break:break-word;line-height:1.5;">${escHtml(snapShort)}</div>` +
+          `</div>`;
+      }
     }
-  }
-  rows += `</div>`;
-  if (ttComments.length > 0) {
-    const latest = ttComments.slice().sort((a, b) => { const da = parseDate(a.date), db = parseDate(b.date); return (da && db) ? db - da : 0; })[0];
-    const cColor = commenterColor(latest.name);
-    // Truncate at ~400 chars to avoid runaway tooltips (10 lines at ~40 chars each)
-    const shortText = latest.text.length > 400 ? latest.text.slice(0, 400) + '\u2026' : latest.text;
-    rows += `<div class="tt-row" style="flex-direction:column;align-items:flex-start;gap:2px;">` +
-      `<div style="display:flex;align-items:center;"><span class="tt-label">Latest</span><span style="color:${cColor};font-weight:700">${escHtml(latest.name)}</span>&nbsp;<span style="color:var(--text-mu);font-size:0.75em;">${escHtml(latest.date)}</span></div>` +
-      `<div style="padding-left:78px;white-space:pre-wrap;word-break:break-word;line-height:1.5;max-height:calc(10 * 1.5em);overflow:hidden;">${escHtml(shortText)}</div>` +
-      `</div>`;
-  }
-  // Show snapshot's latest comment for comparison context
-  if (partnerTask) {
-    const partnerComments = partnerTask.Comments || [];
-    if (partnerComments.length > 0) {
-      const snapLatest = partnerComments.slice().sort((a, b) => { const da = parseDate(a.date), db = parseDate(b.date); return (da && db) ? db - da : 0; })[0];
-      const spColor = commenterColor(snapLatest.name);
-      const snapShort = snapLatest.text.length > 45 ? snapLatest.text.slice(0, 45) + '\u2026' : snapLatest.text;
-      rows += `<div class="tt-row" style="flex-direction:column;align-items:flex-start;gap:2px;">` +
-        `<div style="display:flex;align-items:center;"><span class="tt-label">Snap note</span><span style="color:${spColor};font-weight:700">${escHtml(snapLatest.name)}</span>&nbsp;<span style="color:var(--text-mu);font-size:0.75em;">${escHtml(snapLatest.date)}</span></div>` +
-        `<div style="padding-left:78px;white-space:pre-wrap;word-break:break-word;line-height:1.5;">${escHtml(snapShort)}</div>` +
-        `</div>`;
-    }
+
+    propsCol = `<div class="tt-col tt-col-props"><div class="tt-title">${escHtml(t.Title || '')}</div>${phaseCatHtml}${rows}${commentsHtml}</div>`;
   }
 
-  // Hotkey hints (only for real tasks, not snapshot ghosts)
+  // Column 2: Description — heading uses the same style as the item title
+  let descCol = '';
+  if (prefs.description) {
+    // Diff highlighting is intentionally skipped here (same as the previous
+    // single-column tooltip) — descriptions are free text, so a full diff
+    // would be noisy rather than useful.
+    const myDesc = _getVal(t, 'Description');
+    descCol = `<div class="tt-col tt-col-desc"><div class="tt-title">Description</div>` +
+      `<div style="white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;">${escHtml(myDesc)}</div></div>`;
+  }
+
+  // Hotkey hints (only for real tasks, not snapshot ghosts) — spans full width, beneath the columns
   let hotkeyHtml = '';
   if (!isGhost) {
-    hotkeyHtml = `<div style="color:var(--text-mu); font-size:0.85em; margin-top:3px; border-top:1px solid var(--border); padding-top:2px;">e: edit  \u2022  c: comments  \u2022  d: add dependent  \u2022  n: duplicate</div>`;
+    hotkeyHtml = `<div class="tt-hotkeys">e: edit  •  c: comments  •  d: add dependent  •  n: duplicate  •  s: add parent</div>`;
   }
 
-  tt.innerHTML = `${snap}<div class="tt-title">${escHtml(t.Title || '')}</div>${phaseCatHtml}${rows}${hotkeyHtml}`;
+  tt.innerHTML = `${snap}<div class="tt-grid">${propsCol}${descCol}</div>${hotkeyHtml}`;
   tt.style.display = 'block'; moveTooltip(e);
 }
 function showSimpleTooltip(e, text, shortcut) {
@@ -6984,8 +7588,15 @@ function showHTMLTooltip(e, htmlContent) {
 function moveTooltip(e) {
   const tt = document.getElementById('tooltip'); const px = 12;
   let lx = e.clientX + px, ly = e.clientY + px;
-  if (lx + 350 > window.innerWidth) lx = e.clientX - 350 - px;
+  if (lx + tt.offsetWidth > window.innerWidth) lx = e.clientX - tt.offsetWidth - px;
   if (ly + tt.offsetHeight > window.innerHeight) ly = e.clientY - tt.offsetHeight - px;
+  // The flips above assume there's room on the opposite side, which isn't
+  // guaranteed on a narrow window (e.g. the wide multi-column properties/
+  // description tooltip near a left/top edge) — clamp fully on-screen as a
+  // fallback instead of letting it run off either edge.
+  const margin = 4;
+  lx = Math.max(margin, Math.min(lx, window.innerWidth - tt.offsetWidth - margin));
+  ly = Math.max(margin, Math.min(ly, window.innerHeight - tt.offsetHeight - margin));
   tt.style.left = lx + 'px'; tt.style.top = ly + 'px';
 }
 document.addEventListener('mousemove', e => { if (document.getElementById('tooltip').style.display === 'block') moveTooltip(e); });
@@ -7092,6 +7703,7 @@ function isOverdueNow(t, today) {
 
 function toggleFlyout() {
   if (AppState._infoPanelOpen) toggleInfoPanel();
+  if (AppState._settingsPanelOpen) toggleSettingsPanel();
   AppState._flyoutOpen = !AppState._flyoutOpen;
   const pane = document.getElementById('flyout-pane');
   const btn = document.getElementById('stats-btn');
@@ -7101,9 +7713,48 @@ function toggleFlyout() {
 
 function toggleInfoPanel() {
   if (AppState._flyoutOpen && document.getElementById('flyout-pane').classList.contains('open')) toggleFlyout();
+  if (AppState._settingsPanelOpen) toggleSettingsPanel();
   AppState._infoPanelOpen = !AppState._infoPanelOpen;
   const pane = document.getElementById('info-panel');
   if (pane) pane.classList.toggle('open', AppState._infoPanelOpen);
+}
+
+// ── Settings flyout (hover panel preferences) ──────────────────────────
+const HOVER_PANEL_PREFS_KEY = 'gantt_hover_panel_prefs';
+
+function _loadHoverPanelPrefs() {
+  try {
+    const raw = localStorage.getItem(HOVER_PANEL_PREFS_KEY);
+    if (raw) Object.assign(AppState.hoverPanelPrefs, JSON.parse(raw));
+  } catch (e) { /* ignore malformed/unavailable storage */ }
+}
+
+function _saveHoverPanelPrefs() {
+  try { localStorage.setItem(HOVER_PANEL_PREFS_KEY, JSON.stringify(AppState.hoverPanelPrefs)); } catch (e) { /* ignore */ }
+}
+
+function _syncSettingsPanelUI() {
+  ['properties', 'description'].forEach(key => {
+    const cb = document.getElementById('settings-hover-' + key);
+    if (cb) cb.checked = !!AppState.hoverPanelPrefs[key];
+  });
+}
+
+function toggleSettingsPanel() {
+  if (AppState._flyoutOpen && document.getElementById('flyout-pane').classList.contains('open')) toggleFlyout();
+  if (AppState._infoPanelOpen) toggleInfoPanel();
+  AppState._settingsPanelOpen = !AppState._settingsPanelOpen;
+  const pane = document.getElementById('settings-panel');
+  if (pane) pane.classList.toggle('open', AppState._settingsPanelOpen);
+  if (AppState._settingsPanelOpen) _syncSettingsPanelUI();
+}
+
+function toggleHoverPanelSetting(checkbox) {
+  if (!checkbox) return;
+  const key = checkbox.dataset.key;
+  if (!key || !(key in AppState.hoverPanelPrefs)) return;
+  AppState.hoverPanelPrefs[key] = checkbox.checked;
+  _saveHoverPanelPrefs();
 }
 
 function updateFlyout() {
@@ -7370,12 +8021,15 @@ function _reorderVisibleForFlow(visible) {
 
     const rowById = {};
     normalRows.forEach(row => { const id = getTaskId(row.task); if (id) rowById[id] = row; });
-    // Group by resolved-parent-id-within-category; '' = root for this grouping.
+    // Group by resolved-parent-id-within-category; '' = root for this grouping. A task
+    // with several dependencies nests under the first one (in Dependency list order)
+    // that's in this same category — the rest still get their own arrows drawn by
+    // renderFlowChart(), they just don't drive the tree position.
     const childrenOf = {};
     normalRows.forEach(row => {
       const myId = getTaskId(row.task);
-      const depId = row.task.Dependency ? String(row.task.Dependency).trim() : '';
-      const parentKey = (depId && depId !== myId && rowById[depId]) ? depId : '';
+      const depIds = normalizeDependencyList(row.task.Dependency);
+      const parentKey = depIds.find(depId => depId !== myId && rowById[depId]) || '';
       (childrenOf[parentKey] || (childrenOf[parentKey] = [])).push(row);
     });
     Object.values(childrenOf).forEach(list => list.sort(bySiblingSort));
@@ -7433,6 +8087,9 @@ function render() {
   renderLeft(visible, today, statsMap);
   if (AppState.viewMode === 'flow') renderFlowChart(visible, today);
   else renderChart(visible, today);
+  const ca = document.getElementById('chart-area');
+  const lr = document.getElementById('left-rows');
+  if (ca && lr) lr.scrollTop = ca.scrollTop;
   _syncViewModeToolbar();
   updateToggleBtn();
   updateFlyout();
@@ -7524,29 +8181,37 @@ function toggleViewMode() {
   }
 }
 
+// Switches to a specific view mode (used by the two icons flanking the view
+// slider, which select a side outright rather than toggling).
+function setViewMode(mode) {
+  if (AppState.viewMode === mode) return;
+  toggleViewMode();
+}
+
 function _updateViewModeBtn() {
   const btn = document.getElementById('viewmode-btn');
   if (!btn) return;
   const isFlow = AppState.viewMode === 'flow';
-  btn.innerHTML = isFlow
-    ? '&#128197;<span class="txt-full"> Timeline View</span><span class="txt-short txt-min"> T</span>'
-    : '&#128279;<span class="txt-full"> Linked View</span><span class="txt-short txt-min"> L</span>';
-  btn.dataset.tooltip = isFlow ? 'Switch to Timeline view' : 'Switch to Dependency Linked view';
+  btn.classList.toggle('flow', isFlow);
+  btn.setAttribute('aria-checked', isFlow ? 'true' : 'false');
 }
 
-// Shows/hides the two mutually-exclusive toolbar-center button groups (Week/Month/Year +
+// Swaps the two mutually-exclusive toolbar-center control pairs (Week/Month/Year +
 // Today for Timeline mode; All/Active/Overdue + First/Last for Flow mode). The prev/next
 // arrow buttons are shared between both modes (see navigate()).
+//
+// visibility rather than display, because each pair shares a single .mode-slot
+// grid cell: keeping the inactive control laid out (but invisible, untabbable
+// and click-through) is what makes the slot permanently as wide as the wider
+// of the two, so toggling the view mode can't resize .toolbar-center and slide
+// the whole centred block sideways.
 function _syncViewModeToolbar() {
   const isFlow = AppState.viewMode === 'flow';
-  const viewBtns = document.getElementById('view-btns');
-  const todayBtn = document.getElementById('today-btn');
-  const flowFilterBtns = document.getElementById('flow-filter-btns');
-  const flowFirstLastBtns = document.getElementById('flow-first-last-btns');
-  if (viewBtns) viewBtns.style.display = isFlow ? 'none' : '';
-  if (todayBtn) todayBtn.style.display = isFlow ? 'none' : '';
-  if (flowFilterBtns) flowFilterBtns.style.display = isFlow ? '' : 'none';
-  if (flowFirstLastBtns) flowFirstLastBtns.style.display = isFlow ? '' : 'none';
+  const show = (el, visible) => { if (el) el.style.visibility = visible ? 'visible' : 'hidden'; };
+  show(document.getElementById('view-btns'), !isFlow);
+  show(document.getElementById('today-btn'), !isFlow);
+  show(document.getElementById('flow-filter-btns'), isFlow);
+  show(document.getElementById('flow-first-last-btns'), isFlow);
 }
 
 // "First" scrolls to the dependency-chain roots (flush past the FLOW_SCROLL_PAD_PX
@@ -7858,7 +8523,8 @@ function closeCommentsModal() { closeModal(); }
 
 function renderCommentList() {
   const list = document.getElementById('comments-list');
-  if (!list || !AppState._modalTask) return;
+  if (!list) return;
+  if (!AppState._modalTask) { list.innerHTML = ''; return; }
   list.innerHTML = '';
   const comments = (AppState._modalTask.Comments || []).slice().sort((a, b) => {
     const da = parseDate(a.date), db = parseDate(b.date);
@@ -7904,9 +8570,10 @@ function renderCommentList() {
       cancelBtn.addEventListener('click', () => renderCommentList());
     });
     // Delete button
-    item.querySelector('.comment-delete-btn').addEventListener('click', () => {
+    item.querySelector('.comment-delete-btn').addEventListener('click', async () => {
       hideTooltip();
-      if (confirm('Delete this comment?')) {
+      const ok = await showConfirmDialog('Delete this comment?', 'Delete Comment');
+      if (ok) {
         AppState._modalTask.Comments.splice(realIdx, 1);
         syncCurrentTasksToData(); setUnsavedChanges(true); renderCommentList();
       }
@@ -7994,9 +8661,76 @@ function closeModal() {
   if (overlay) overlay.style.display = 'none';
 }
 
-function closeModalConfirm() {
+// ── Centered Custom Confirm Modal ─────────────────────────────────────
+function showConfirmDialog(message, title = 'Confirm') {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.style.zIndex = '10005';
+    overlay.style.display = 'flex';
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.width = '380px';
+    modal.style.maxWidth = '90vw';
+
+    const header = document.createElement('div');
+    header.className = 'modal-header';
+    header.innerHTML = `<h3 style="margin:0;">${escHtml(title)}</h3>`;
+
+    const body = document.createElement('div');
+    body.className = 'modal-body';
+    body.style.whiteSpace = 'pre-wrap';
+    body.style.lineHeight = '1.5';
+    body.textContent = message;
+
+    const footer = document.createElement('div');
+    footer.className = 'modal-footer';
+    footer.style.justifyContent = 'flex-end';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn';
+    cancelBtn.textContent = 'Cancel';
+
+    const okBtn = document.createElement('button');
+    okBtn.className = 'btn btn-primary';
+    okBtn.textContent = 'OK';
+
+    footer.appendChild(cancelBtn);
+    footer.appendChild(okBtn);
+
+    modal.appendChild(header);
+    modal.appendChild(body);
+    modal.appendChild(footer);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const cleanup = (res) => {
+      document.body.removeChild(overlay);
+      resolve(res);
+    };
+
+    cancelBtn.addEventListener('click', () => cleanup(false));
+    okBtn.addEventListener('click', () => cleanup(true));
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) cleanup(false);
+    });
+    document.addEventListener('keydown', function escHandler(e) {
+      if (e.key === 'Escape') {
+        document.removeEventListener('keydown', escHandler);
+        cleanup(false);
+      }
+    });
+    setTimeout(() => okBtn.focus(), 50);
+  });
+}
+
+async function closeModalConfirm() {
   _markCommentsDirty();
-  if ((_isEditDirty() || AppState._commentsDirty) && !confirm('Discard unsaved changes?')) return;
+  if (_isEditDirty() || AppState._commentsDirty) {
+    const ok = await showConfirmDialog('Discard unsaved changes?', 'Discard Changes');
+    if (!ok) return;
+  }
   _clearCommentsDirty();
   closeModal();
 }
@@ -8216,10 +8950,13 @@ function initEvents() {
         case 'navigate': navigate(Number(val)); break;
         case 'goToday': goToday(); break;
         case 'toggleViewMode': toggleViewMode(); break;
+        case 'setViewMode': setViewMode(val); break;
         case 'flowGoFirst': flowGoFirst(); break;
         case 'flowGoLast': flowGoLast(); break;
         case 'toggleFlyout': toggleFlyout(); break;
         case 'toggleInfoPanel': toggleInfoPanel(); break;
+        case 'toggleSettingsPanel': toggleSettingsPanel(); break;
+        case 'toggleHoverPanelSetting': toggleHoverPanelSetting(actionEl); break;
         case 'toggleChangesOnly': toggleChangesOnly(); break;
         case 'restoreFromSnapshot': restoreFromSnapshot(); break;
         case 'clearCompare': clearCompare(); break;
@@ -8245,7 +8982,6 @@ function initEvents() {
         case 'closeTaskModal': closeModal(); break;
         case 'closeTaskModalConfirm': closeModalConfirm(); break;
         case 'closeModalConfirm': closeModalConfirm(); break;
-        case 'saveTaskModal': saveTaskModal(); break;
         case 'saveTaskModalAndClose': saveTaskModalAndClose(); break;
         case 'deleteTaskFromModal': deleteTaskFromModal(); break;
         case 'duplicateTaskFromModal': duplicateTaskFromModal(); break;
@@ -8306,11 +9042,11 @@ function initEvents() {
       return;
     }
     if (modalOpen) {
+      if (e.key === 's' || e.key === 'S') { e.preventDefault(); saveTaskModalAndClose(); }
       if (e.key === 'e') { e.preventDefault(); modalSwitchEdit(); }
       if (e.key === 'c') { e.preventDefault(); modalSwitchComments(); }
       if (e.key === 'b') { e.preventDefault(); modalSwitchBoth(); }
     } else if (!anyModalOpen) {
-      if (e.key === 's') { e.preventDefault(); saveSnapshot(); }
       if (e.key === 'x') { e.preventDefault(); exportChart(); }
       if (e.key === 'i') { e.preventDefault(); toggleInfoPanel(); }
       if (e.key === 't') { e.preventDefault(); goToday(); }
@@ -8345,6 +9081,10 @@ function initEvents() {
           e.preventDefault();
           openTaskModal(_activeHoverTask, 'edit');
           duplicateTaskFromModal();
+        }
+        if (e.key === 's') {
+          e.preventDefault();
+          createParentTask(_activeHoverTask);
         }
       }
       if (!_activeHoverTask) {
@@ -8395,12 +9135,16 @@ function initEvents() {
       toggleMilestoneModal();
     } else if (e.target.id === 'modal-tags-sel') {
       _addTagFromDropdown();
+    } else if (e.target.id === 'modal-dep-sel') {
+      _toggleDepFromDropdown();
     }
   });
 
   document.body.addEventListener('input', (e) => {
     if (e.target.id === 'modal-task-title') {
       onTaskTitleInput();
+    } else if (e.target.id === 'modal-task-tags') {
+      _updateTagsDropdown();
     }
     // Track pending unsaved comment text for dirty-state warning (single and dual modal)
     if (e.target.id === 'comments-text-input') {
@@ -8511,6 +9255,9 @@ window.addEventListener('resize', () => {
 
 // ── Init ──────────────────────────────────────────────────────────────
 function init() {
+  _loadHoverPanelPrefs();
+  _syncSettingsPanelUI();
+
   // Status 'Done' → Progress 100
   AppState.currentTasks = DATA.tasks.map(t => {
     if ((String(t.Status || '')).toLowerCase() === 'done') return { ...t, Progress: 100 };
@@ -8679,6 +9426,9 @@ function _onModalEndDateChange() {
 function openTaskModal(task, mode, defaultPhase, defaultCat) {
   AppState._modalTask = task;
   AppState._modalMode = mode;
+  // Cleared here (not just after a successful save) so a cancelled/closed
+  // createParentTask() flow can never leak into an unrelated later Add Task.
+  AppState._pendingParentChildId = null;
   const isEdit = mode === 'edit';
 
   document.getElementById('modal-title').textContent = isEdit ? 'Edit Task' : 'Add Task';
@@ -8719,9 +9469,7 @@ function openTaskModal(task, mode, defaultPhase, defaultCat) {
 
   // Tags
   document.getElementById('modal-task-tags').value = isEdit ? (task.Tags || '') : '';
-  const tgl = document.getElementById('modal-tags-sel');
-  tgl.innerHTML = '<option value="" disabled selected hidden>&mdash; Or select existing &mdash;</option>';
-  _collectAllTags().forEach(tag => { const o = document.createElement('option'); o.value = tag; o.textContent = tag; tgl.appendChild(o); });
+  _updateTagsDropdown();
 
   // Setup datalists
   const phaseSet = new Set(), catSet = new Set();
@@ -8732,9 +9480,9 @@ function openTaskModal(task, mode, defaultPhase, defaultCat) {
   catSet.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; cl.appendChild(o); });
 
   // Dependencies
-  const depSel = document.getElementById('modal-task-dependency');
-  _buildDepOptions(depSel, isEdit ? getTaskId(task) : null);
-  depSel.value = isEdit ? (task.Dependency || '') : '';
+  document.getElementById('modal-task-dependency').value = isEdit ? (task.Dependency || '') : '';
+  _updateDepDropdown(isEdit ? getTaskId(task) : null);
+  _renderDepChips();
 
   // Select Pills
   renderPills('modal-priority-container', PREDEFINED_PRIORITIES, isEdit ? (task.Priority || 'medium') : 'medium');
@@ -8829,17 +9577,45 @@ function renderPills(containerId, options, currentValue) {
   });
 }
 
-// Selecting a tag from the modal's dropdown APPENDS it to the comma-separated
-// Tags input rather than replacing it (unlike the Phase/Category selects).
+// Helper to update the modal's tags dropdown options and highlight selected tags
+function _updateTagsDropdown() {
+  const sel = document.getElementById('modal-tags-sel');
+  if (!sel) return;
+  const input = document.getElementById('modal-task-tags');
+  const selectedTags = input ? normalizeTagsList(input.value) : [];
+  sel.innerHTML = '<option value="" disabled selected hidden>&mdash; Select or deselect tags &mdash;</option>';
+  _collectAllTags().forEach(tag => {
+    const o = document.createElement('option');
+    o.value = tag;
+    const isSelected = selectedTags.includes(tag);
+    o.textContent = isSelected ? `\u2713 ${tag}` : `   ${tag}`;
+    if (isSelected) {
+      o.style.fontWeight = 'bold';
+      o.style.color = 'var(--accent)';
+    } else {
+      o.style.fontWeight = 'normal';
+      o.style.color = 'var(--text)';
+    }
+    sel.appendChild(o);
+  });
+}
+
+// Selecting a tag from the modal's dropdown toggles (adds or removes) it from
+// the comma-separated Tags input field.
 function _addTagFromDropdown() {
   const sel = document.getElementById('modal-tags-sel');
   if (!sel || !sel.value) return;
-  const newTag = sel.value;
+  const tag = sel.value;
   sel.value = '';
   const input = document.getElementById('modal-task-tags');
-  const tags = normalizeTagsList(input.value);
-  if (!tags.includes(newTag)) tags.push(newTag);
+  let tags = normalizeTagsList(input.value);
+  if (tags.includes(tag)) {
+    tags = tags.filter(t => t !== tag);
+  } else {
+    tags.push(tag);
+  }
   input.value = tags.join(', ');
+  _updateTagsDropdown();
   _updateEditDirtyHighlights();
 }
 
@@ -8903,7 +9679,7 @@ function saveTaskModal() {
 
   t.Progress = document.getElementById('modal-task-progress-range').value;
   t.Tags = normalizeTagsList(document.getElementById('modal-task-tags').value).join(', ');
-  t.Dependency = document.getElementById('modal-task-dependency').value;
+  const depValue = document.getElementById('modal-task-dependency').value;
 
   let idVal = normalizeText(document.getElementById('modal-task-id').value);
   if (!idVal) idVal = t.Title.replace(/[^a-zA-Z0-9 ]/g, '');
@@ -8923,12 +9699,27 @@ function saveTaskModal() {
     idVal = candidate;
   }
   t.ID = idVal;
+  // A dependency list is an unordered set — sort so repeated saves don't produce
+  // spurious diffs against snapshots purely from selection order, and drop any
+  // self-reference (can only happen if the task's own ID just changed to match one).
+  t.Dependency = normalizeDependencyList(depValue).filter(id => id !== idVal).sort().join(', ');
 
   if (!isEdit) {
     // Copy comments from duplicate source if present (not for dependent tasks)
     if (AppState._pendingDuplicateComments) {
       t.Comments = AppState._pendingDuplicateComments;
       AppState._pendingDuplicateComments = null;
+    }
+    // Created via createParentTask() (the 's' hotkey on a hovered task): link
+    // the new task as a dependency of the task it was created for.
+    if (AppState._pendingParentChildId) {
+      const child = AppState.currentTasks.find(ct => getTaskId(ct) === AppState._pendingParentChildId);
+      if (child) {
+        const childDeps = normalizeDependencyList(child.Dependency);
+        if (!childDeps.includes(idVal)) childDeps.push(idVal);
+        child.Dependency = childDeps.sort().join(', ');
+      }
+      AppState._pendingParentChildId = null;
     }
     AppState.currentTasks.push(t);
     syncCurrentTasksToData();
@@ -8940,10 +9731,10 @@ function saveTaskModal() {
 
   syncCurrentTasksToData();
   setUnsavedChanges(true);
-  // Keep edit modal open — refresh dep dropdown and reset dirty state
-  const depSel = document.getElementById('modal-task-dependency');
-  _buildDepOptions(depSel, getTaskId(t));
-  depSel.value = t.Dependency || '';
+  // Keep edit modal open — refresh dep dropdown/chips and reset dirty state
+  document.getElementById('modal-task-dependency').value = t.Dependency || '';
+  _updateDepDropdown(getTaskId(t));
+  _renderDepChips();
   const comments = t.Comments || [];
   const infoEl = document.getElementById('modal-comment-info');
   if (infoEl) {
@@ -8974,9 +9765,10 @@ function saveTaskModalAndClose() {
   if (isEdit) closeModal();
 }
 
-function deleteTaskFromModal() {
+async function deleteTaskFromModal() {
   if (AppState._modalMode !== 'edit' || !AppState._modalTask) return;
-  if (confirm('Are you sure you want to delete this task?')) {
+  const ok = await showConfirmDialog('Are you sure you want to delete this task?', 'Delete Task');
+  if (ok) {
     AppState.currentTasks = AppState.currentTasks.filter(t => t !== AppState._modalTask);
     syncCurrentTasksToData();
     setUnsavedChanges(true);
@@ -8986,6 +9778,10 @@ function deleteTaskFromModal() {
 }
 
 function duplicateTaskFromModal() {
+  // Persist any unsaved edits on the current task before this same modal gets
+  // repurposed to represent the new duplicate — otherwise they'd be silently
+  // discarded when the form fields below are overwritten.
+  if (AppState._modalMode === 'edit') saveTaskModal();
   // Copy comments from the original task to the new duplicate
   AppState._pendingDuplicateComments = (AppState._modalTask && AppState._modalTask.Comments && AppState._modalTask.Comments.length)
     ? AppState._modalTask.Comments.map(c => ({ ...c }))
@@ -8994,11 +9790,9 @@ function duplicateTaskFromModal() {
   document.getElementById('modal-task-id').value = "";
   document.getElementById('modal-task-id').dataset.autoGenerated = "true";
 
-  // Repopulate dependencies dropdown since we are switching to add mode
-  const currentDep = document.getElementById('modal-task-dependency').value;
-  const depSel = document.getElementById('modal-task-dependency');
-  _buildDepOptions(depSel, null); // allow depending on the duplicated task
-  depSel.value = currentDep;
+  // Repopulate dependencies dropdown/chips since we are switching to add mode
+  _updateDepDropdown(null); // allow depending on the duplicated task
+  _renderDepChips();
   AppState._modalMode = 'add';
   document.getElementById('modal-title').textContent = 'Add Task';
   document.getElementById('modal-btn-delete').style.display = 'none';
@@ -9010,6 +9804,10 @@ function duplicateTaskFromModal() {
 }
 
 function createDependentTask() {
+  // Persist any unsaved edits on the current (parent) task before this same
+  // modal gets repurposed to represent the new dependent task.
+  if (AppState._modalMode === 'edit') saveTaskModal();
+  AppState._modalTask = null; // dependent tasks are new tasks
   AppState._pendingDuplicateComments = null; // dependent tasks never copy parent comments
   const parentId = document.getElementById('modal-task-id').value || document.getElementById('modal-task-title').value.replace(/[^a-zA-Z0-9 ]/g, '');
 
@@ -9019,13 +9817,19 @@ function createDependentTask() {
   document.getElementById('modal-task-id').dataset.autoGenerated = "true";
 
   // Re-populate dependencies since we are now adding a new task, which allows depending on the previous one
-  const depSel = document.getElementById('modal-task-dependency');
-  _buildDepOptions(depSel, null); // include all tasks — new task can depend on the parent
-  depSel.value = parentId;
+  document.getElementById('modal-task-dependency').value = parentId;
+  _updateDepDropdown(null); // include all tasks — new task can depend on the parent
+  _renderDepChips();
 
   // Clear the comment info section — the new dependent task starts with no comments
   const _depInfoEl = document.getElementById('modal-comment-info');
   if (_depInfoEl) _depInfoEl.style.display = 'none';
+
+  _setModalTaskInfo('modal-taskinfo', null);
+  const _vs = document.getElementById('modal-view-switcher');
+  if (_vs) _vs.style.display = 'none';
+  _setView('edit');
+  renderCommentList();
 
   // Prefill Start Date with parent's End Date + 1 day
   const parentTask = AppState.currentTasks.find(t => getTaskId(t) === parentId);
@@ -9048,6 +9852,29 @@ function createDependentTask() {
   const depBtn = document.getElementById('modal-btn-dependent');
   if (depBtn) depBtn.style.display = 'none';
   setTimeout(() => { const el = document.getElementById('modal-task-title'); if (el) { el.focus(); } }, 80);
+}
+
+// Creates a new "source" (parent) task in the same Phase/Category as
+// `childTask`, pre-filled with a 1-week default range that ends the day
+// before childTask's Start Date. This is the reverse of createDependentTask():
+// instead of the new task depending on an already-open one, childTask itself
+// gains the new task's ID as a dependency once it's saved (see the
+// AppState._pendingParentChildId check in saveTaskModal()). Bound to the 's'
+// key while hovering a task bar or left-panel row (main view, no modal open).
+function createParentTask(childTask) {
+  if (!childTask) return;
+  openTaskModal(null, 'add', childTask.Phase, childTask.Category);
+  AppState._pendingDuplicateComments = null;
+  AppState._pendingParentChildId = getTaskId(childTask);
+
+  const childStart = parseDate(childTask['Start Date']);
+  if (childStart && !isNaN(childStart)) {
+    const newEnd = addDays(childStart, -1);
+    const newStart = addDays(newEnd, -7);
+    document.getElementById('modal-task-start').value = newStart.toISOString().split('T')[0];
+    document.getElementById('modal-task-end').value = newEnd.toISOString().split('T')[0];
+    _syncModalDatePrevValues();
+  }
 }
 
 </script>
