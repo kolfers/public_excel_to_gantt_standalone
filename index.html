@@ -1616,16 +1616,16 @@ select#compare-sel {
   transition: left .2s
 }
 
-/* Floating "+" new-task button — top-left of the chart, same row as the first phase
-   bar. Shared by both Timeline and Flow view. Reuses --header-bg/--header-text (the
+/* Floating "+" new-task button — top-left of the chart, below the timeline header.
+   Shared by both Timeline and Flow view. Reuses --header-bg/--header-text (the
    same high-contrast pairing as the app-title bar) so it stands out against the chart
    background in every palette without a bespoke colour. */
 .new-task-fab {
   position: fixed;
-  /* Vertically centred within the first phase row's --row-h band (34px), the same
-     band #filter-summary's top and the chart's row-0 both anchor to: bandTop + half
-     the leftover space, so a 30px button sits with an equal ~2px margin top/bottom. */
-  top: calc(var(--toolbar-h) + var(--head-h) + (var(--row-h) - 30px) / 2);
+  /* Gap between the bottom of the timeline header and the button's top edge matches
+     the 8px gap between the left panel and the button's left edge, so the button sits
+     with equal clearance on both sides. */
+  top: calc(var(--toolbar-h) + var(--head-h) + 8px);
   left: calc(var(--lp-compact-w, var(--left-w)) + 8px);
   width: 30px;
   height: 30px;
@@ -1635,8 +1635,13 @@ select#compare-sel {
   justify-content: center;
   font-size: 1.25rem;
   font-weight: 700;
-  line-height: 1;
-  font-family: var(--font);
+  /* Fixed line-height equal to the button's own height, not `1`, and a neutral system
+     font rather than var(--font): with line-height:1 the glyph is centred within its
+     font's own em-box, whose internal ascent/descent metrics differ per palette font
+     (e.g. the monospace and serif palettes) enough to visibly throw the "+" off-centre
+     in some themes. A fixed-height line box sidesteps those per-font metrics. */
+  line-height: 30px;
+  font-family: system-ui, sans-serif;
   background: var(--header-bg);
   color: var(--header-text);
   /* Border uses --accent (not --header-bg) so the button keeps a visible outline even in
@@ -1652,6 +1657,111 @@ select#compare-sel {
 
 .new-task-fab:hover {
   filter: brightness(1.15)
+}
+
+/* Nudges just the glyph, never the button's own box — the button's border/background
+   must stay exactly where its `top`/`left` puts it (that position is load-bearing: it's
+   what keeps the 8px top/left clearance equal). Flex/line-height centering places the
+   "+" a little low in most real UI fonts regardless of the line-height fix above (that
+   fix only made the offset *consistent* across palettes, not zero) — this is a small
+   empirical correction on top of it. Retune the px value here, not the button's own
+   layout, if it still reads off in a given font/OS combination. */
+.new-task-fab-glyph {
+  display: inline-block;
+  transform: translateY(-1px);
+}
+
+/* Task-search field — sits immediately to the right of the "+" new-task button, same
+   row. Wrap holds both the input and its floating autocomplete dropdown so the dropdown
+   can be positioned relative to the input without affecting layout. */
+#task-search-wrap {
+  position: fixed;
+  top: calc(var(--toolbar-h) + var(--head-h) + 8px);
+  left: calc(var(--lp-compact-w, var(--left-w)) + 8px + 30px + 8px);
+  width: 210px;
+  z-index: 21;
+  transition: left .2s
+}
+
+#task-search-input {
+  width: 100%;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--surface);
+  /* Same --accent border as .new-task-fab, rather than the plain --border used by most
+     inputs — --border alone was too low-contrast against --surface in several dark
+     palettes for a control floating directly on top of the chart. */
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  outline: none;
+}
+
+#task-search-input::placeholder {
+  /* Brighter than a plain --text-mu (which reads too dim in several dark palettes for a
+     placeholder sitting on top of the chart background), same blend technique as
+     --header-date-text. */
+  color: color-mix(in srgb, var(--text-mu) 55%, var(--text) 45%);
+}
+
+#task-search-input:focus {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25), 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+#task-search-results {
+  display: none;
+  position: absolute;
+  top: 34px;
+  left: 0;
+  width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
+  z-index: 22;
+}
+
+#task-search-results.open {
+  display: block;
+}
+
+.task-search-item {
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-search-item mark {
+  background: none;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.task-search-item:hover,
+.task-search-item.active {
+  background: var(--accent);
+  color: var(--header-text);
+}
+
+.task-search-item:hover mark,
+.task-search-item.active mark {
+  color: inherit;
+}
+
+.task-search-empty {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  color: var(--text-mu);
 }
 
 /* Flow-view header title — replaces the Timeline header's date columns. */
@@ -3569,7 +3679,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="drop-card" id="drop-card" style="position: relative;">
     <div class="drop-title">&#128200; Gantt Chart Builder</div>
     <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
-    <div class="drop-version">v2.30</div>
+    <div class="drop-version">v2.33</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
       Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
@@ -3756,7 +3866,12 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
       <div id="center-view-arrow" aria-hidden="true"></div>
       <div id="center-view-arrow-up" aria-hidden="true"></div>
       <button id="new-task-fab" class="new-task-fab" data-action="openTaskModalNew"
-        data-tooltip="New task">+</button>
+        data-tooltip="New task"><span class="new-task-fab-glyph">+</span></button>
+      <div id="task-search-wrap">
+        <input id="task-search-input" type="text" autocomplete="off" spellcheck="false"
+          placeholder="Search tasks&hellip;" data-tooltip="Search item titles (3+ characters)" />
+        <div id="task-search-results"></div>
+      </div>
       <div id="chart-area"><svg id="gantt-svg"></svg></div>
     </div>
   </div>
@@ -4058,7 +4173,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
       &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.30</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.33</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
         <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
@@ -4541,6 +4656,9 @@ const BAR_HOVER_HIDE_DELAY_MS = 500;  // ms: delay before hiding the bar-hover o
 const BAR_HOVER_BTN_W         = 68;   // px: approx total width of the bar-hover button group
 const BAR_HOVER_CURSOR_GAP    = 20;   // px: clearance between cursor and hover buttons
 const FILTER_PANEL_CLOSE_DELAY_MS = 350; // ms: grace period before the filter panel closes after the cursor leaves the button or panel
+const TASK_SEARCH_MIN_CHARS   = 3;    // chars: minimum query length before the task-search dropdown starts matching
+const TASK_SEARCH_MAX_RESULTS = 8;    // max number of matches shown in the task-search dropdown
+const LOAD_MORE_BTN_TOP_PX    = 46;   // px: SVG y-position of the Load More Past/Future pills — clears the fixed new-task-fab/task-search row (8px gap + 30px tall + 8px gap)
 
 // ── Flow (dependency) view layout constants ────────────────────────────
 const FLOW_LEFT_OFFSET_FRAC = 0.2;  // fraction of chart viewport width: left-edge x for root (no-dependency) tasks
@@ -4652,6 +4770,10 @@ const AppState = {
   _dragItem: null,        // { kind: 'phase'|'category'|'task', phase, cat, taskId } while a left-row drag is in progress
   _dragHoverKey: null,    // key of the row currently hovered over (used to detect when the hover target changes)
   _dragHoverTimer: null,  // setTimeout handle: auto-expands a collapsed phase/category hovered during a drag
+
+  // Task search (title fuzzy-search + jump) — see _onTaskSearchInput() etc. in js_render.js
+  _searchResults: [],     // current ranked array of matching tasks (empty when dropdown closed)
+  _searchActiveIndex: -1, // index into _searchResults highlighted for Enter/keyboard selection
 };
 
 // ── Title trimmer & snapshot formatter ───────────────────────────────
@@ -6267,15 +6389,18 @@ function getVisibleRows(rows, today) {
       if (anyRestriction) return validPhases.has(r.phase);
       return true;
     }
-    if (AppState.collapsed['p:' + r.phase]) return false;
-
     if (r.type === 'category') {
+      // Under a filter/comparison restriction, a category that holds a matching
+      // task stays visible even if its parent phase is collapsed — otherwise
+      // collapsing the phase would hide the very item the filter surfaced.
       if (anyRestriction) return validCats.has(r.phase + '||' + r.cat);
-      return true;
+      return !AppState.collapsed['p:' + r.phase];
     }
-    if (AppState.collapsed['c:' + r.phase + ':' + r.cat]) return false;
 
-    // Remaining must be task
+    // Remaining must be task — hidden behind either a collapsed phase or a
+    // collapsed category regardless of any filter/comparison restriction.
+    if (AppState.collapsed['p:' + r.phase]) return false;
+    if (AppState.collapsed['c:' + r.phase + ':' + r.cat]) return false;
     return idIsVisible(getTaskId(r.task));
   });
 }
@@ -6961,10 +7086,11 @@ function renderChart(visible, today) {
   });
 
   // ── Load More Buttons ──
-  // Sized larger and pinned to the top of the chart area, vertically centred
-  // on the first (phase) row so they line up with the first phase bar.
+  // Sized larger and pinned to the top of the chart area, just below the fixed
+  // new-task-fab/task-search row (LOAD_MORE_BTN_TOP_PX) rather than centred on the
+  // first (phase) row — that centring used to put them directly under those controls.
   const btnW = 170, btnH = 44;
-  const btnY = Math.max(4, ROW_H / 2 - btnH / 2);
+  const btnY = LOAD_MORE_BTN_TOP_PX;
 
   // Load More Past (Left)
   const leftG = svgEl('g', { class: 'load-more-btn', style: 'cursor:pointer;' });
@@ -7779,6 +7905,185 @@ function scrollToTask(task, scrollVertical = true) {
       lr.scrollTop = ca.scrollTop;
     }
   }, 60);
+}
+
+// ── Task search (fuzzy title search + jump) ───────────────────────────────
+// Scores `title` against `query` (both lower-cased by the caller): an exact substring
+// match ranks highest (earlier position wins), otherwise falls back to an in-order
+// subsequence match (every query char must appear in title, in order, gaps allowed) so
+// e.g. "gtw" still matches "Gateway Testing". Returns -1 when no match at all.
+function _fuzzyMatchScore(query, title) {
+  const idx = title.indexOf(query);
+  if (idx >= 0) return 10000 - idx;
+  let ti = 0, gaps = 0;
+  for (let qi = 0; qi < query.length; qi++) {
+    const found = title.indexOf(query[qi], ti);
+    if (found === -1) return -1;
+    gaps += found - ti;
+    ti = found + 1;
+  }
+  return 1000 - gaps;
+}
+
+function _taskSearchMatches(query) {
+  const q = query.trim().toLowerCase();
+  if (q.length < TASK_SEARCH_MIN_CHARS) return [];
+  return AppState.currentTasks
+    .map(task => ({ task, score: _fuzzyMatchScore(q, String(task.Title || '').toLowerCase()) }))
+    .filter(m => m.score >= 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, TASK_SEARCH_MAX_RESULTS)
+    .map(m => m.task);
+}
+
+// Wraps each character of `title` that is part of the in-order match for `query` in
+// <mark>. Falls back to plain escaped text if, for any reason, the chars can't all be
+// located (should not happen for a task already in _searchResults).
+function _highlightSearchMatch(query, title) {
+  const q = query.trim().toLowerCase();
+  const lower = title.toLowerCase();
+  let out = '', ti = 0, qi = 0;
+  for (let i = 0; i < title.length; i++) {
+    if (qi < q.length && lower[i] === q[qi]) {
+      out += `<mark>${escHtml(title[i])}</mark>`;
+      qi++;
+    } else {
+      out += escHtml(title[i]);
+    }
+  }
+  return out;
+}
+
+function _renderTaskSearchResults() {
+  const box = document.getElementById('task-search-results');
+  const input = document.getElementById('task-search-input');
+  if (!box || !input) return;
+  const query = input.value;
+  if (query.trim().length < TASK_SEARCH_MIN_CHARS) {
+    AppState._searchResults = [];
+    AppState._searchActiveIndex = -1;
+    box.classList.remove('open');
+    box.innerHTML = '';
+    return;
+  }
+  AppState._searchResults = _taskSearchMatches(query);
+  AppState._searchActiveIndex = -1;
+  box.innerHTML = '';
+  if (AppState._searchResults.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'task-search-empty';
+    empty.textContent = 'No matching items';
+    box.appendChild(empty);
+  } else {
+    // Nodes are only rebuilt here, in response to the user actually typing — never on
+    // hover/keyboard highlight (see _setActiveSearchItem). Replacing the DOM node
+    // currently under a stationary mouse cursor makes the browser re-fire `mouseenter`
+    // on its replacement, which previously re-triggered this same rebuild and starved
+    // the click event entirely (the item under the cursor was recreated dozens of times
+    // a second and never received the mouseup/click).
+    AppState._searchResults.forEach((task, i) => {
+      const item = document.createElement('div');
+      item.className = 'task-search-item';
+      item.innerHTML = _highlightSearchMatch(query, String(task.Title || ''));
+      item.addEventListener('mouseenter', () => _setActiveSearchItem(i));
+      item.addEventListener('click', () => _selectTaskSearchResult(i));
+      box.appendChild(item);
+    });
+  }
+  box.classList.add('open');
+}
+
+// Highlights result `i` as the keyboard/hover-active row without rebuilding any DOM
+// nodes (see the comment in _renderTaskSearchResults for why that matters for clicks).
+function _setActiveSearchItem(i) {
+  if (AppState._searchActiveIndex === i) return;
+  AppState._searchActiveIndex = i;
+  const box = document.getElementById('task-search-results');
+  if (!box) return;
+  box.querySelectorAll('.task-search-item').forEach((el, idx) => el.classList.toggle('active', idx === i));
+}
+
+// Ghost-text-as-you-type: extends the input's value with the remainder of the
+// highest-ranked match (index 0) and selects that remainder, the same
+// select-the-suggested-suffix technique browser address bars use — typing further
+// replaces the selection normally, and _acceptInlineAutocomplete() (Tab) or a plain
+// caret move collapses it to accept. Does nothing when the top match isn't an actual
+// prefix of what was typed (a subsequence-only fuzzy match isn't a valid completion).
+function _applyInlineAutocomplete() {
+  const input = document.getElementById('task-search-input');
+  if (!input || !AppState._searchResults.length) return;
+  const query = input.value;
+  const title = String(AppState._searchResults[0].Title || '');
+  if (title.length > query.length && title.toLowerCase().startsWith(query.toLowerCase())) {
+    input.value = query + title.slice(query.length);
+    input.setSelectionRange(query.length, title.length);
+  }
+}
+
+// Selects match `i` — jumping to it exactly as a left-panel row click would
+// (scrollToTask) — then clears the field back to its empty placeholder state.
+function _selectTaskSearchResult(i) {
+  const task = AppState._searchResults[i];
+  if (!task) return;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  // The task may be hidden by the active filter mode or custom filters — jumping to it
+  // would otherwise scroll/highlight a row that isn't actually rendered.
+  if (!isTaskVisible(task, today)) setFilter('all');
+  // Same for a collapsed Phase/Category — its task rows aren't in the visible-row list
+  // at all, so scrollToTask() couldn't find one to scroll/highlight (same pattern the
+  // hidden-dependency "!" icon's click handler uses to reveal a collapsed parent).
+  AppState.collapsed['p:' + task.Phase] = false;
+  AppState.collapsed['c:' + task.Phase + ':' + task.Category] = false;
+  _closeTaskSearchDropdown();
+  const input = document.getElementById('task-search-input');
+  if (input) input.value = '';
+  scrollToTask(task);
+}
+
+function _closeTaskSearchDropdown() {
+  AppState._searchResults = [];
+  AppState._searchActiveIndex = -1;
+  const box = document.getElementById('task-search-results');
+  if (box) { box.classList.remove('open'); box.innerHTML = ''; }
+}
+
+function _onTaskSearchInput() {
+  _renderTaskSearchResults();
+  _applyInlineAutocomplete();
+}
+
+// Accepts the current ghost suggestion (if any) by collapsing the selection to the end
+// of the input, leaving the completed text in place without jumping to it.
+function _acceptInlineAutocomplete(input) {
+  if (input.selectionStart === input.selectionEnd) return false;
+  const end = input.value.length;
+  input.setSelectionRange(end, end);
+  return true;
+}
+
+function _onTaskSearchKeydown(e) {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    e.stopPropagation();
+    if (AppState._searchResults.length > 0) _closeTaskSearchDropdown();
+    else e.target.blur();
+    return;
+  }
+  if (e.key === 'Tab') {
+    if (_acceptInlineAutocomplete(e.target)) e.preventDefault();
+    return;
+  }
+  if (!AppState._searchResults.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _setActiveSearchItem((AppState._searchActiveIndex + 1) % AppState._searchResults.length);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _setActiveSearchItem((AppState._searchActiveIndex - 1 + AppState._searchResults.length) % AppState._searchResults.length);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    _selectTaskSearchResult(AppState._searchActiveIndex >= 0 ? AppState._searchActiveIndex : 0);
+  }
 }
 
 function updateScrollAnchoring() {
@@ -9417,6 +9722,22 @@ function initEvents() {
     const btn = document.getElementById('filter-btn');
     if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
       _closeFilterPanel();
+    }
+  });
+
+  // Task search field: fuzzy title match + autocomplete dropdown (see _renderTaskSearchResults)
+  const _searchInput = document.getElementById('task-search-input');
+  if (_searchInput) {
+    _searchInput.addEventListener('input', _onTaskSearchInput);
+    _searchInput.addEventListener('keydown', _onTaskSearchKeydown);
+    _searchInput.addEventListener('focus', () => { if (_searchInput.value.trim().length >= TASK_SEARCH_MIN_CHARS) _renderTaskSearchResults(); });
+  }
+  document.addEventListener('mousedown', (e) => {
+    const wrap = document.getElementById('task-search-wrap');
+    if (!wrap || wrap.contains(e.target)) return;
+    if (AppState._searchResults.length || (_searchInput && _searchInput.value)) {
+      _closeTaskSearchDropdown();
+      if (_searchInput) _searchInput.value = '';
     }
   });
 

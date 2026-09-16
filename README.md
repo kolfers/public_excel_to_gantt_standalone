@@ -1,6 +1,6 @@
 # Gantt Chart Tool
 
-***Last updated: 16 Sep 2026: v2.30***
+***Last updated: 16 Sep 2026: v2.31***
 
 **Live App:** [https://kolfers.github.io/public_excel_to_gantt_standalone/](https://kolfers.github.io/public_excel_to_gantt_standalone/)
 **GitHub Repository:** [https://github.com/kolfers/public_excel_to_gantt_standalone](https://github.com/kolfers/public_excel_to_gantt_standalone)
@@ -48,6 +48,7 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 - Click and drag the chart to scroll horizontally.
 - Switch between Week, Month, and Year scale views. Week view aligns to Mondays.
 - **Linked view** (toggle button in the toolbar, or press `l`) lays tasks out left-to-right by dependency chain instead of by date, so you can follow a chain of dependent tasks at a glance. Dependency arrows connect each task to what it's waiting on, and snapshot comparisons still show ghost bars for changed items. Add Task, Edit, and all the usual row shortcuts work the same as in Timeline view.
+- **Task search**: the search field next to the `+` new-task button finds tasks by title as you type (3+ characters), with an autocomplete dropdown you can navigate by mouse or arrow keys. Selecting a result jumps straight to that task, automatically clearing filters or expanding a collapsed Phase/Category if needed to reveal it.
 
 ### Task Management
 - Click any task bar to open the Edit Task modal. Hovering a bar shows ✎ Edit and 💬 Comments buttons. The same options are available by hovering task rows in the left panel.
@@ -72,6 +73,11 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 - **Export Chart** packages the current view into a single self-contained `.html` file that can be opened on any computer without the original Excel file.
 
 ## Changelog
+
+### v2.31 — 16 Sep 2026
+- New **task search**: a search field next to the `+` new-task button lets you find a task by title as you type (3+ characters). Matching tasks are listed in a dropdown with the matched letters highlighted; use the mouse or the arrow keys and Enter to jump straight to a task, even if it's currently hidden behind a filter or a collapsed Phase/Category.
+- The `+` new-task button now sits just below the timeline header instead of overlapping the first phase row, and its "+" glyph is centered more consistently across all color themes.
+- Fixed: when a Phase was collapsed while a filter or comparison was active, matching Categories under that Phase could disappear instead of staying visible.
 
 ### v2.30 — 16 Sep 2026
 - Dragging a Phase in the left panel can now be dropped on any Category or Task row belonging to a different Phase (not just another Phase header) — it's inserted right after whichever Phase that row belongs to.
