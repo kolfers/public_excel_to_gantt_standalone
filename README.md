@@ -1,6 +1,6 @@
 # Gantt Chart Tool
 
-***Last updated: 9 Sep 2026: v2.28***
+***Last updated: 16 Sep 2026: v2.30***
 
 **Live App:** [https://kolfers.github.io/public_excel_to_gantt_standalone/](https://kolfers.github.io/public_excel_to_gantt_standalone/)
 **GitHub Repository:** [https://github.com/kolfers/public_excel_to_gantt_standalone](https://github.com/kolfers/public_excel_to_gantt_standalone)
@@ -56,6 +56,7 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 - A task can now depend on **multiple other tasks** — pick as many as needed from the dependency dropdown in the Edit Task modal, shown as removable chips colored by each dependency's status. The chart draws one arrow per dependency, and arrows converging on the same task merge into a single shared line instead of crossing.
 - **Tags**: A full-width field below Progress in the Edit Task modal. Type comma-separated tags and/or pick from a dropdown of tags already used elsewhere — picking one from the dropdown adds it to the list instead of replacing what's typed.
 - Comments support author names, timestamps, and inline edit/delete.
+- Hovering a Phase or Category row in the left panel reveals a ✏ (rename/delete) icon; renaming a Category also offers a **Move** button to reassign it (and all its tasks) to a different Phase. You can also drag and drop rows directly in the left panel: drag a Phase onto another Phase to reorder, a Category onto a row in a different Phase to move it, or a task onto a Category/task row to reassign it.
 - **Keyboard shortcuts** (while hovering a bar or left-panel row): `e` Edit · `c` Comments · `d` Dependent · `n` Duplicate · `s` creates a new predecessor task in the same Phase/Category, automatically linked as a dependency of the hovered task once saved (the reverse of `d`). On Phase/Category hover: `n` adds a task, `e` or `r` renames. Use the **Save Excel** button to save — `s` is no longer a save shortcut.
 
 ### Filtering
@@ -71,6 +72,17 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 - **Export Chart** packages the current view into a single self-contained `.html` file that can be opened on any computer without the original Excel file.
 
 ## Changelog
+
+### v2.30 — 16 Sep 2026
+- Dragging a Phase in the left panel can now be dropped on any Category or Task row belonging to a different Phase (not just another Phase header) — it's inserted right after whichever Phase that row belongs to.
+- New **Preferences** setting for Linked (dependency) view: choose whether task bars are all Narrow, all Medium (the new default), all Wide, or sized "By Duration" (the previous always-on behavior).
+
+### v2.29 — 16 Sep 2026
+- **Fixed the Start/End Date picker icon being invisible (black-on-black) in dark mode.**
+- The Edit Task modal's **Category** dropdown now only lists Categories already used within the currently-selected Phase, instead of every Category across the whole plan.
+- Renaming or deleting a Phase/Category, and choosing how to resolve a naming collision, now uses the app's own centered dialogs instead of the browser's plain popup boxes.
+- New **Move** button in the Rename/Delete Category modal: moves a Category (and all its tasks) to a different Phase, with the same "merge into an existing Category or keep it separate" handling as a rename collision.
+- **Left-panel drag and drop**: Phases, Categories, and individual tasks can now be reordered/re-parented by dragging their row in the left panel — drag a Phase onto another Phase to reorder them, a Category onto any row in a different Phase to move it there, or a task onto a Category/task row to move it. Dragging over a collapsed Phase or Category for about a second auto-expands it, and dragging near the top/bottom edge auto-scrolls.
 
 ### v2.28 — 9 Sep 2026
 - **Fixed Export Chart producing a broken, unopenable file.** Exported charts now open correctly every time, with all tasks, bars, and toolbar behavior intact.

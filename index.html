@@ -1840,6 +1840,18 @@ select#compare-sel {
   overflow: hidden
 }
 
+/* Left-panel drag & drop (Phase reorder / Category & Task re-parenting) — see
+   _onLeftRowDragStart() etc. in js_render.js */
+.left-row.dragging {
+  opacity: 0.4;
+}
+
+.left-row.drag-over {
+  outline: 2px dashed var(--accent);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
 .chevron {
   font-size: .58rem;
   margin-right: 4px;
@@ -3012,6 +3024,10 @@ details.info-section[open] .info-section-heading::after {
   line-height: 1.45;
 }
 
+[data-theme='dark'] .form-group input[type="date"] {
+  color-scheme: dark;
+}
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -3553,7 +3569,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
   <div class="drop-card" id="drop-card" style="position: relative;">
     <div class="drop-title">&#128200; Gantt Chart Builder</div>
     <!--<div style="color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 8px; text-align: center;">DISCLAIMER: Not mobile friendly. <br>People who view Gantt charts on their phone are maniacs.</div>-->
-    <div class="drop-version">v2.28</div>
+    <div class="drop-version">v2.30</div>
     <div class="drop-text">
       Load an Excel (<strong>.xlsx</strong> or <strong>.xlsm</strong>) workbook, <br>
       Only table headers <strong>Title, Start Date, and End Date</strong> are required. <br>
@@ -4042,7 +4058,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <p style="margin-top:16px;"><strong>Privacy:</strong> Runs entirely in your browser. Files are never uploaded
       &mdash; all processing happens locally.</p>
     <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:10px;">
-      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.28</p>
+      <p style="margin:0; font-size:0.85em; color:var(--text-mu);">Version: v2.30</p>
       <p style="margin:5px 0 0 0; font-size:0.85em; color:var(--text-mu);">The latest version can always be found on the
         <a href="https://kolfers.github.io/public_excel_to_gantt_standalone/" target="_blank" rel="noopener"
           style="color:var(--accent); text-decoration:none;">Live App</a> or at the <a
@@ -4076,6 +4092,32 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
         <input type="checkbox" id="settings-hover-description" data-action="toggleHoverPanelSetting"
           data-key="description" checked>
         <span>Description</span>
+      </label>
+    </div>
+    <div class="settings-section">
+      <div class="settings-section-heading">Linked View Bar Width</div>
+      <p style="margin:0 0 10px 0; font-size:0.8em; color:var(--text-mu);">Choose how wide task bars are drawn in
+        Linked (dependency) view. "By Duration" sizes each bar from its own date range; the other options give
+        every bar the same fixed width.</p>
+      <label class="settings-toggle-row">
+        <input type="radio" name="flow-bar-width" id="settings-flow-width-narrow" data-action="setFlowBarWidthMode"
+          data-value="narrow">
+        <span>Narrow</span>
+      </label>
+      <label class="settings-toggle-row">
+        <input type="radio" name="flow-bar-width" id="settings-flow-width-medium" data-action="setFlowBarWidthMode"
+          data-value="medium" checked>
+        <span>Medium</span>
+      </label>
+      <label class="settings-toggle-row">
+        <input type="radio" name="flow-bar-width" id="settings-flow-width-wide" data-action="setFlowBarWidthMode"
+          data-value="wide">
+        <span>Wide</span>
+      </label>
+      <label class="settings-toggle-row">
+        <input type="radio" name="flow-bar-width" id="settings-flow-width-variant" data-action="setFlowBarWidthMode"
+          data-value="variant">
+        <span>By Duration</span>
       </label>
     </div>
   </div>
@@ -4175,7 +4217,7 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
                 style="border-bottom-left-radius:0; border-bottom-right-radius:0; margin-bottom:-1px; z-index:1;"
                 placeholder="Type to create new...">
               <select id="modal-phase-sel"
-                onchange="if(this.value){document.getElementById('modal-task-phase').value = this.value; this.value='';}"
+                onchange="if(this.value){document.getElementById('modal-task-phase').value = this.value; this.value=''; _updateCatDropdown();}"
                 style="border-top-left-radius:0; border-top-right-radius:0; cursor:pointer;"
                 title="Select existing phase"></select>
             </div>
@@ -4281,6 +4323,8 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     <div class="modal-footer" id="modal-edit-footer">
       <button id="modal-btn-delete" class="btn btn-delete" data-action="deleteTaskFromModal"
         style="display:none;">Delete</button>
+      <button id="modal-btn-parent" class="btn" data-action="createParentTaskFromModal"
+        style="display:none;" data-tooltip="Create a new parent/source task in the same Phase &amp; Category that this task will depend on">New Parent</button>
       <button id="modal-btn-dependent" class="btn" data-action="createDependentTask"
         style="display:none;">New Dependent</button>
       <button id="modal-btn-duplicate" class="btn" data-action="duplicateTaskFromModal"
@@ -4308,9 +4352,30 @@ parse_Primary(n.content)}catch(l){}a="/EncryptionInfo";n=Qe.find(e,a);if(!n||!n.
     </div>
     <div class="modal-footer">
       <button class="btn btn-delete" data-action="deletePhaseOrCategory">Delete</button>
+      <button id="rename-move-btn" class="btn" data-action="openMoveCategoryModal" style="display:none;">Move</button>
       <div style="flex:1"></div>
       <button class="btn" data-action="closeRenameModal">Cancel</button>
       <button class="btn btn-primary" data-action="saveRename">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="move-cat-modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal" style="width:360px;">
+    <div class="modal-header" style="display:flex; align-items:center;">
+      <h3 style="margin:0;">Move Category</h3>
+      <div style="flex:1;"></div>
+      <span class="modal-close" data-action="closeMoveCategoryModal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label id="move-cat-modal-label">Move category to Phase</label>
+        <select id="move-cat-phase-sel"></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-action="closeMoveCategoryModal">Cancel</button>
+      <button class="btn btn-primary" data-action="performMoveCategory">Move</button>
     </div>
   </div>
 </div>
@@ -4548,6 +4613,11 @@ const AppState = {
   // see _loadHoverPanelPrefs() / _saveHoverPanelPrefs() in js_render.js
   hoverPanelPrefs: { properties: true, description: true },
 
+  // Linked (Flow) View bar width — 'narrow' | 'medium' | 'wide' (all bars use that one
+  // fixed width) | 'variant' (width by task duration, the original per-duration logic).
+  // Persisted to localStorage — see _loadFlowBarWidthPref() / _saveFlowBarWidthPref() in js_render.js
+  _flowBarWidthMode: 'medium',
+
   // Init flags
   _dragScrollInit: false,
   _eventsInit: false,
@@ -4576,6 +4646,12 @@ const AppState = {
   _easterClickTimer: null,
   _milestone42Shown: false,
   _prevDoneMilestoneCount: 0,
+
+  // Left-panel drag & drop (Phase / Category / Task reordering & reparenting)
+  // — see _onLeftRowDragStart() etc. in js_render.js
+  _dragItem: null,        // { kind: 'phase'|'category'|'task', phase, cat, taskId } while a left-row drag is in progress
+  _dragHoverKey: null,    // key of the row currently hovered over (used to detect when the hover target changes)
+  _dragHoverTimer: null,  // setTimeout handle: auto-expands a collapsed phase/category hovered during a drag
 };
 
 // ── Title trimmer & snapshot formatter ───────────────────────────────
@@ -6296,6 +6372,12 @@ function renderLeft(visible, today, statsMap) {
       if (!r.ghost) {
         div.addEventListener('mouseenter', () => { AppState._hoveredPhase = r.phase; AppState._hoveredCatInfo = null; });
         div.addEventListener('mouseleave', () => { AppState._hoveredPhase = null; });
+        div.draggable = true;
+        div.addEventListener('dragstart', (e) => _onLeftRowDragStart(e, { kind: 'phase', phase: r.phase }));
+        div.addEventListener('dragend', _onLeftRowDragEnd);
+        div.addEventListener('dragover', (e) => _onLeftRowDragOver(e, { type: 'phase', phase: r.phase }));
+        div.addEventListener('dragleave', (e) => _onLeftRowDragLeave(e, { type: 'phase', phase: r.phase }));
+        div.addEventListener('drop', (e) => _onLeftRowDrop(e, { type: 'phase', phase: r.phase }));
         const editP = document.createElement('span'); editP.className = 'rename-btn'; editP.dataset.tooltip = 'Rename or Delete Phase'; editP.dataset.shortcut = 'e / r: rename / delete'; editP.textContent = '\u270F';
         editP.onclick = (e) => { e.stopPropagation(); openRenameModal('phase', r.phase); };
         div.appendChild(editP);
@@ -6342,6 +6424,12 @@ function renderLeft(visible, today, statsMap) {
       if (!r.ghost) {
         div.addEventListener('mouseenter', () => { AppState._hoveredCatInfo = { phase: r.phase, cat: r.cat }; AppState._hoveredPhase = null; });
         div.addEventListener('mouseleave', () => { AppState._hoveredCatInfo = null; });
+        div.draggable = true;
+        div.addEventListener('dragstart', (e) => _onLeftRowDragStart(e, { kind: 'category', phase: r.phase, cat: r.cat }));
+        div.addEventListener('dragend', _onLeftRowDragEnd);
+        div.addEventListener('dragover', (e) => _onLeftRowDragOver(e, { type: 'category', phase: r.phase, cat: r.cat }));
+        div.addEventListener('dragleave', (e) => _onLeftRowDragLeave(e, { type: 'category', phase: r.phase, cat: r.cat }));
+        div.addEventListener('drop', (e) => _onLeftRowDrop(e, { type: 'category', phase: r.phase, cat: r.cat }));
         const editC = document.createElement('span'); editC.className = 'rename-btn'; editC.dataset.tooltip = 'Rename or Delete Category'; editC.dataset.shortcut = 'e / r: rename / delete'; editC.textContent = '\u270F';
         editC.onclick = (e) => { e.stopPropagation(); openRenameModal('category', r.cat, r.phase); };
         div.appendChild(editC);
@@ -6415,6 +6503,13 @@ function renderLeft(visible, today, statsMap) {
       if (!r.ghost) {
         div.addEventListener('mouseenter', () => { AppState._hoveredLeftTask = r.task; });
         div.addEventListener('mouseleave', () => { AppState._hoveredLeftTask = null; });
+        div.draggable = true;
+        const dragTaskId = getTaskId(r.task);
+        div.addEventListener('dragstart', (e) => _onLeftRowDragStart(e, { kind: 'task', phase: r.phase, cat: r.cat, taskId: dragTaskId }));
+        div.addEventListener('dragend', _onLeftRowDragEnd);
+        div.addEventListener('dragover', (e) => _onLeftRowDragOver(e, { type: 'task', phase: r.phase, cat: r.cat, task: r.task }));
+        div.addEventListener('dragleave', (e) => _onLeftRowDragLeave(e, { type: 'task', phase: r.phase, cat: r.cat, task: r.task }));
+        div.addEventListener('drop', (e) => _onLeftRowDrop(e, { type: 'task', phase: r.phase, cat: r.cat, task: r.task }));
       }
       // All task rows (current + ghost) are clickable
       div.onclick = (e) => {
@@ -7092,6 +7187,11 @@ function computeFlowLayout(visible, chartWidth) {
   });
 
   function widthFor(t) {
+    const mode = AppState._flowBarWidthMode || 'medium';
+    if (mode === 'narrow') return smallW;
+    if (mode === 'medium') return normalW;
+    if (mode === 'wide') return wideW;
+    // 'variant': width by task duration (the original per-duration logic)
     const s = parseDate(t['Start Date']), e = parseDate(t['End Date']);
     if (!s || !e) return smallW;
     const days = dayDiff(s, e);
@@ -7738,6 +7838,30 @@ function _syncSettingsPanelUI() {
     const cb = document.getElementById('settings-hover-' + key);
     if (cb) cb.checked = !!AppState.hoverPanelPrefs[key];
   });
+  const radio = document.getElementById('settings-flow-width-' + (AppState._flowBarWidthMode || 'medium'));
+  if (radio) radio.checked = true;
+}
+
+// ── Settings flyout (Linked/Flow View bar width preference) ───────────
+const FLOW_BAR_WIDTH_KEY = 'gantt_flow_bar_width_mode';
+const FLOW_BAR_WIDTH_MODES = ['narrow', 'medium', 'wide', 'variant'];
+
+function _loadFlowBarWidthPref() {
+  try {
+    const raw = localStorage.getItem(FLOW_BAR_WIDTH_KEY);
+    if (raw && FLOW_BAR_WIDTH_MODES.includes(raw)) AppState._flowBarWidthMode = raw;
+  } catch (e) { /* ignore malformed/unavailable storage */ }
+}
+
+function _saveFlowBarWidthPref() {
+  try { localStorage.setItem(FLOW_BAR_WIDTH_KEY, AppState._flowBarWidthMode); } catch (e) { /* ignore */ }
+}
+
+function setFlowBarWidthMode(mode) {
+  if (!FLOW_BAR_WIDTH_MODES.includes(mode) || mode === AppState._flowBarWidthMode) return;
+  AppState._flowBarWidthMode = mode;
+  _saveFlowBarWidthPref();
+  render();
 }
 
 function toggleSettingsPanel() {
@@ -8264,6 +8388,165 @@ function updateToggleBtn() {
 }
 function toggleAll() { isAllCollapsed() ? expandAll() : collapseAll(); }
 
+// ── Left Panel Drag & Drop ───────────────────────────────────────────
+// Lets the user reorder Phases, and re-parent Categories (with all their
+// tasks) or individual tasks, by dragging left-panel rows onto one another.
+// The drag payload lives in AppState._dragItem — dataTransfer's own data
+// channel isn't readable during dragover in most browsers, so it only
+// carries a placeholder string purely to satisfy the drag API.
+const DRAG_HOVER_EXPAND_MS = 1000; // ms a collapsed phase/category must be hovered during a drag before it auto-expands
+
+function _onLeftRowDragStart(e, item) {
+  AppState._dragItem = item;
+  e.dataTransfer.effectAllowed = 'move';
+  try { e.dataTransfer.setData('text/plain', item.kind); } catch (err) { /* Safari restricts setData in some contexts; the real payload lives in AppState */ }
+  e.currentTarget.classList.add('dragging');
+}
+
+function _onLeftRowDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  AppState._dragItem = null;
+  AppState._dragHoverKey = null;
+  if (AppState._dragHoverTimer) { clearTimeout(AppState._dragHoverTimer); AppState._dragHoverTimer = null; }
+  document.querySelectorAll('.left-row.drag-over').forEach(el => el.classList.remove('drag-over'));
+}
+
+// A dragged Phase may land on any row belonging to a different Phase (Phase / Category /
+// Task rows alike) — it's inserted immediately after whichever Phase that row belongs to
+// (see _reorderPhase()). A dragged Category may land on any row belonging to a different
+// Phase too. A dragged Task needs a concrete Category, so it may only land on Category or
+// Task rows.
+function _isValidDragTarget(target) {
+  const drag = AppState._dragItem;
+  if (!drag) return false;
+  if (drag.kind === 'phase' || drag.kind === 'category') return target.phase !== drag.phase;
+  if (target.type === 'phase') return false;
+  return target.phase !== drag.phase || target.cat !== drag.cat;
+}
+
+function _dragRowKey(target) {
+  if (target.type === 'phase') return 'p:' + target.phase;
+  if (target.type === 'category') return 'c:' + target.phase + ':' + target.cat;
+  return 't:' + getTaskId(target.task);
+}
+
+const DRAG_SCROLL_EDGE_PX = 50; // px from the chart area's top/bottom edge that triggers auto-scroll while dragging
+const DRAG_SCROLL_STEP_PX = 18; // px scrolled per dragover tick while the pointer sits in the auto-scroll zone
+
+function _onLeftRowDragOver(e, target) {
+  if (!AppState._dragItem) return;
+  // Auto-scroll the (left-panel-mirrored) chart area when dragging near the top/bottom edge,
+  // so a Phase/Category/Task can be dragged onto a row that's currently off-screen.
+  const ca = document.getElementById('chart-area');
+  if (ca) {
+    const caRect = ca.getBoundingClientRect();
+    if (e.clientY < caRect.top + DRAG_SCROLL_EDGE_PX) ca.scrollTop = Math.max(0, ca.scrollTop - DRAG_SCROLL_STEP_PX);
+    else if (e.clientY > caRect.bottom - DRAG_SCROLL_EDGE_PX) ca.scrollTop += DRAG_SCROLL_STEP_PX;
+  }
+  // Hover-to-expand fires for ANY collapsed phase/category the drag passes over, even one
+  // that isn't a legal final drop site (e.g. an item passing over a Phase header) — it's
+  // there to reveal nested rows to drag further into, not to mark a valid drop.
+  const key = _dragRowKey(target);
+  if (AppState._dragHoverKey !== key) {
+    AppState._dragHoverKey = key;
+    if (AppState._dragHoverTimer) clearTimeout(AppState._dragHoverTimer);
+    const collapsedKey = target.type === 'phase' ? 'p:' + target.phase
+      : target.type === 'category' ? 'c:' + target.phase + ':' + target.cat : null;
+    AppState._dragHoverTimer = (collapsedKey && AppState.collapsed[collapsedKey])
+      ? setTimeout(() => {
+          AppState.collapsed[collapsedKey] = false;
+          AppState._dragHoverTimer = null;
+          render();
+        }, DRAG_HOVER_EXPAND_MS)
+      : null;
+  }
+  if (!_isValidDragTarget(target)) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  if (!e.currentTarget.classList.contains('drag-over')) {
+    document.querySelectorAll('.left-row.drag-over').forEach(el => el.classList.remove('drag-over'));
+    e.currentTarget.classList.add('drag-over');
+  }
+}
+
+function _onLeftRowDragLeave(e, target) {
+  if (AppState._dragHoverKey !== _dragRowKey(target)) return;
+  e.currentTarget.classList.remove('drag-over');
+  AppState._dragHoverKey = null;
+  if (AppState._dragHoverTimer) { clearTimeout(AppState._dragHoverTimer); AppState._dragHoverTimer = null; }
+}
+
+function _onLeftRowDrop(e, target) {
+  const drag = AppState._dragItem;
+  if (!drag || !_isValidDragTarget(target)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  if (drag.kind === 'phase') _reorderPhase(drag.phase, target.phase);
+  else if (drag.kind === 'category') moveCategoryToPhase(drag.phase, drag.cat, target.phase);
+  else _moveTaskToPhaseCategory(drag.taskId, target.phase, target.cat);
+}
+
+// Moves the dragged Phase (and all its tasks) so it sits immediately after `targetPhase`
+// in AppState.currentTasks — Phase display order follows first-appearance order in that
+// array (see buildAllRows()), so reordering the array is how a Phase gets reordered.
+function _reorderPhase(draggedPhase, targetPhase) {
+  if (draggedPhase === targetPhase) return;
+  const order = [];
+  const groups = {};
+  AppState.currentTasks.forEach(t => {
+    const ph = t.Phase;
+    if (!groups[ph]) { groups[ph] = []; order.push(ph); }
+    groups[ph].push(t);
+  });
+  const fromIdx = order.indexOf(draggedPhase);
+  if (fromIdx === -1) return;
+  order.splice(fromIdx, 1);
+  const toIdx = order.indexOf(targetPhase);
+  order.splice(toIdx + 1, 0, draggedPhase);
+  AppState.currentTasks = order.flatMap(ph => groups[ph]);
+  syncCurrentTasksToData(); setUnsavedChanges(true); render();
+}
+
+// Moves every task in `sourcePhase › catName` to `targetPhase`. Also the handler
+// for the "Move" button in the Rename/Delete Category modal (see performMoveCategory).
+// A same-named Category already present in the target Phase is handled the same way
+// as a rename collision: offer to merge into it, or keep the moved Category separate
+// under an adjusted name.
+async function moveCategoryToPhase(sourcePhase, catName, targetPhase) {
+  if (sourcePhase === targetPhase) return;
+  const collision = AppState.currentTasks.some(t => t.Phase === targetPhase && t.Category === catName);
+  let finalCatName = catName;
+  if (collision) {
+    const addToExisting = await showConfirmDialog(
+      `A Category named "${catName}" already exists in Phase "${targetPhase}".\n\n` +
+      `Add the moved items to that existing Category, or rename the moved Category to keep it separate?`,
+      'Category Already Exists', 'Add to Existing', 'Rename'
+    );
+    if (!addToExisting) {
+      const promptedName = await showPromptDialog(
+        `New name for the moved Category (currently "${catName}"):`, 'Rename Category', catName
+      );
+      if (promptedName === null) return; // cancelled — abort the move entirely
+      const newName = normalizeText(promptedName) || catName;
+      let suffix = 2; let safeName = newName;
+      while (AppState.currentTasks.some(t => t.Phase === targetPhase && t.Category === safeName)) { safeName = `${newName} ${suffix++}`; }
+      finalCatName = safeName;
+    }
+  }
+  AppState.currentTasks.forEach(t => {
+    if (t.Phase === sourcePhase && t.Category === catName) { t.Phase = targetPhase; t.Category = finalCatName; }
+  });
+  syncCurrentTasksToData(); setUnsavedChanges(true); render();
+}
+
+function _moveTaskToPhaseCategory(taskId, targetPhase, targetCat) {
+  const task = AppState.currentTasks.find(t => getTaskId(t) === taskId);
+  if (!task || (task.Phase === targetPhase && task.Category === targetCat)) return;
+  task.Phase = targetPhase;
+  task.Category = targetCat;
+  syncCurrentTasksToData(); setUnsavedChanges(true); render();
+}
+
 // ── Filter ────────────────────────────────────────────────────────────
 function _updateFilterBtnState() {
   const filterBtn = document.getElementById('filter-btn');
@@ -8662,7 +8945,7 @@ function closeModal() {
 }
 
 // ── Centered Custom Confirm Modal ─────────────────────────────────────
-function showConfirmDialog(message, title = 'Confirm') {
+function showConfirmDialog(message, title = 'Confirm', okLabel = 'OK', cancelLabel = 'Cancel') {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -8690,11 +8973,11 @@ function showConfirmDialog(message, title = 'Confirm') {
 
     const cancelBtn = document.createElement('button');
     cancelBtn.className = 'btn';
-    cancelBtn.textContent = 'Cancel';
+    cancelBtn.textContent = cancelLabel;
 
     const okBtn = document.createElement('button');
     okBtn.className = 'btn btn-primary';
-    okBtn.textContent = 'OK';
+    okBtn.textContent = okLabel;
 
     footer.appendChild(cancelBtn);
     footer.appendChild(okBtn);
@@ -8725,6 +9008,81 @@ function showConfirmDialog(message, title = 'Confirm') {
   });
 }
 
+// Nice-looking centered replacement for window.prompt(). Resolves the entered
+// string, or null if the dialog was cancelled/dismissed (mirrors window.prompt's
+// contract so call sites can keep the same null-check pattern).
+function showPromptDialog(message, title = 'Enter Value', defaultValue = '') {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.style.zIndex = '10005';
+    overlay.style.display = 'flex';
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.width = '380px';
+    modal.style.maxWidth = '90vw';
+
+    const header = document.createElement('div');
+    header.className = 'modal-header';
+    header.innerHTML = `<h3 style="margin:0;">${escHtml(title)}</h3>`;
+
+    const body = document.createElement('div');
+    body.className = 'modal-body';
+    const label = document.createElement('div');
+    label.style.whiteSpace = 'pre-wrap';
+    label.style.lineHeight = '1.5';
+    label.style.marginBottom = '8px';
+    label.textContent = message;
+    const group = document.createElement('div');
+    group.className = 'form-group';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = defaultValue;
+    input.style.width = '100%';
+    group.appendChild(input);
+    body.appendChild(label);
+    body.appendChild(group);
+
+    const footer = document.createElement('div');
+    footer.className = 'modal-footer';
+    footer.style.justifyContent = 'flex-end';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn';
+    cancelBtn.textContent = 'Cancel';
+
+    const okBtn = document.createElement('button');
+    okBtn.className = 'btn btn-primary';
+    okBtn.textContent = 'OK';
+
+    footer.appendChild(cancelBtn);
+    footer.appendChild(okBtn);
+
+    modal.appendChild(header);
+    modal.appendChild(body);
+    modal.appendChild(footer);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const cleanup = (res) => {
+      document.body.removeChild(overlay);
+      resolve(res);
+    };
+
+    cancelBtn.addEventListener('click', () => cleanup(null));
+    okBtn.addEventListener('click', () => cleanup(input.value));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); cleanup(input.value); }
+      if (e.key === 'Escape') cleanup(null);
+    });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) cleanup(null);
+    });
+    setTimeout(() => { input.focus(); input.select(); }, 50);
+  });
+}
+
 async function closeModalConfirm() {
   _markCommentsDirty();
   if (_isEditDirty() || AppState._commentsDirty) {
@@ -8743,6 +9101,7 @@ function openRenameModal(type, oldName, phase) {
   document.getElementById('rename-modal-title').textContent = type === 'phase' ? 'Rename Phase' : 'Rename Category';
   document.getElementById('rename-modal-label').textContent = type === 'phase' ? 'Phase name' : 'Category name';
   document.getElementById('rename-modal-input').value = oldName;
+  document.getElementById('rename-move-btn').style.display = type === 'category' ? 'inline-block' : 'none';
   document.getElementById('rename-modal-overlay').style.display = 'flex';
   setTimeout(() => { const inp = document.getElementById('rename-modal-input'); if (inp) { inp.focus(); inp.select(); } }, 50);
 }
@@ -8751,7 +9110,44 @@ function closeRenameModal() {
   document.getElementById('rename-modal-overlay').style.display = 'none';
 }
 
-function saveRename() {
+// ── Move Category Modal ────────────────────────────────────────────────
+// Opened from the "Move" button in the Rename/Delete Category modal. Lets the
+// user re-parent a Category (and all its tasks) under a different Phase.
+function openMoveCategoryModal() {
+  if (_renameType !== 'category') return;
+  const sel = document.getElementById('move-cat-phase-sel');
+  const phaseSet = new Set();
+  AppState.currentTasks.forEach(t => phaseSet.add(t.Phase));
+  phaseSet.delete(_renamePhase);
+  sel.innerHTML = '';
+  if (phaseSet.size === 0) {
+    const o = document.createElement('option');
+    o.value = ''; o.textContent = 'No other phases available';
+    sel.appendChild(o);
+  } else {
+    Array.from(phaseSet).sort((a, b) => a.localeCompare(b)).forEach(p => {
+      const o = document.createElement('option');
+      o.value = p; o.textContent = p;
+      sel.appendChild(o);
+    });
+  }
+  document.getElementById('move-cat-modal-label').textContent =
+    `Move "${_renameOldValue}" (and all its tasks) to Phase`;
+  document.getElementById('move-cat-modal-overlay').style.display = 'flex';
+}
+
+function closeMoveCategoryModal() {
+  document.getElementById('move-cat-modal-overlay').style.display = 'none';
+}
+
+async function performMoveCategory() {
+  const targetPhase = document.getElementById('move-cat-phase-sel').value;
+  if (!targetPhase || targetPhase === _renamePhase) { closeMoveCategoryModal(); return; }
+  await moveCategoryToPhase(_renamePhase, _renameOldValue, targetPhase);
+  closeMoveCategoryModal(); closeRenameModal();
+}
+
+async function saveRename() {
   const newName = normalizeText(document.getElementById('rename-modal-input').value);
   if (!newName) return;
   if (newName === _renameOldValue) { closeRenameModal(); return; }
@@ -8759,21 +9155,20 @@ function saveRename() {
   if (_renameType === 'phase') {
     const existingPhase = AppState.currentTasks.some(t => t.Phase === newName);
     if (existingPhase) {
-      const choice = window.confirm(
+      const choice = await showConfirmDialog(
         `A Phase named "${newName}" already exists.\n\n` +
-        `Click OK to merge "${_renameOldValue}" into "${newName}" (all tasks will be moved).\n` +
-        `Click Cancel to keep both phases (a number will be added to avoid duplicates).`
+        `Merge "${_renameOldValue}" into "${newName}" (all tasks will be moved), or keep both phases (a number will be added to avoid duplicates)?`,
+        'Phase Already Exists', 'Merge', 'Keep Both'
       );
       if (choice === true) {
         // Merge: move all tasks from old phase to new phase
         AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = newName; });
-      } else if (choice === false) {
+      } else {
         // Duplicate: add incremented suffix
         let suffix = 2; let safeName = `${newName} ${suffix}`;
         while (AppState.currentTasks.some(t => t.Phase === safeName)) { suffix++; safeName = `${newName} ${suffix}`; }
         AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = safeName; });
       }
-      // null = Cancel (dialog was dismissed) — do nothing
     } else {
       AppState.currentTasks.forEach(t => { if (t.Phase === _renameOldValue) t.Phase = newName; });
     }
@@ -8783,30 +9178,30 @@ function saveRename() {
     const otherPhaseCatExists = !samePhaseCatExists && AppState.currentTasks.some(t => t.Phase !== _renamePhase && t.Category === newName);
 
     if (samePhaseCatExists) {
-      const choice = window.confirm(
+      const choice = await showConfirmDialog(
         `A Category named "${newName}" already exists in phase "${_renamePhase}".\n\n` +
-        `Click OK to merge "${_renameOldValue}" into "${newName}" (all tasks will be moved).\n` +
-        `Click Cancel to keep both categories (a number will be added to avoid duplicates).`
+        `Merge "${_renameOldValue}" into "${newName}" (all tasks will be moved), or keep both categories (a number will be added to avoid duplicates)?`,
+        'Category Already Exists', 'Merge', 'Keep Both'
       );
       if (choice === true) {
         AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
-      } else if (choice === false) {
+      } else {
         let suffix = 2; let safeName = `${newName} ${suffix}`;
         while (AppState.currentTasks.some(t => t.Phase === _renamePhase && t.Category === safeName)) { suffix++; safeName = `${newName} ${suffix}`; }
         AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = safeName; });
       }
     } else if (otherPhaseCatExists) {
-      const choice = window.confirm(
+      const choice = await showConfirmDialog(
         `A Category named "${newName}" exists in a different Phase.\n\n` +
-        `Click OK to merge and move all tasks from "${_renamePhase} \u203A ${_renameOldValue}" into that other category.\n` +
-        `Click Cancel to proceed with a simple rename (tasks stay in "${_renamePhase}").`
+        `Merge and move all tasks from "${_renamePhase} \u203A ${_renameOldValue}" into that other category, or proceed with a simple rename (tasks stay in "${_renamePhase}")?`,
+        'Category Already Exists', 'Merge & Move', 'Rename Only'
       );
       if (choice === true) {
         // Find the phase of the matching category
         const targetTask = AppState.currentTasks.find(t => t.Phase !== _renamePhase && t.Category === newName);
         const targetPhase = targetTask ? targetTask.Phase : _renamePhase;
         AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) { t.Category = newName; t.Phase = targetPhase; } });
-      } else if (choice === false) {
+      } else {
         AppState.currentTasks.forEach(t => { if (t.Phase === _renamePhase && t.Category === _renameOldValue) t.Category = newName; });
       }
     } else {
@@ -8817,13 +9212,14 @@ function saveRename() {
   closeRenameModal(); render();
 }
 
-function deletePhaseOrCategory() {
+async function deletePhaseOrCategory() {
   if (_renameType === 'phase') {
     const tasks = AppState.currentTasks.filter(t => t.Phase === _renameOldValue);
     if (tasks.length > 0) {
-      const ok = window.confirm(
+      const ok = await showConfirmDialog(
         `Phase "${_renameOldValue}" contains ${tasks.length} task${tasks.length !== 1 ? 's' : ''}.\n\n` +
-        `Deleting this phase will permanently remove all its tasks.\n\nProceed?`
+        `Deleting this phase will permanently remove all its tasks.\n\nProceed?`,
+        'Delete Phase', 'Delete', 'Cancel'
       );
       if (!ok) return;
     }
@@ -8831,9 +9227,10 @@ function deletePhaseOrCategory() {
   } else {
     const tasks = AppState.currentTasks.filter(t => t.Phase === _renamePhase && t.Category === _renameOldValue);
     if (tasks.length > 0) {
-      const ok = window.confirm(
+      const ok = await showConfirmDialog(
         `Category "${_renameOldValue}" contains ${tasks.length} task${tasks.length !== 1 ? 's' : ''}.\n\n` +
-        `Deleting this category will permanently remove all its tasks.\n\nProceed?`
+        `Deleting this category will permanently remove all its tasks.\n\nProceed?`,
+        'Delete Category', 'Delete', 'Cancel'
       );
       if (!ok) return;
     }
@@ -8957,6 +9354,7 @@ function initEvents() {
         case 'toggleInfoPanel': toggleInfoPanel(); break;
         case 'toggleSettingsPanel': toggleSettingsPanel(); break;
         case 'toggleHoverPanelSetting': toggleHoverPanelSetting(actionEl); break;
+        case 'setFlowBarWidthMode': setFlowBarWidthMode(val); break;
         case 'toggleChangesOnly': toggleChangesOnly(); break;
         case 'restoreFromSnapshot': restoreFromSnapshot(); break;
         case 'clearCompare': clearCompare(); break;
@@ -8986,6 +9384,7 @@ function initEvents() {
         case 'deleteTaskFromModal': deleteTaskFromModal(); break;
         case 'duplicateTaskFromModal': duplicateTaskFromModal(); break;
         case 'createDependentTask': createDependentTask(); break;
+        case 'createParentTaskFromModal': createParentTaskFromModal(); break;
         // Comments panel actions
         case 'openCommentsFromEdit': openCommentsFromEdit(); break;
         case 'closeCommentsModal': closeModal(); break;
@@ -9004,6 +9403,9 @@ function initEvents() {
         case 'closeRenameModal': closeRenameModal(); break;
         case 'saveRename': saveRename(); break;
         case 'deletePhaseOrCategory': deletePhaseOrCategory(); break;
+        case 'openMoveCategoryModal': openMoveCategoryModal(); break;
+        case 'closeMoveCategoryModal': closeMoveCategoryModal(); break;
+        case 'performMoveCategory': performMoveCategory(); break;
       }
     }
   });
@@ -9034,10 +9436,12 @@ function initEvents() {
     if (e.key !== 'Escape' && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
     const modalOpen = document.getElementById('modal-overlay') && document.getElementById('modal-overlay').style.display !== 'none';
     const renameModalOpen = document.getElementById('rename-modal-overlay') && document.getElementById('rename-modal-overlay').style.display !== 'none';
-    const anyModalOpen = modalOpen || renameModalOpen;
+    const moveCatModalOpen = document.getElementById('move-cat-modal-overlay') && document.getElementById('move-cat-modal-overlay').style.display !== 'none';
+    const anyModalOpen = modalOpen || renameModalOpen || moveCatModalOpen;
     // Escape closes whichever modal is open (with unsaved-change prompt where relevant)
     if (e.key === 'Escape') {
-      if (modalOpen) { e.preventDefault(); closeModalConfirm(); }
+      if (moveCatModalOpen) { e.preventDefault(); closeMoveCategoryModal(); }
+      else if (modalOpen) { e.preventDefault(); closeModalConfirm(); }
       else if (renameModalOpen) { e.preventDefault(); closeRenameModal(); }
       return;
     }
@@ -9145,6 +9549,8 @@ function initEvents() {
       onTaskTitleInput();
     } else if (e.target.id === 'modal-task-tags') {
       _updateTagsDropdown();
+    } else if (e.target.id === 'modal-task-phase') {
+      _updateCatDropdown();
     }
     // Track pending unsaved comment text for dirty-state warning (single and dual modal)
     if (e.target.id === 'comments-text-input') {
@@ -9256,6 +9662,7 @@ window.addEventListener('resize', () => {
 // ── Init ──────────────────────────────────────────────────────────────
 function init() {
   _loadHoverPanelPrefs();
+  _loadFlowBarWidthPref();
   _syncSettingsPanelUI();
 
   // Status 'Done' → Progress 100
@@ -9472,12 +9879,11 @@ function openTaskModal(task, mode, defaultPhase, defaultCat) {
   _updateTagsDropdown();
 
   // Setup datalists
-  const phaseSet = new Set(), catSet = new Set();
-  AppState.currentTasks.forEach(t => { phaseSet.add(t.Phase); catSet.add(t.Category); });
+  const phaseSet = new Set();
+  AppState.currentTasks.forEach(t => phaseSet.add(t.Phase));
   const pl = document.getElementById('modal-phase-sel'); pl.innerHTML = '<option value="" disabled selected hidden>&mdash; Or select existing &mdash;</option>';
   phaseSet.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; pl.appendChild(o); });
-  const cl = document.getElementById('modal-cat-sel'); cl.innerHTML = '<option value="" disabled selected hidden>&mdash; Or select existing &mdash;</option>';
-  catSet.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; cl.appendChild(o); });
+  _updateCatDropdown();
 
   // Dependencies
   document.getElementById('modal-task-dependency').value = isEdit ? (task.Dependency || '') : '';
@@ -9489,6 +9895,8 @@ function openTaskModal(task, mode, defaultPhase, defaultCat) {
   renderPills('modal-status-container', PREDEFINED_STATUSES, isEdit ? (task.Status || 'none') : 'none');
 
   document.getElementById('modal-btn-delete').style.display = isEdit ? 'inline-block' : 'none';
+  const parentBtn = document.getElementById('modal-btn-parent');
+  if (parentBtn) parentBtn.style.display = isEdit ? 'inline-block' : 'none';
   const dupBtn = document.getElementById('modal-btn-duplicate');
   if (dupBtn) dupBtn.style.display = isEdit ? 'inline-block' : 'none';
   const depBtn = document.getElementById('modal-btn-dependent');
@@ -9578,6 +9986,19 @@ function renderPills(containerId, options, currentValue) {
 }
 
 // Helper to update the modal's tags dropdown options and highlight selected tags
+// Restricts the "Or select existing" Category dropdown to categories already
+// used within the currently-typed Phase, so switching Phase can't offer a
+// Category from an unrelated Phase.
+function _updateCatDropdown() {
+  const cl = document.getElementById('modal-cat-sel');
+  if (!cl) return;
+  const phaseVal = normalizeText(document.getElementById('modal-task-phase')?.value ?? '');
+  const catSet = new Set();
+  AppState.currentTasks.forEach(t => { if (t.Phase === phaseVal) catSet.add(t.Category); });
+  cl.innerHTML = '<option value="" disabled selected hidden>&mdash; Or select existing &mdash;</option>';
+  catSet.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; cl.appendChild(o); });
+}
+
 function _updateTagsDropdown() {
   const sel = document.getElementById('modal-tags-sel');
   if (!sel) return;
@@ -9660,6 +10081,7 @@ function saveTaskModal() {
   ensureModalIdHandler();
   const isEdit = AppState._modalMode === 'edit';
   const t = isEdit ? AppState._modalTask : {};
+  const oldId = isEdit && AppState._modalTask ? getTaskId(AppState._modalTask) : null;
 
   t.Title = normalizeText(document.getElementById('modal-task-title').value) || 'New Task';
   t.Phase = normalizeText(document.getElementById('modal-task-phase').value) || 'Phase 1';
@@ -9703,6 +10125,18 @@ function saveTaskModal() {
   // spurious diffs against snapshots purely from selection order, and drop any
   // self-reference (can only happen if the task's own ID just changed to match one).
   t.Dependency = normalizeDependencyList(depValue).filter(id => id !== idVal).sort().join(', ');
+
+  // If editing an existing task and its ID changed, update dependencies on other tasks
+  if (isEdit && oldId && oldId !== idVal) {
+    AppState.currentTasks.forEach(otherTask => {
+      if (otherTask === t) return;
+      let deps = normalizeDependencyList(otherTask.Dependency);
+      if (deps.includes(oldId)) {
+        deps = deps.map(d => d === oldId ? idVal : d);
+        otherTask.Dependency = normalizeDependencyList(deps.join(', ')).filter(id => id !== getTaskId(otherTask)).sort().join(', ');
+      }
+    });
+  }
 
   if (!isEdit) {
     // Copy comments from duplicate source if present (not for dependent tasks)
@@ -9777,6 +10211,14 @@ async function deleteTaskFromModal() {
   }
 }
 
+function createParentTaskFromModal() {
+  if (AppState._modalMode === 'edit' && AppState._modalTask) {
+    const childTask = AppState._modalTask;
+    saveTaskModal();
+    createParentTask(childTask);
+  }
+}
+
 function duplicateTaskFromModal() {
   // Persist any unsaved edits on the current task before this same modal gets
   // repurposed to represent the new duplicate — otherwise they'd be silently
@@ -9796,6 +10238,8 @@ function duplicateTaskFromModal() {
   AppState._modalMode = 'add';
   document.getElementById('modal-title').textContent = 'Add Task';
   document.getElementById('modal-btn-delete').style.display = 'none';
+  const parentBtn = document.getElementById('modal-btn-parent');
+  if (parentBtn) parentBtn.style.display = 'none';
   const dupBtn = document.getElementById('modal-btn-duplicate');
   if (dupBtn) dupBtn.style.display = 'none';
   const depBtn = document.getElementById('modal-btn-dependent');
@@ -9847,6 +10291,8 @@ function createDependentTask() {
   AppState._modalMode = 'add';
   document.getElementById('modal-title').textContent = 'Add Task';
   document.getElementById('modal-btn-delete').style.display = 'none';
+  const parentBtn = document.getElementById('modal-btn-parent');
+  if (parentBtn) parentBtn.style.display = 'none';
   const dupBtn = document.getElementById('modal-btn-duplicate');
   if (dupBtn) dupBtn.style.display = 'none';
   const depBtn = document.getElementById('modal-btn-dependent');
