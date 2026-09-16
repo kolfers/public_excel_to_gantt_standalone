@@ -1,6 +1,6 @@
 # Gantt Chart Tool
 
-***Last updated: 16 Sep 2026: v2.31***
+***Last updated: 16 Sep 2026: v2.32***
 
 **Live App:** [https://kolfers.github.io/public_excel_to_gantt_standalone/](https://kolfers.github.io/public_excel_to_gantt_standalone/)
 **GitHub Repository:** [https://github.com/kolfers/public_excel_to_gantt_standalone](https://github.com/kolfers/public_excel_to_gantt_standalone)
@@ -73,6 +73,10 @@ A historical archive of your plan. Each time you click **💾 Save Excel** in th
 - **Export Chart** packages the current view into a single self-contained `.html` file that can be opened on any computer without the original Excel file.
 
 ## Changelog
+
+### v2.32 — 16 Sep 2026
+- Fixed: applying a filter (Active/Overdue or a custom filter) to a fully collapsed board could hide every Phase entirely instead of showing the collapsed Phase headers that still had matching tasks inside.
+- Fixed: applying a filter to a collapsed Phase no longer spills its Categories back open — collapsed groups now stay collapsed exactly as you left them, whether or not a filter is active.
 
 ### v2.31 — 16 Sep 2026
 - New **task search**: a search field next to the `+` new-task button lets you find a task by title as you type (3+ characters). Matching tasks are listed in a dropdown with the matched letters highlighted; use the mouse or the arrow keys and Enter to jump straight to a task, even if it's currently hidden behind a filter or a collapsed Phase/Category.
