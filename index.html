@@ -6383,24 +6383,24 @@ function getVisibleRows(rows, today) {
     });
   }
 
-  // 2. Filter rows, handling visibility logic and collapse state
+  // 2. Filter rows, handling visibility logic and collapse state.
+  // A restriction decides only WHICH phases/categories are worth showing — never
+  // whether a group is open. Collapse state is honoured exactly as the user left
+  // it, so applying a filter never makes a collapsed phase spill its contents.
   return rows.filter(r => {
     if (r.type === 'phase') {
       if (anyRestriction) return validPhases.has(r.phase);
       return true;
     }
-    if (r.type === 'category') {
-      // Under a filter/comparison restriction, a category that holds a matching
-      // task stays visible even if its parent phase is collapsed — otherwise
-      // collapsing the phase would hide the very item the filter surfaced.
-      if (anyRestriction) return validCats.has(r.phase + '||' + r.cat);
-      return !AppState.collapsed['p:' + r.phase];
-    }
-
-    // Remaining must be task — hidden behind either a collapsed phase or a
-    // collapsed category regardless of any filter/comparison restriction.
     if (AppState.collapsed['p:' + r.phase]) return false;
+
+    if (r.type === 'category') {
+      if (anyRestriction) return validCats.has(r.phase + '||' + r.cat);
+      return true;
+    }
     if (AppState.collapsed['c:' + r.phase + ':' + r.cat]) return false;
+
+    // Remaining must be task
     return idIsVisible(getTaskId(r.task));
   });
 }
@@ -6442,12 +6442,15 @@ function renderLeft(visible, today, statsMap) {
   const c = document.getElementById('left-rows'); c.innerHTML = '';
   // Empty state when filtering (and/or "changes only" comparison) gives no results.
   // `visible` already reflects filterMode, custom filters, and changesOnly together
-  // (see getVisibleRows), so it's the single source of truth for this count. Ghost
-  // (snapshot) rows count too — e.g. a removed task can be the only visible row
-  // for its ID in "changes only" mode, and that's a real result, not an empty one.
-  const taskCount = visible.filter(r => r.type === 'task').length;
+  // (see getVisibleRows), so it's the single source of truth here. Ghost (snapshot)
+  // rows count too — e.g. a removed task can be the only visible row for its ID in
+  // "changes only" mode, and that's a real result, not an empty one.
+  // The test is whether ANY row survived, not how many TASK rows did: under a
+  // restriction a phase/category header only survives when it holds a matching
+  // task, so a board whose matches all sit inside collapsed groups still renders
+  // those headers instead of claiming there is nothing to show.
   const changesActive = AppState.changesOnly && AppState.compareLabel;
-  if (taskCount === 0 && (AppState.filterMode !== 'all' || hasCustomFilters() || changesActive)) {
+  if (visible.length === 0 && (AppState.filterMode !== 'all' || hasCustomFilters() || changesActive)) {
     const msg = document.createElement('div'); msg.className = 'empty-state';
     if (hasCustomFilters()) {
       msg.innerHTML = '\uD83D\uDD0D No items match the active filters';
