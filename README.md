@@ -7,6 +7,17 @@ Turn your Excel plan into an interactive Gantt chart. One self-contained HTML fi
 
 Desktop browsers only (Chrome or Edge recommended; see [Saving](#saving)).
 
+## Changelog
+
+### v3.0.0 — 5 Oct 2026
+- **A complete rewrite.** Version 3 opens your existing workbooks and adds six views: Timeline, Dependencies, Roadmap, Table, Board (kanban by status) and Matrix (urgency by importance). See "Coming from version 2?" below for what changed.
+- Saving writes into your original workbook and keeps its formatting and Excel Tables. Plan settings are shared through a hidden `Gantt Settings` sheet, and the `Log` sheet is now a compact history.
+- If a save fails the app retries, offers Save as... and keeps a recovery copy in your browser. If the file changed on disk, changes are merged and you are only asked about real conflicts.
+- Compare against a snapshot with ghost bars and a Changes panel, now with a snapshot picker in the navigation row.
+- Select several tasks and change them together with the bulk bar; every bulk action is one undo step.
+- Better filtering, a docked Settings panel and Info guide, a more compact left panel, and Matrix cards with due tags.
+- Timeline and Roadmap header labels now thin out at regular calendar intervals so they never overlap, however far you zoom out or narrow the window.
+
 ## Quick start
 
 1. Open `index.html` (or the live app) in a modern desktop browser.
