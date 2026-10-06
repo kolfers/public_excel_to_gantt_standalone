@@ -9,6 +9,17 @@ Desktop browsers only (Chrome or Edge recommended; see [Saving](#saving)).
 
 ## Changelog
 
+### v3.0.9 — 6 Oct 2026
+- **Jump to a task from the eye menu.** Choosing a view from the eye ("Show in view…") now scrolls so the task's start sits under the Today button (or the Uniform button in Dependencies), and the eye is also at the end of the hover buttons on bars in the Timeline and Dependencies views.
+- **Zoom the Dependencies view.** Ctrl/Cmd + scroll, a trackpad pinch or `+` / `-` now make the bars wider or narrower (Narrow, Medium, Wide) instead of zooming the whole page.
+- **Late items show a red "!".** In the Timeline and Dependencies views, late tasks no longer get an outline; a red exclamation mark appears next to the status dot instead.
+- **Left panel Full / Compact is a browser setting.** Your choice now applies to every file you open in this browser and is no longer remembered per file.
+- **Filter pills.** Tags, Phase and Category in the Filter panel show your picks as pills you click to remove, and the All button no longer looks selected while a filter is on.
+- **Phase and Category pickers in the task window.** They now suggest existing values as you type, show a grey completion that Tab accepts, keep a new value when you press Enter, and have a ▾ arrow that lists everything.
+- **Roomier task window.** The title now has its own full-width row, and the Milestone switch sits next to Status and Priority.
+- **Custom statuses and import report.** A status such as "In Progress" no longer triggers the import report and can now be picked in the task window, the bulk Status menu and the Filter panel. Unresolved dependencies in the import report have an Edit link that opens the task.
+- **Search jumps to the task.** Picking a task in the search box now scrolls the view to it, vertically centred, with its start under the Today button.
+
 ### v3.0.0 — 5 Oct 2026
 - **A complete rewrite.** Version 3 opens your existing workbooks and adds six views: Timeline, Dependencies, Roadmap, Table, Board (kanban by status) and Matrix (urgency by importance). See "Coming from version 2?" below for what changed.
 - Saving writes into your original workbook and keeps its formatting and Excel Tables. Plan settings are shared through a hidden `Gantt Settings` sheet, and the `Log` sheet is now a compact history.
@@ -65,7 +76,7 @@ Rows without a title or with missing or unreadable dates are skipped (and kept i
   - *Table*: one row per task with sortable, reorderable columns.
   - *Board*: a kanban board by status; drag a card to change its status.
   - *Matrix*: urgency by importance, in four quadrants; drag a card to change its priority or due date.
-- **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps, **Fit project**, **Today** (`t`). `v` cycles the levels.
+- **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
 - **Edit:** double-click a bar or row (or press `e`) to open the task modal. Drag a bar to move it, drag its edges to resize (snaps to days). `d` adds a task that depends on the hovered one, `n` duplicates, `s` adds a parent task.
 - **Select several tasks:** Ctrl/Cmd+click, Shift+click for a range, Alt+click for a task and everything downstream. A bulk bar offers Status, Priority, Move to, Shift dates, Tags and Delete.
 - **Undo / redo:** Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y. Every bulk action is one step.
