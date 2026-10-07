@@ -7,28 +7,6 @@ Turn your Excel plan into an interactive Gantt chart. One self-contained HTML fi
 
 Desktop browsers only (Chrome or Edge recommended; see [Saving](#saving)).
 
-## Changelog
-
-### v3.0.9 — 6 Oct 2026
-- **Jump to a task from the eye menu.** Choosing a view from the eye ("Show in view…") now scrolls so the task's start sits under the Today button (or the Uniform button in Dependencies), and the eye is also at the end of the hover buttons on bars in the Timeline and Dependencies views.
-- **Zoom the Dependencies view.** Ctrl/Cmd + scroll, a trackpad pinch or `+` / `-` now make the bars wider or narrower (Narrow, Medium, Wide) instead of zooming the whole page.
-- **Late items show a red "!".** In the Timeline and Dependencies views, late tasks no longer get an outline; a red exclamation mark appears next to the status dot instead.
-- **Left panel Full / Compact is a browser setting.** Your choice now applies to every file you open in this browser and is no longer remembered per file.
-- **Filter pills.** Tags, Phase and Category in the Filter panel show your picks as pills you click to remove, and the All button no longer looks selected while a filter is on.
-- **Phase and Category pickers in the task window.** They now suggest existing values as you type, show a grey completion that Tab accepts, keep a new value when you press Enter, and have a ▾ arrow that lists everything.
-- **Roomier task window.** The title now has its own full-width row, and the Milestone switch sits next to Status and Priority.
-- **Custom statuses and import report.** A status such as "In Progress" no longer triggers the import report and can now be picked in the task window, the bulk Status menu and the Filter panel. Unresolved dependencies in the import report have an Edit link that opens the task.
-- **Search jumps to the task.** Picking a task in the search box now scrolls the view to it, vertically centred, with its start under the Today button.
-
-### v3.0.0 — 5 Oct 2026
-- **A complete rewrite.** Version 3 opens your existing workbooks and adds six views: Timeline, Dependencies, Roadmap, Table, Board (kanban by status) and Matrix (urgency by importance). See "Coming from version 2?" below for what changed.
-- Saving writes into your original workbook and keeps its formatting and Excel Tables. Plan settings are shared through a hidden `Gantt Settings` sheet, and the `Log` sheet is now a compact history.
-- If a save fails the app retries, offers Save as... and keeps a recovery copy in your browser. If the file changed on disk, changes are merged and you are only asked about real conflicts.
-- Compare against a snapshot with ghost bars and a Changes panel, now with a snapshot picker in the navigation row.
-- Select several tasks and change them together with the bulk bar; every bulk action is one undo step.
-- Better filtering, a docked Settings panel and Info guide, a more compact left panel, and Matrix cards with due tags.
-- Timeline and Roadmap header labels now thin out at regular calendar intervals so they never overlap, however far you zoom out or narrow the window.
-
 ## Quick start
 
 1. Open `index.html` (or the live app) in a modern desktop browser.
@@ -74,7 +52,7 @@ Rows without a title or with missing or unreadable dates are skipped (and kept i
   - *Dependencies*: tasks laid out left to right by what they depend on.
   - *Roadmap*: one row per phase or category, for the big picture.
   - *Table*: one row per task with sortable, reorderable columns.
-  - *Board*: a kanban board by status; drag a card to change its status.
+  - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾, and create your own statuses with + New status (or Custom… in a task's Status list).
   - *Matrix*: urgency by importance, in four quadrants; drag a card to change its priority or due date.
 - **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
 - **Edit:** double-click a bar or row (or press `e`) to open the task modal. Drag a bar to move it, drag its edges to resize (snaps to days). `d` adds a task that depends on the hovered one, `n` duplicates, `s` adds a parent task.
@@ -90,7 +68,7 @@ Rows without a title or with missing or unreadable dates are skipped (and kept i
 ## Saving
 
 - **Save Excel** (Ctrl+S) writes your changes into the original workbook, keeping its formatting and Excel Tables, and appends a snapshot to the `Log` sheet. In Chrome and Edge a file opened with **Open Excel file** or **Recent** is saved in place; a dropped file or another browser downloads a copy instead.
-- **Plan settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, ...) stay in your browser.
+- **Plan settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, ...) stay in your browser.
 - **Auto-save** (optional, Chrome / Edge) saves the planning sheet about a second and a half after each edit.
 - If a save fails the app retries three times, then shows **Not saved** with Retry, Save as... and Download copy. A recovery copy is kept in your browser, and the app offers to restore it the next time you open that file.
 - If the file changed on disk (for example you edited it in Excel), the app merges the changes and asks only about fields that conflict.
@@ -108,6 +86,32 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 ## Privacy
 
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
+
+## Changelog
+
+### v3.0.11 — 7 Oct 2026
+- **Custom statuses.** Pick Custom… in a task's Status list, or + New status in the Board's Panels menu, to create your own status. Each gets its own colour and is saved in the Excel file.
+- **Board by status or priority.** The Board can now show a column per priority instead of per status, and Panels ▾ lets you hide and reorder the columns; Swimlanes is now a dropdown.
+
+### v3.0.9 — 6 Oct 2026
+- **Jump to a task from the eye menu.** Choosing a view from the eye ("Show in view…") now scrolls so the task's start sits under the Today button (or the Uniform button in Dependencies), and the eye is also at the end of the hover buttons on bars in the Timeline and Dependencies views.
+- **Zoom the Dependencies view.** Ctrl/Cmd + scroll, a trackpad pinch or `+` / `-` now make the bars wider or narrower (Narrow, Medium, Wide) instead of zooming the whole page.
+- **Late items show a red "!".** In the Timeline and Dependencies views, late tasks no longer get an outline; a red exclamation mark appears next to the status dot instead.
+- **Left panel Full / Compact is a browser setting.** Your choice now applies to every file you open in this browser and is no longer remembered per file.
+- **Filter pills.** Tags, Phase and Category in the Filter panel show your picks as pills you click to remove, and the All button no longer looks selected while a filter is on.
+- **Phase and Category pickers in the task window.** They now suggest existing values as you type, show a grey completion that Tab accepts, keep a new value when you press Enter, and have a ▾ arrow that lists everything.
+- **Roomier task window.** The title now has its own full-width row, and the Milestone switch sits next to Status and Priority.
+- **Custom statuses and import report.** A status such as "In Progress" no longer triggers the import report and can now be picked in the task window, the bulk Status menu and the Filter panel. Unresolved dependencies in the import report have an Edit link that opens the task.
+- **Search jumps to the task.** Picking a task in the search box now scrolls the view to it, vertically centred, with its start under the Today button.
+
+### v3.0.0 — 5 Oct 2026
+- **A complete rewrite.** Version 3 opens your existing workbooks and adds six views: Timeline, Dependencies, Roadmap, Table, Board (kanban by status or priority) and Matrix (urgency by importance). See "Coming from version 2?" below for what changed.
+- Saving writes into your original workbook and keeps its formatting and Excel Tables. Plan settings are shared through a hidden `Gantt Settings` sheet, and the `Log` sheet is now a compact history.
+- If a save fails the app retries, offers Save as... and keeps a recovery copy in your browser. If the file changed on disk, changes are merged and you are only asked about real conflicts.
+- Compare against a snapshot with ghost bars and a Changes panel, now with a snapshot picker in the navigation row.
+- Select several tasks and change them together with the bulk bar; every bulk action is one undo step.
+- Better filtering, a docked Settings panel and Info guide, a more compact left panel, and Matrix cards with due tags.
+- Timeline and Roadmap header labels now thin out at regular calendar intervals so they never overlap, however far you zoom out or narrow the window.
 
 ---
 *Released under the MIT License.*
