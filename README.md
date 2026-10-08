@@ -52,8 +52,9 @@ Rows without a title or with missing or unreadable dates are skipped (and kept i
   - *Dependencies*: tasks laid out left to right by what they depend on.
   - *Roadmap*: one row per phase or category, for the big picture.
   - *Table*: one row per task with sortable, reorderable columns.
-  - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾, and create your own statuses with + New status (or Custom… in a task's Status list).
-  - *Matrix*: urgency by importance, in four quadrants; drag a card to change its priority or due date.
+  - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾, restore the default layout with **Reset view** (shown only when something was changed), and create your own statuses with + New status (or Custom… in a task's Status list).
+  - *Matrix*: urgency by importance, in four quadrants; drag a card to change its priority or due date; **Reset view** restores the default rules (shown only when something was changed).
+- **Collapsed categories:** in the Timeline and Dependencies charts a collapsed category shows **show: Category**; click it to expand.
 - **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
 - **Edit:** double-click a bar or row (or press `e`) to open the task modal. Drag a bar to move it, drag its edges to resize (snaps to days). `d` adds a task that depends on the hovered one, `n` duplicates, `s` adds a parent task.
 - **Select several tasks:** Ctrl/Cmd+click, Shift+click for a range, Alt+click for a task and everything downstream. A bulk bar offers Status, Priority, Move to, Shift dates, Tags and Delete.
@@ -62,13 +63,13 @@ Rows without a title or with missing or unreadable dates are skipped (and kept i
 - **Check dependencies:** finds overlaps, cycles and missing references, and offers fixes with a preview.
 - **Compare** (Timeline, Dependencies and Table): tick **Show changes since** and pick a snapshot to see ghost bars and a Changes panel (added, delayed, completed, ...). Snapshots can be named and one can be marked as the baseline.
 - **Export:** the **...** menu offers a 16:9 **slide** (PNG, SVG or clipboard, rolled up to phases, categories or tasks) and a read-only **interactive HTML** copy you can share.
-- **Settings** (the gear): legend, compact rows, auto-save, hover panel, layout choices for the Table, Board, Matrix and Roadmap, and reset buttons. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
+- **Settings** (the gear): legend, compact rows, auto-save, hover panel, phase and category rows in the chart, layout choices for the Table, Board, Matrix and Roadmap, and reset buttons. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
 - **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. Press `?` for the full list of shortcuts.
 
 ## Saving
 
 - **Save Excel** (Ctrl+S) writes your changes into the original workbook, keeping its formatting and Excel Tables, and appends a snapshot to the `Log` sheet. In Chrome and Edge a file opened with **Open Excel file** or **Recent** is saved in place; a dropped file or another browser downloads a copy instead.
-- **Plan settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, ...) stay in your browser.
+- **Plan settings** (hover panel, phase and category rows in the chart, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, ...) stay in your browser.
 - **Auto-save** (optional, Chrome / Edge) saves the planning sheet about a second and a half after each edit.
 - If a save fails the app retries three times, then shows **Not saved** with Retry, Save as... and Download copy. A recovery copy is kept in your browser, and the app offers to restore it the next time you open that file.
 - If the file changed on disk (for example you edited it in Excel), the app merges the changes and asks only about fields that conflict.
@@ -88,6 +89,11 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.14 — 8 Oct 2026
+- Timeline and Dependencies: a collapsed category now shows "show: Category" in the chart (click to expand), and Settings → Category rows in the chart draws category title rows like the phase rows.
+- Board and Matrix: a Reset view button appears in the nav row when you have changed the view's layout, and puts it back to the defaults in one click.
+- Clicking the Info button again now closes the Info panel.
 
 ### v3.0.11 — 7 Oct 2026
 - **Custom statuses.** Pick Custom… in a task's Status list, or + New status in the Board's Panels menu, to create your own status. Each gets its own colour and is saved in the Excel file.
