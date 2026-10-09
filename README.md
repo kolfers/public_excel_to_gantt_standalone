@@ -91,6 +91,10 @@ Your data stays on your machine. The app makes no network requests; fonts and th
 
 ## Changelog
 
+### v3.0.23 — 9 Oct 2026
+- Compact hover card: bold Priority, Owner, Tags and Description labels, the priority in its colour, and when the task last changed (from the Excel Log).
+- Timeline: clicking a task in the left panel now scrolls the chart so the task's start is under the Today button, like search, without scrolling up or down.
+
 ### v3.0.21 — 9 Oct 2026
 - Bar hover menu in Timeline and Dependencies: the link triangles moved into the menu (◁ parent first, ▷ child last), the Comments button is gone (press `c` or open the task), and the eye is no longer accent-coloured.
 - Hover info in Timeline and Dependencies now has four modes in Settings: Compact (new default: priority, owner, tags, a bit of the description and the latest comment), Full, Side pane and Off.
