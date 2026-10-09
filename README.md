@@ -56,7 +56,8 @@ Rows without a title or with missing or unreadable dates are skipped (and kept i
   - *Matrix*: urgency by importance, in four quadrants; drag a card to change its priority or due date; **Reset view** restores the default rules (shown only when something was changed).
 - **Collapsed categories:** in the Timeline and Dependencies charts a collapsed category shows **show: Category**; click it to expand.
 - **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
-- **Edit:** double-click a bar or row (or press `e`) to open the task modal. Drag a bar to move it, drag its edges to resize (snaps to days). `d` adds a task that depends on the hovered one, `n` duplicates, `s` adds a parent task.
+- **Edit:** double-click a bar or row (or press `e`) to open the task modal. Drag a bar to move it, drag its edges to resize (snaps to days). `d` adds a task that depends on the hovered one, `n` duplicates, `s` adds a parent task. Tags are pills: type to add one (new tags too), click a pill to remove it. Mark a task done with the ✓ in its hover menu or the Done switch in the task window.
+- **Link tasks:** hover a bar and drag the triangle at its left end onto the task it should wait for (its parent), or the right one onto a task that should wait for it. Click a dependency line to remove it.
 - **Select several tasks:** Ctrl/Cmd+click, Shift+click for a range, Alt+click for a task and everything downstream. A bulk bar offers Status, Priority, Move to, Shift dates, Tags and Delete.
 - **Undo / redo:** Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y. Every bulk action is one step.
 - **Filters and search:** All / Active / Overdue, a filter panel (`f`) with Status, Priority, Owner, Tags and more, group by owner, and task search (`/`).
@@ -89,6 +90,11 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.17 — 9 Oct 2026
+- Timeline and Dependencies: drag from the triangle at either end of a bar onto another bar to link them, and click a dependency line to remove the link.
+- Mark a task done in one click: a ✓ in the bar hover menu and a Done switch next to View in the task window.
+- Task window: tags are now removable pills, as in the Filter panel; type to add an existing or a new tag.
 
 ### v3.0.14 — 8 Oct 2026
 - Timeline and Dependencies: a collapsed category now shows "show: Category" in the chart (click to expand), and Settings → Category rows in the chart draws category title rows like the phase rows.
