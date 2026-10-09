@@ -57,15 +57,15 @@ Rows without a title or with missing or unreadable dates are skipped (and kept i
 - **Collapsed categories:** in the Timeline and Dependencies charts a collapsed category shows **show: Category**; click it to expand.
 - **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
 - **Edit:** double-click a bar or row (or press `e`) to open the task modal. Drag a bar to move it, drag its edges to resize (snaps to days). `d` adds a task that depends on the hovered one, `n` duplicates, `s` adds a parent task. Tags are pills: type to add one (new tags too), click a pill to remove it. Mark a task done with the ✓ in its hover menu or the Done switch in the task window.
-- **Link tasks:** hover a bar and drag the triangle at its left end onto the task it should wait for (its parent), or the right one onto a task that should wait for it. Click a dependency line to remove it.
+- **Link tasks:** hover a bar and drag the ◁ at the start of its hover menu onto the task it should wait for (its parent), or the ▷ at the end onto a task that should wait for it. Click a dependency line to remove it.
 - **Select several tasks:** Ctrl/Cmd+click, Shift+click for a range, Alt+click for a task and everything downstream. A bulk bar offers Status, Priority, Move to, Shift dates, Tags and Delete.
 - **Undo / redo:** Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y. Every bulk action is one step.
 - **Filters and search:** All / Active / Overdue, a filter panel (`f`) with Status, Priority, Owner, Tags and more, group by owner, and task search (`/`).
 - **Check dependencies:** finds overlaps, cycles and missing references, and offers fixes with a preview.
 - **Compare** (Timeline, Dependencies and Table): tick **Show changes since** and pick a snapshot to see ghost bars and a Changes panel (added, delayed, completed, ...). Snapshots can be named and one can be marked as the baseline.
 - **Export:** the **...** menu offers a 16:9 **slide** (PNG, SVG or clipboard, rolled up to phases, categories or tasks) and a read-only **interactive HTML** copy you can share.
-- **Settings** (the gear): legend, compact rows, auto-save, hover panel, phase and category rows in the chart, layout choices for the Table, Board, Matrix and Roadmap, and reset buttons. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
-- **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. Press `?` for the full list of shortcuts.
+- **Settings** (the gear): legend, the Hotkeys strip, compact rows, auto-save, hover info (Compact, Full, Side pane or Off), phase and category rows in the chart, layout choices for the Table, Board, Matrix and Roadmap, and reset buttons. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
+- **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. The Hotkeys strip at the bottom shows the keys for what is under the mouse. Press `?` for the full list of shortcuts.
 
 ## Saving
 
@@ -90,6 +90,12 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.21 — 9 Oct 2026
+- Bar hover menu in Timeline and Dependencies: the link triangles moved into the menu (◁ parent first, ▷ child last), the Comments button is gone (press `c` or open the task), and the eye is no longer accent-coloured.
+- Hover info in Timeline and Dependencies now has four modes in Settings: Compact (new default: priority, owner, tags, a bit of the description and the latest comment), Full, Side pane and Off.
+- New Hotkeys strip at the bottom: shows the keyboard shortcuts for the task, row or chart space under the mouse (or the current task); fold it like the legend or switch it off in Settings.
+- Timeline and Dependencies: the legend row at the bottom now spans the full window width, under the left panel, as in the other views.
 
 ### v3.0.17 — 9 Oct 2026
 - Timeline and Dependencies: drag from the triangle at either end of a bar onto another bar to link them, and click a dependency line to remove the link.
