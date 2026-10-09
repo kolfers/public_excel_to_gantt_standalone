@@ -91,6 +91,10 @@ Your data stays on your machine. The app makes no network requests; fonts and th
 
 ## Changelog
 
+### v3.0.25 — 9 Oct 2026
+- Bar hover buttons now open with the edit button above the mouse and follow it along long bars, so they no longer end up off-screen.
+- Zooming between Month and Week with Ctrl + scroll or `+` / `-` now goes in smaller steps instead of one big jump.
+
 ### v3.0.23 — 9 Oct 2026
 - Compact hover card: bold Priority, Owner, Tags and Description labels, the priority in its colour, and when the task last changed (from the Excel Log).
 - Timeline: clicking a task in the left panel now scrolls the chart so the task's start is under the Today button, like search, without scrolling up or down.
