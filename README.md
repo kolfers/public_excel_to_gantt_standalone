@@ -52,7 +52,7 @@ Rows without a title or with missing or unreadable dates are skipped (and kept i
   - *Dependencies*: tasks laid out left to right by what they depend on.
   - *Roadmap*: one row per phase or category, for the big picture.
   - *Table*: one row per task with sortable, reorderable columns.
-  - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾, restore the default layout with **Reset view** (shown only when something was changed), and create your own statuses with + New status (or Custom… in a task's Status list).
+  - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾ or by dragging a column title, restore the default layout with **Reset view** (shown only when something was changed), and create your own statuses with + New status (or Custom… in a task's Status list).
   - *Matrix*: urgency by importance, in four quadrants; drag a card to change its priority or due date; **Reset view** restores the default rules (shown only when something was changed).
 - **Collapsed categories:** in the Timeline and Dependencies charts a collapsed category shows **show: Category**; click it to expand.
 - **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
@@ -90,6 +90,12 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.29 — 10 Oct 2026
+- Board: drag a column title left or right to reorder the columns.
+- Board and Matrix: the highlighted (current) card now stands out with a coloured outline and a slight lift instead of a fill, so its text stays easy to read.
+- Dependency lines: only the task you last hovered or clicked has its lines highlighted; earlier highlights clear right away.
+- Timeline: clicking a task bar now just selects it; the chart no longer jumps sideways.
 
 ### v3.0.25 — 9 Oct 2026
 - Bar hover buttons now open with the edit button above the mouse and follow it along long bars, so they no longer end up off-screen.
