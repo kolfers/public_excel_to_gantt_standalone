@@ -15,6 +15,8 @@ Desktop browsers only (Chrome or Edge recommended; see [Saving](#saving)).
 
 No plan yet? Click **Try example chart**, **Start an empty chart**, or **Download template**. **Download the app for offline use** saves this page as a single file you can keep.
 
+The example chart opens with a short guided tour of the main features. **Stop tour** ends it, **Don't show again** switches it off (turn it back on in Settings), and the **?** button at the right end of the nav row replays the tour for the view you are in.
+
 ## Your Excel file
 
 The workbook can have three sheets:
@@ -54,7 +56,7 @@ Rows without a title or with missing or unreadable dates are skipped (and kept i
   - *Table*: one row per task with sortable, reorderable columns.
   - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾ or by dragging a column title, restore the default layout with **Reset view** (shown only when something was changed), and create your own statuses with + New status (or Custom… in a task's Status list).
   - *Matrix*: urgency by importance, in four quadrants; drag a card to change its priority or due date; **Reset view** restores the default rules (shown only when something was changed).
-- **Collapsed categories:** in the Timeline and Dependencies charts a collapsed category shows **show: Category**; click it to expand.
+- **Collapsed phases and categories:** in the Timeline and Dependencies charts a collapsed category shows **show category: Category**, and with Phase rows in the chart off a collapsed phase shows **show phase: Phase**; click it to expand.
 - **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
 - **Edit:** double-click a bar or row (or press `e`) to open the task modal. Drag a bar to move it, drag its edges to resize (snaps to days). `d` adds a task that depends on the hovered one, `n` duplicates, `s` adds a parent task. Tags are pills: type to add one (new tags too), click a pill to remove it. Mark a task done with the ✓ in its hover menu or the Done switch in the task window.
 - **Link tasks:** hover a bar and drag the ◁ at the start of its hover menu onto the task it should wait for (its parent), or the ▷ at the end onto a task that should wait for it. Click a dependency line to remove it.
@@ -90,6 +92,11 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.32 — 11 Oct 2026
+- New guided tour: the example chart walks you through the main features, and the ? button at the right of the nav row replays the tour for the current view (switch it off in Settings).
+- Timeline and Dependencies: a collapsed category now shows a clearer "show category: …" button, and with Phase rows in the chart off a collapsed phase shows "show phase: …".
+- Timeline and Dependencies: hovering the "!" next to a bar now tells you which predecessor is hidden in a collapsed phase or category and that clicking it shows it.
 
 ### v3.0.29 — 10 Oct 2026
 - Board: drag a column title left or right to reorder the columns.
