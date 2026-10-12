@@ -54,10 +54,12 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
   - *Dependencies*: tasks laid out left to right by what they depend on.
   - *Roadmap*: one row per phase or category, for the big picture.
   - *Table*: one row per task with sortable, reorderable columns.
-  - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾ or by dragging a column title, restore the default layout with **Reset view** (shown only when something was changed), and create your own statuses with + New status (or Custom… in a task's Status list).
-  - *Matrix*: urgency by importance, in four quadrants; drag a card to change its priority or due date; **Reset view** restores the default rules (shown only when something was changed).
+  - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾ or by dragging a column title, restore the default layout with **Reset view**, and create your own statuses with + New status (or Custom… in a task's Status list).
+  - *Matrix*: urgency by importance, in four quadrants; drag a card to change its priority or due date; **Reset view** restores the default rules.
+- **Reorganise in the left panel:** drag a task onto another category to move it there, a category onto another phase, or a phase above or below another to reorder the phases (one undo step each).
 - **Collapsed phases and categories:** in the Timeline and Dependencies charts a collapsed category shows **show category: Category**, and with Phase rows in the chart off a collapsed phase shows **show phase: Phase**; click it to expand.
 - **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
+- **Reset view:** appears in the nav row of every view once you change the view's layout or turn on a filter; one click restores the view's defaults and clears all filters (your data and browser settings stay).
 - **Edit:** double-click a bar or row (or press `e`) to open the task modal. Drag a bar to move it, drag its edges to resize (snaps to days). `d` adds a task that depends on the hovered one, `n` duplicates, `s` adds a parent task. Tags are pills: type to add one (new tags too), click a pill to remove it. Mark a task done with the ✓ in its hover menu or the Done switch in the task window.
 - **Link tasks:** hover a bar and drag the ◁ at the start of its hover menu onto the task it should wait for (its parent), or the ▷ at the end onto a task that should wait for it. Click a dependency line to remove it.
 - **Select several tasks:** Ctrl/Cmd+click, Shift+click for a range, Alt+click for a task and everything downstream. A bulk bar offers Status, Priority, Move to, Shift dates, Tags and Delete.
@@ -65,7 +67,7 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Filters and search:** All / Active / Overdue, a filter panel (`f`) with Status, Priority, Owner, Tags and more, group by owner, and task search (`/`).
 - **Check dependencies:** finds overlaps, cycles and missing references, and offers fixes with a preview.
 - **Compare** (Timeline, Dependencies and Table): tick **Show changes since** and pick a snapshot to see ghost bars and a Changes panel (added, delayed, completed, ...). Snapshots can be named and one can be marked as the baseline.
-- **Export:** the **...** menu offers a 16:9 **slide** (PNG, SVG or clipboard, rolled up to phases, categories or tasks) and a read-only **interactive HTML** copy you can share.
+- **Export:** the **...** menu offers 16:9 **slides** (PNG, SVG or clipboard): the timeline (rolled up to phases, categories or tasks), the changes since a snapshot, the milestones and a one-page status; and a read-only **interactive HTML** copy you can share.
 - **Settings** (the gear): grouped into File (save as, **New chart** opens the start screen in a new tab, export, reload, auto-save), Tools and Display (theme and palette buttons, legend, the Hotkeys strip, compact rows, phase and category rows in the chart), then hover info (Compact, Full, Side pane or Off), bar width and the guided tour. Every setting is tagged (browser) or (excel) to show where it is saved, and there are two reset buttons: Reset browser settings and Reset Excel settings. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
 - **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. The Hotkeys strip at the bottom shows the keys for what is under the mouse. Press `?` for the full list of shortcuts.
 
@@ -92,6 +94,16 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.48 — 12 Oct 2026
+- Hover texts: the "!" for a hidden dependency, Matrix pane titles, category counters and Check dependencies now show a bold heading with the details on separate lines or as a list.
+- Filter chips are easier to read: Status and Priority chips now have a soft coloured background with normal text, over the chart and in the Filter panel.
+- Matrix: dragging a card where only one change is possible (for example into Do, which only sets the priority to High) now applies it at once, with an undo hint, instead of asking first.
+- Roadmap, Table and Board: an empty row at the top keeps active filter chips from covering the headers.
+- Reset view now appears in every view whenever you change the view or turn on a filter, and one click restores the view's defaults and clears all filters (including Phases / Categories).
+- Guided tour: the Left panel step now mentions drag and drop, and the chart steps explain linking with the ◁ / ▷ buttons in a bar's hover menu.
+- Export: three new slides: changes since a snapshot (summary numbers, the moved bars and the biggest changes), milestones, and a one-page status summary.
+- Roadmap: picking a task in the search box now opens its phase (or category) list with the task highlighted.
 
 ### v3.0.40 — 12 Oct 2026
 - Task window: the Done and Comments switches now show a checkmark and a comment icon before their labels.
