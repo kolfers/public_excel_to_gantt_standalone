@@ -54,8 +54,8 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
   - *Dependencies*: tasks laid out left to right by what they depend on.
   - *Roadmap*: one row per phase or category, for the big picture.
   - *Table*: one row per task with sortable, reorderable columns.
-  - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾ or by dragging a column title, restore the default layout with **Reset view**, and create your own statuses with + New status (or Custom… in a task's Status list).
-  - *Matrix*: urgency by importance, in four quadrants; drag a card to change its priority or due date; **Reset view** restores the default rules.
+  - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾ or by dragging a column title, restore the default layout with **Reset view**, and create your own statuses with + New status (or Custom… in a task's Status list); the coloured edge of each card shows its phase or category (Settings).
+  - *Matrix*: urgency by importance, in four quadrants; the coloured edge of each card shows its phase or category (Settings); drag a card to change its priority or due date; **Reset view** restores the default rules.
 - **Reorganise in the left panel:** drag a task onto another category to move it there, a category onto another phase, or a phase above or below another to reorder the phases (one undo step each).
 - **Collapsed phases and categories:** in the Timeline and Dependencies charts a collapsed category shows **show category: Category**, and with Phase rows in the chart off a collapsed phase shows **show phase: Phase**; click it to expand.
 - **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
@@ -68,13 +68,13 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Check dependencies:** finds overlaps, cycles and missing references, and offers fixes with a preview.
 - **Compare** (Timeline, Dependencies and Table): tick **Show changes since** and pick a snapshot to see ghost bars and a Changes panel (added, delayed, completed, ...). Snapshots can be named and one can be marked as the baseline.
 - **Export:** the **...** menu offers 16:9 **slides** (PNG, SVG or clipboard): the timeline (rolled up to phases, categories or tasks), the changes since a snapshot, the milestones and a one-page status; and a read-only **interactive HTML** copy you can share.
-- **Settings** (the gear): grouped into File (save as, **New chart** opens the start screen in a new tab, export, reload, auto-save), Tools and Display (theme and palette buttons, legend, the Hotkeys strip, compact rows, phase and category rows in the chart), then hover info (Compact, Full, Side pane or Off), bar width and the guided tour. Every setting is tagged (browser) or (excel) to show where it is saved, and there are two reset buttons: Reset browser settings and Reset Excel settings. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
+- **Settings** (the gear): grouped into File (save as, **New chart** opens the start screen in a new tab, export, reload, auto-save), Tools and Display (theme and palette buttons, legend, the Hotkeys strip, compact rows, phase and category rows in the chart, colour items by phase or category), then hover info (Compact, Full, Side pane or Off), bar width and the guided tour. Every setting is tagged (browser) or (excel) to show where it is saved, and there are two reset buttons: Reset browser settings and Reset Excel settings. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
 - **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. The Hotkeys strip at the bottom shows the keys for what is under the mouse. Press `?` for the full list of shortcuts.
 
 ## Saving
 
 - **Save Excel** (Ctrl+S) writes your changes into the original workbook, keeping its formatting and Excel Tables, and appends a snapshot to the `Log` sheet. In Chrome and Edge a file opened with **Open Excel file** or **Recent** is saved in place; a dropped file or another browser downloads a copy instead.
-- **Excel settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, ...) stay in your browser.
+- **Excel settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, colour by, ...) stay in your browser.
 - **Auto-save** (optional, Chrome / Edge) saves the planning sheet about a second and a half after each edit.
 - If a save fails the app retries three times, then shows **Not saved** with Retry, Save as... and Download copy. A recovery copy is kept in your browser, and the app offers to restore it the next time you open that file.
 - If the file changed on disk (for example you edited it in Excel), the app merges the changes and asks only about fields that conflict.
@@ -94,6 +94,10 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.50 — 12 Oct 2026
+- Colour by phase or category: Settings → Display → Colour items by colours bars, cards and left panel rows in every view by phase (now the default) or by category; choose Category to get the previous look back.
+- Board and Matrix: the coloured left edge of each card now shows the task's phase instead of its category.
 
 ### v3.0.48 — 12 Oct 2026
 - Hover texts: the "!" for a hidden dependency, Matrix pane titles, category counters and Check dependencies now show a bold heading with the details on separate lines or as a list.
