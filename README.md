@@ -10,7 +10,7 @@ Desktop browsers only (Chrome or Edge recommended; see [Saving](#saving)).
 ## Quick start
 
 1. Open `index.html` (or the live app) in a modern desktop browser.
-2. Click **Open Excel file**, or drop an `.xlsx` / `.xlsm` file onto the drop box. Your two most recent files are listed under **Recent** (Chrome / Edge).
+2. Click **Open Excel file**, or drop an `.xlsx` / `.xlsm` file onto the drop box. Your two most recent files are listed under **Recent** (Chrome / Edge). Use **Try styles** above the drop box to pick dark or light mode and a colour palette.
 3. The chart renders immediately.
 
 No plan yet? Click **Try example chart**, **Start an empty chart**, or **Download template**. **Download the app for offline use** saves this page as a single file you can keep.
@@ -27,7 +27,7 @@ The workbook can have three sheets:
 | `Log` (or `Sheet2`, `Sheet 2`) | Snapshot history, written by the app |
 | `Gantt Settings` (hidden) | Plan settings shared by everyone who opens the file, written by the app (see [Saving](#saving)). Do not edit it by hand. |
 
-Only **Title**, **Start Date** and **End Date** are required. Header names are matched case-insensitively. Columns you add yourself are kept and written back untouched.
+Only **Title** is required. Header names are matched case-insensitively. Columns you add yourself are kept and written back untouched.
 
 | Column | Description |
 |---|---|
@@ -36,7 +36,7 @@ Only **Title**, **Start Date** and **End Date** are required. Header names are m
 | `Category` | Group within a phase. Default `Category 1`. |
 | `Title` | **Required.** Add `(milestone)` to mark a milestone. |
 | `Status` | `Done`, `On Track`, `Behind`, `Waiting`, `On Hold`. |
-| `Start Date`, `End Date` | **Required.** `DD-Mon-YYYY` (for example `12-Mar-2026`), `YYYY-MM-DD` or a real Excel date. Avoid text like `12/03/2026`, which is ambiguous. |
+| `Start Date`, `End Date` | Optional: a task with no dates starts today and ends 6 days later; with one date, the other is set 6 days away. `DD-Mon-YYYY` (for example `12-Mar-2026`), `YYYY-MM-DD` or a real Excel date. Avoid text like `12/03/2026`, which is ambiguous. |
 | `Progress` | 0-100. |
 | `Priority` | `High`, `Medium` or `Low`. |
 | `Dependency` | IDs of the tasks this one depends on, separated by commas. A task title also works and is converted to the ID. |
@@ -45,7 +45,7 @@ Only **Title**, **Start Date** and **End Date** are required. Header names are m
 | `Description` | Free text. |
 | `Comments` | Managed by the app, as `[DD-Mon-YYYY HH:MM:Name] text` entries. |
 
-Rows without a title or with missing or unreadable dates are skipped (and kept in the file); an **Import report** tells you what was skipped or fixed.
+Rows without a title are skipped (and kept in the file). Missing or unreadable dates get the defaults above; an **Import report** summarises what was skipped or filled in, with per-row details on request.
 
 ## Using the chart
 
@@ -66,13 +66,13 @@ Rows without a title or with missing or unreadable dates are skipped (and kept i
 - **Check dependencies:** finds overlaps, cycles and missing references, and offers fixes with a preview.
 - **Compare** (Timeline, Dependencies and Table): tick **Show changes since** and pick a snapshot to see ghost bars and a Changes panel (added, delayed, completed, ...). Snapshots can be named and one can be marked as the baseline.
 - **Export:** the **...** menu offers a 16:9 **slide** (PNG, SVG or clipboard, rolled up to phases, categories or tasks) and a read-only **interactive HTML** copy you can share.
-- **Settings** (the gear): legend, the Hotkeys strip, compact rows, auto-save, hover info (Compact, Full, Side pane or Off), phase and category rows in the chart, layout choices for the Table, Board, Matrix and Roadmap, and reset buttons. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
+- **Settings** (the gear): grouped into File (save as, **New chart** opens the start screen in a new tab, export, reload, auto-save), Tools and Display (theme and palette buttons, legend, the Hotkeys strip, compact rows, phase and category rows in the chart), then hover info (Compact, Full, Side pane or Off), bar width and the guided tour. Every setting is tagged (browser) or (excel) to show where it is saved, and there are two reset buttons: Reset browser settings and Reset Excel settings. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
 - **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. The Hotkeys strip at the bottom shows the keys for what is under the mouse. Press `?` for the full list of shortcuts.
 
 ## Saving
 
 - **Save Excel** (Ctrl+S) writes your changes into the original workbook, keeping its formatting and Excel Tables, and appends a snapshot to the `Log` sheet. In Chrome and Edge a file opened with **Open Excel file** or **Recent** is saved in place; a dropped file or another browser downloads a copy instead.
-- **Plan settings** (hover panel, phase and category rows in the chart, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, ...) stay in your browser.
+- **Excel settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, ...) stay in your browser.
 - **Auto-save** (optional, Chrome / Edge) saves the planning sheet about a second and a half after each edit.
 - If a save fails the app retries three times, then shows **Not saved** with Retry, Save as... and Download copy. A recovery copy is kept in your browser, and the app offers to restore it the next time you open that file.
 - If the file changed on disk (for example you edited it in Excel), the app merges the changes and asks only about fields that conflict.
@@ -92,6 +92,16 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.40 — 12 Oct 2026
+- Task window: the Done and Comments switches now show a checkmark and a comment icon before their labels.
+- Timeline: the full title shown after a narrow bar is now solid, so dependency lines and the Today line no longer show through its letters.
+- The Info and Settings panels now end above the bottom row, so the legend, hotkeys and theme buttons stay visible while they are open.
+- Start screen: the dark/light and palette buttons now sit in a "Try styles:" row just above the drop box.
+- Settings: a new **New chart** button below Save as… opens the start screen in a new tab.
+- Settings: regrouped into File, Tools and Display sections, with the theme and palette buttons, a (browser)/(excel) tag on every setting, and a new Reset Excel settings button.
+- Opening a workbook now only needs a Title column: tasks without dates start today and end 6 days later, and the Import report summarises every default it filled in, with per-row details on request.
+- Timeline and Dependencies: phase rows are now hidden by default (a thin line separates phases); Phase rows and Category rows in the chart are now saved in your browser instead of the Excel file, with shorter descriptions in Settings.
 
 ### v3.0.32 — 11 Oct 2026
 - New guided tour: the example chart walks you through the main features, and the ? button at the right of the nav row replays the tour for the current view (switch it off in Settings).
