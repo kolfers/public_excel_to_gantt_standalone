@@ -13,7 +13,7 @@ Desktop browsers only (Chrome or Edge recommended; see [Saving](#saving)).
 2. Click **Open Excel file**, or drop an `.xlsx` / `.xlsm` file onto the drop box. Your two most recent files are listed under **Recent** (Chrome / Edge). Use **Try styles** above the drop box to pick dark or light mode and a colour palette.
 3. The chart renders immediately.
 
-No plan yet? Click **Try example chart**, **Start an empty chart**, or **Download template**. **Download the app for offline use** saves this page as a single file you can keep.
+No plan yet? Click **Try example chart**, **Start an empty chart** (the app asks you for your first task), or **Download template**. **Download the app for offline use** saves this page as a single file you can keep.
 
 The example chart opens with a short guided tour of the main features. **Stop tour** ends it, **Don't show again** switches it off (turn it back on in Settings), and the **?** button at the right end of the nav row replays the tour for the view you are in.
 
@@ -68,13 +68,13 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Check dependencies:** finds overlaps, cycles and missing references, and offers fixes with a preview.
 - **Compare** (Timeline, Dependencies and Table): tick **Show changes since** and pick a snapshot to see ghost bars and a Changes panel (added, delayed, completed, ...). Snapshots can be named and one can be marked as the baseline.
 - **Export:** the **...** menu offers 16:9 **slides** (PNG, SVG or clipboard): the timeline (rolled up to phases, categories or tasks), the changes since a snapshot, the milestones and a one-page status; and a read-only **interactive HTML** copy you can share.
-- **Settings** (the gear): grouped into File (save as, **New chart** opens the start screen in a new tab, export, reload, auto-save), Tools and Display (theme and palette buttons, legend, the Hotkeys strip, compact rows, phase and category rows in the chart, colour items by phase or category), then hover info (Compact, Full, Side pane or Off), bar width and the guided tour. Every setting is tagged (browser) or (excel) to show where it is saved, and there are two reset buttons: Reset browser settings and Reset Excel settings. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
+- **Settings** (the gear): grouped into File (save as, **New chart** opens the start screen in a new tab, export, reload, auto-save), Tools and Display (theme and palette buttons, legend, the Hotkeys strip, compact rows, phase and category rows in the chart, colour items by phase or category, status indicators left or right of the title), then hover info (Compact, Full, Side pane or Off), bar width and the guided tour. Every setting is tagged (browser) or (excel) to show where it is saved, and there are two reset buttons: Reset browser settings and Reset Excel settings. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
 - **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. The Hotkeys strip at the bottom shows the keys for what is under the mouse. Press `?` for the full list of shortcuts.
 
 ## Saving
 
 - **Save Excel** (Ctrl+S) writes your changes into the original workbook, keeping its formatting and Excel Tables, and appends a snapshot to the `Log` sheet. In Chrome and Edge a file opened with **Open Excel file** or **Recent** is saved in place; a dropped file or another browser downloads a copy instead.
-- **Excel settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, colour by, ...) stay in your browser.
+- **Excel settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, colour by, status indicators, ...) stay in your browser.
 - **Auto-save** (optional, Chrome / Edge) saves the planning sheet about a second and a half after each edit.
 - If a save fails the app retries three times, then shows **Not saved** with Retry, Save as... and Download copy. A recovery copy is kept in your browser, and the app offers to restore it the next time you open that file.
 - If the file changed on disk (for example you edited it in Excel), the app merges the changes and asks only about fields that conflict.
@@ -94,6 +94,13 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.55 — 13 Oct 2026
+- A clear "New Task" button now sits at the far left of the toolbar in every view (just "+" when space is short).
+- Starting an empty chart now welcomes you and opens the New task form for your first task.
+- Dependencies view: a bar too narrow for its title now shows the full title next to it, like the Timeline.
+- Roadmap bars now use the same phase colours as the other views; a dot in each bar shows its status.
+- Status indicators in one place: the status dot, late mark and milestone diamond now sit left of the title in every view (Settings → Display → Status indicators switches them to the right).
 
 ### v3.0.50 — 12 Oct 2026
 - Colour by phase or category: Settings → Display → Colour items by colours bars, cards and left panel rows in every view by phase (now the default) or by category; choose Category to get the previous look back.
