@@ -95,6 +95,10 @@ Your data stays on your machine. The app makes no network requests; fonts and th
 
 ## Changelog
 
+### v3.0.57 — 20 Oct 2026
+- Timeline and Dependencies: the "show phase:" and "show category:" buttons now start at the middle of the chart, so they line up.
+- Left panel: a late item's "(3d late)" tag now always sits right of its title, whichever side the status dot is on.
+
 ### v3.0.55 — 13 Oct 2026
 - A clear "New Task" button now sits at the far left of the toolbar in every view (just "+" when space is short).
 - Starting an empty chart now welcomes you and opens the New task form for your first task.
