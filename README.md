@@ -95,6 +95,9 @@ Your data stays on your machine. The app makes no network requests; fonts and th
 
 ## Changelog
 
+### v3.0.58 — 22 Oct 2026
+- Timeline and Dependencies: the "show phase:" / "show category:" buttons are now square, dashed-outline bars with a ▶ triangle, so they no longer look like items.
+
 ### v3.0.57 — 20 Oct 2026
 - Timeline and Dependencies: the "show phase:" and "show category:" buttons now start at the middle of the chart, so they line up.
 - Left panel: a late item's "(3d late)" tag now always sits right of its title, whichever side the status dot is on.
