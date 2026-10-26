@@ -68,7 +68,7 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Undo / redo:** Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y. Every bulk action is one step.
 - **Filters and search:** All / Active / Overdue, a filter panel (`f`) with Status, Priority, Owner, Tags and more, group by owner, and task search (`/`).
 - **Check dependencies:** finds overlaps, cycles and missing references, and offers fixes with a preview.
-- **Compare** (Timeline, Dependencies and Table): tick **Show changes since** and pick a snapshot to see ghost bars and a Changes panel (added, delayed, completed, ...). Snapshots can be named and one can be marked as the baseline.
+- **Compare** (Timeline, Dependencies and Table): tick **Show changes since** and pick a snapshot to see ghost bars and a Changes panel (added, delayed, completed, ...). Hovering a task shows what changed since the snapshot (old → new). Snapshots can be named and one can be marked as the baseline.
 - **Export:** the **...** menu offers 16:9 **slides** (PNG, SVG or clipboard): the timeline (rolled up to phases, categories or tasks), the changes since a snapshot, the milestones and a one-page status; and a read-only **interactive HTML** copy you can share. Slides are made for presentations: pick any of the app's colour palettes, light or dark, add a subtitle, and get a sharp 3840 × 2160 PNG (or Standard 1920 × 1080).
 - **Settings** (the gear): grouped into foldable sections (click a section's title to fold or unfold it; only File is open at first): File (save as, **New chart** opens the start screen in a new tab, export, reload, import report, auto-save) and Display (theme and palette buttons, legend, the Hotkeys strip, compact rows, phase and category rows in the chart, colour items by phase or category, status indicators left or right of the title), then hover info (Compact, Full, Side pane or Off; the left panel's task rows show the same hover card), the Subtasks switch, Dependencies (check dependencies, moving linked tasks, uniform bar width) and Help (keyboard shortcuts and the guided tour). Every setting is tagged (browser) or (excel) to show where it is saved, and there are two reset buttons: Reset browser settings and Reset Excel settings. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
 - **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. The Hotkeys strip at the bottom shows the keys for what is under the mouse. Press `?` for the full list of shortcuts.
@@ -96,6 +96,9 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.78 — 26 Oct 2026
+- Compare: the compact hover card now lists what changed since the snapshot (old → new for dates, status, progress and more).
 
 ### v3.0.77 — 26 Oct 2026
 - Timeline and Dependencies: the Order button now sits right next to the New Task button.
