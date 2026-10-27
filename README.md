@@ -78,7 +78,7 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Save Excel** (Ctrl+S) writes your changes into the original workbook, keeping its formatting and Excel Tables, and appends a snapshot to the `Log` sheet. In Chrome and Edge a file opened with **Open Excel file** or **Recent** is saved in place; a dropped file or another browser downloads a copy instead.
 - **Excel settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, colour by, status indicators, ...) stay in your browser.
 - **Auto-save** (optional, Chrome / Edge) saves the planning sheet about a second and a half after each edit.
-- If a save fails the app retries three times, then shows **Not saved** with Retry, Save as... and Download copy. A recovery copy is kept in your browser, and the app offers to restore it the next time you open that file.
+- If a save fails the app retries three times, then shows **Not saved** and opens a dialog with tips and Retry, Save as... and Download copy. The most common cause is the file being open in Excel: close it there and click Retry. A recovery copy is kept in your browser, and the app offers to restore it the next time you open that file.
 - If the file changed on disk (for example you edited it in Excel), the app merges the changes and asks only about fields that conflict.
 - Opening the same file in a second tab shows a warning and pauses auto-save there.
 - `.xlsm` files are saved in place with their macros kept. Only if the workbook cannot be patched safely does the app offer a new `.xlsx` copy (without macros).
@@ -96,6 +96,9 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.79 — 27 Oct 2026
+- If saving to your Excel file fails (for example because it is open in Excel), a dialog now explains how to fix it and offers Retry, Save as… or Download copy.
 
 ### v3.0.78 — 26 Oct 2026
 - Compare: the compact hover card now lists what changed since the snapshot (old → new for dates, status, progress and more).
