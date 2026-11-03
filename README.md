@@ -15,7 +15,7 @@ Desktop browsers only (Chrome or Edge recommended; see [Saving](#saving)).
 
 No plan yet? Click **Try example chart**, **Start an empty chart** (the app asks you for your first task), or **Download template**. **Download the app (one HTML file, works offline)** saves this page as a single file you can keep.
 
-The example chart opens with a short guided tour of the main features. **Stop tour** ends it, **Don't show again** switches it off (turn it back on in Settings), and the **?** button at the right end of the nav row replays the tour for the view you are in.
+The example chart opens with a short guided tour of the main features. **Stop tour** ends it, **Don't show again** switches it off (turn it back on in Settings), and the **?** button at the right end of the nav row replays the tour for the view you are in. It also points out undo (Ctrl+Z), the shortcut sheet (?) and where Compare snapshots come from.
 
 ## Your Excel file
 
@@ -96,6 +96,12 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.90 — 3 Nov 2026
+
+- Guided tour: now mentions undo and redo, the ? shortcut sheet and Hotkeys strip, the Order button, where Compare snapshots come from, and which icon is Save, Info or Settings in a narrow window.
+- Guided tour: the step counter now counts only the tips you see, so it no longer skips numbers in Roadmap, Board and Matrix.
+- Guided tour: replaying the tour on your own plan no longer calls it an example plan.
 
 ### v3.0.87 — 2 Nov 2026
 - Order: new Shared parent and Shared child options keep linked tasks together, by their direct parent or child or by the start or end of their chain.
