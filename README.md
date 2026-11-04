@@ -13,7 +13,7 @@ Desktop browsers only (Chrome or Edge recommended; see [Saving](#saving)).
 2. Click **Open Excel file**, or drop an `.xlsx` / `.xlsm` file onto the drop box. Your two most recent files are listed under **Recent** (Chrome / Edge). Use **Try styles** above the drop box to pick dark or light mode and a colour palette.
 3. The chart renders immediately. Files that aren't Excel workbooks, or can't be read, are refused with a message saying what to do.
 
-No plan yet? Click **Try example chart**, **Start an empty chart** (the app asks you for your first task), or **Download template**. **Download the app (one HTML file, works offline)** saves this page as a single file you can keep.
+No plan yet? Click **Try example chart**, **Start an empty chart** (the app asks you for your first task, and for a name when you first save), or **Download template**. **Download the app (one HTML file, works offline)** saves this page as a single file you can keep.
 
 The example chart opens with a short guided tour of the main features. **Stop tour** ends it, **Don't show again** switches it off (turn it back on in Settings), and the **?** button at the right end of the nav row replays the tour for the view you are in. It also points out undo (Ctrl+Z), the shortcut sheet (?) and where Compare snapshots come from.
 
@@ -36,7 +36,7 @@ Only **Title** is required. Header names are matched case-insensitively. Columns
 | `Category` | Group within a phase. Default `Category 1`. |
 | `Title` | **Required.** Add `(milestone)` to mark a milestone. |
 | `Status` | `Done`, `On Track`, `Behind`, `Waiting`, `On Hold`. |
-| `Start Date`, `End Date` | Optional: a task with no dates starts today and ends 6 days later; with one date, the other is set 6 days away. `DD-Mon-YYYY` (for example `12-Mar-2026`), `YYYY-MM-DD` or a real Excel date. Avoid text like `12/03/2026`, which is ambiguous. |
+| `Start Date`, `End Date` | Optional: a task with no dates starts today and ends 6 days later; with one date, the other is set 6 days away. `DD-Mon-YYYY` (for example `12-Mar-2026`), `YYYY-MM-DD` or a real Excel date. Text like `12/03/2026` is read day first (12 March); the Import report lists such dates so you can check them. |
 | `Progress` | 0-100. |
 | `Priority` | `High`, `Medium` or `Low`. |
 | `Dependency` | IDs of the tasks this one depends on, separated by commas. A task title also works and is converted to the ID. |
@@ -46,7 +46,7 @@ Only **Title** is required. Header names are matched case-insensitively. Columns
 | `Subtasks` | Optional checklist: one line per subtask, `- [ ] text` (open) or `- [x] text` (done). |
 | `Comments` | Managed by the app, as `[DD-Mon-YYYY HH:MM:Name] text` entries. |
 
-Rows without a title are skipped (and kept in the file). Missing or unreadable dates get the defaults above; an **Import report** summarises what was skipped or filled in, with per-row details on request.
+Rows without a title are skipped (and kept in the file). Missing or unreadable dates get the defaults above, and dates written with slashes are listed so you can check them; an **Import report** summarises what was skipped or filled in, with per-row details on request.
 
 ## Using the chart
 
@@ -66,16 +66,18 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Link tasks:** hover a bar and drag the ◁ at the start of its hover menu onto the task it should wait for (its parent), or the ▷ at the end onto a task that should wait for it. Click a dependency line to remove it.
 - **Select several tasks:** Ctrl/Cmd+click, Shift+click for a range, Alt+click for a task and everything downstream. A bulk bar offers Status, Priority, Move to, Shift dates, Tags and Delete.
 - **Undo / redo:** Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y. Every bulk action is one step.
-- **Filters and search:** All / Active / Overdue, a filter panel (`f`) with Status, Priority, Owner, Tags and more, group by owner, and task search (`/`).
+- **Filters and search:** All / Active / Overdue, a filter panel (`f`) with Status, Priority, Owner, Tags and more (the Title field suggests matching task titles as you type), group by owner, and task search (`/`).
 - **Check dependencies:** finds overlaps, cycles and missing references, and offers fixes with a preview.
 - **Compare** (Timeline, Dependencies and Table): pick a snapshot in the **Compare Snapshot** drop-down (the last control in the nav row; choose **None** or × to stop) to see ghost bars and a Changes panel (added, delayed, completed, ...). Hovering a task shows what changed since the snapshot (old → new). The drop-down is greyed out until the file has a snapshot: every Save Excel adds one. Snapshots can be named and one can be marked as the baseline.
+- **Completed Tasks** (the ✓ button right of Compare Snapshot, in every view): a panel on the right lists every finished task (status Done or 100 %), newest first, grouped by day, week or month. The date comes from the saves in the file's Log; a task finished since the last save shows as "unsaved" under today, and tasks that were already done in the first save show under "Earlier (date unknown)". Hover a task for its details; click it to find it in the current view.
 - **Export:** **Settings → File → Export…** (or `x`) offers 16:9 **slides** (PNG, SVG or clipboard): the timeline (rolled up to phases, categories or tasks), the changes since a snapshot, the milestones and a one-page status; and a read-only **interactive HTML** copy you can share. Slides are made for presentations: pick any of the app's colour palettes, light or dark, add a subtitle, and get a sharp 3840 × 2160 PNG (or Standard 1920 × 1080).
 - **Settings** (the gear): grouped into foldable sections (click a section's title to fold or unfold it; only File is open at first): File (save as, **New chart** opens the start screen in a new tab, export, reload, import report, auto-save) and Display (theme and palette buttons, legend, the Hotkeys strip, compact rows, phase and category rows in the chart, colour items by phase or category, status indicators left or right of the title), then hover info (Compact, Full, Side pane or Off; the left panel's task rows show the same hover card), the Subtasks switch, Dependencies (check dependencies, moving linked tasks, uniform bar width) and Help (keyboard shortcuts and the guided tour). Every setting is tagged (this browser) or (saved in the file) to show where it is saved (explained at the top of the panel), and there are two reset buttons: Reset browser settings and Reset Excel settings. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
 - **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. The Hotkeys strip at the bottom shows the keys for what is under the mouse. Press `?` for the full list of shortcuts.
 
 ## Saving
 
-- **Save Excel** (Ctrl+S) writes your changes into the original workbook, keeping its formatting and Excel Tables, and appends a snapshot to the `Log` sheet. In Chrome and Edge a file opened with **Open Excel file** or **Recent** is saved in place; a dropped file or another browser downloads a copy instead.
+- **Save Excel** (Ctrl+S) writes your changes into the original workbook, keeping its formatting and Excel Tables, and appends a snapshot to the `Log` sheet. In Chrome and Edge a file opened with **Open Excel file** or **Recent** is saved in place; a dropped file or another browser downloads a copy instead. The message after saving shows the exact name of the downloaded file.
+- A new empty chart asks for a plan name the first time you save; that name is used for the downloaded file (characters a file name can't hold are removed).
 - **Excel settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, colour by, status indicators, ...) stay in your browser.
 - **Auto-save** (optional, Chrome / Edge) saves the planning sheet about a second and a half after each edit.
 - If a save fails the app retries three times, then shows **Not saved** and opens a dialog with tips and Retry, Save as... and Download copy. The most common cause is the file being open in Excel: close it there and click Retry. A recovery copy is kept in your browser, and the app offers to restore it the next time you open that file, with a list of what changed.
@@ -96,6 +98,17 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.98 — 4 Nov 2026
+
+- New Completed Tasks panel (✓ in the nav row): every finished task, newest first, grouped by day, week or month; click one to find it.
+- The Title field in the Filter panel now suggests matching task titles as you type, like the search box.
+- In the Import report, renamed duplicate IDs show the task's title and an Edit link.
+- Dates typed with slashes in Excel (03/04/2026) are now read day first (3 April), and the Import report lists the ones that could be read either way.
+- Task window: saving with an empty Title now asks for a title instead of creating a task called "New Task", and the welcome line of a new chart explains Phase and Category.
+- New charts: the first Save Excel asks for the plan's name and uses it for the downloaded file, instead of always New_Plan.
+- Saving: the message after Save Excel now shows the exact name of the downloaded file, and the first save of a new chart says it created a new file.
+- The Import report lists missing priorities as one quiet line at the end instead of on every row, so real problems stand out.
 
 ### v3.0.90 — 3 Nov 2026
 
