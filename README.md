@@ -69,14 +69,14 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Filters and search:** All / Active / Overdue, a filter panel (`f`) with Status, Priority, Owner, Tags and more (the Title field suggests matching task titles as you type), group by owner, and task search (`/`).
 - **Check dependencies:** finds overlaps, cycles and missing references, and offers fixes with a preview.
 - **Compare** (Timeline, Dependencies and Table): pick a snapshot in the **Compare Snapshot** drop-down (the last control in the nav row; choose **None** or × to stop) to see ghost bars and a Changes panel (added, delayed, completed, ...). Hovering a task shows what changed since the snapshot (old → new). The drop-down is greyed out until the file has a snapshot: every Save Excel adds one. Snapshots can be named and one can be marked as the baseline.
-- **Completed Tasks** (the ✓ button right of Compare Snapshot, in every view): a panel on the right lists every finished task (status Done or 100 %), newest first, grouped by day, week or month. The date comes from the saves in the file's Log; a task finished since the last save shows as "unsaved" under today, a task created as Done counts from the save that added it, and tasks that were already done when the file's Log started count from that first save. Hover a task for its details; click it to find it in the current view.
+- **Completed Tasks** (the ✓ button right of Compare Snapshot, in every view): a panel on the right lists every finished task (status Done or 100 %), newest first, grouped by day, week or month. The date comes from the saves in the file's Log; a task finished since the last save shows as "unsaved" under today, a task created as Done counts from the save that added it, and tasks that were already done when the file's Log started count from that first save. Hover a task for its details; click it to find it in the current view. The keyboard shortcuts keep working while it is open; Esc closes it.
 - **Export:** **Settings → File → Export…** (or `x`) offers 16:9 **slides** (PNG, SVG or clipboard): the timeline (rolled up to phases, categories or tasks), the changes since a snapshot, the milestones and a one-page status; and a read-only **interactive HTML** copy you can share. Slides are made for presentations: pick any of the app's colour palettes, light or dark, add a subtitle, and get a sharp 3840 × 2160 PNG (or Standard 1920 × 1080).
 - **Settings** (the gear): grouped into foldable sections (click a section's title to fold or unfold it; only File is open at first): File (save as, **New chart** opens the start screen in a new tab, export, reload, import report, auto-save) and Display (theme and palette buttons, legend, the Hotkeys strip, compact rows, phase and category rows in the chart, colour items by phase or category, status indicators left or right of the title), then hover info (Compact, Full, Side pane or Off; the left panel's task rows show the same hover card), the Subtasks switch, Dependencies (check dependencies, moving linked tasks, uniform bar width) and Help (keyboard shortcuts and the guided tour). Every setting is tagged (this browser) or (saved in the file) to show where it is saved (explained at the top of the panel), and there are two reset buttons: Reset browser settings and Reset Excel settings. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
 - **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. The Hotkeys strip at the bottom shows the keys for what is under the mouse. Press `?` for the full list of shortcuts.
 
 ## Saving
 
-- **Save Excel** (Ctrl+S) writes your changes into the original workbook, keeping its formatting and Excel Tables, and appends a snapshot to the `Log` sheet. In Chrome and Edge a file opened with **Open Excel file** or **Recent** is saved in place; a dropped file or another browser downloads a copy instead. The message after saving shows the exact name of the downloaded file.
+- **Save Excel** (Ctrl+S) writes your changes into the original workbook, keeping its formatting and Excel Tables, and appends a snapshot to the `Log` sheet. In Chrome and Edge a file opened with **Open Excel file** or **Recent** is saved in place; a dropped file or another browser downloads a copy instead. The message after saving shows the exact name of the downloaded file. Without file access the status under the plan name says **Downloaded** and the time, so you know the opened file was not changed.
 - A new empty chart asks for a plan name the first time you save; that name is used for the downloaded file (characters a file name can't hold are removed).
 - **Excel settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, colour by, status indicators, ...) stay in your browser.
 - **Auto-save** (optional, Chrome / Edge) saves the planning sheet about a second and a half after each edit.
@@ -98,6 +98,14 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.106 — 6 Nov 2026
+
+- Messages after saving and other actions now appear at the bottom right instead of over the controls at the top.
+- Saving: two downloads in the same minute now get different names (…_2.xlsx), so the message after saving always names the file you got.
+- Clicking the plan name now says why a file can't be saved in place (dropped, or a browser without it) and what to do instead.
+- Saving: when the app can't write to your file, the status now says "Downloaded HH:MM" and the unsaved tip says a new copy is downloaded, so it no longer looks as if the opened file was saved.
+- Completed Tasks: the keyboard shortcuts of the view keep working while the panel is open (Esc still closes it first).
 
 ### v3.0.101 — 5 Nov 2026
 
