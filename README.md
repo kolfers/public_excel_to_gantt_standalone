@@ -81,8 +81,8 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Excel settings** (hover panel, Table columns, Board, Matrix and Roadmap layout, custom statuses, ...) are stored in the workbook's hidden `Gantt Settings` sheet, so everyone who opens the file sees the same layout. Personal settings (theme, palette, zoom, filters, compact rows, colour by, status indicators, ...) stay in your browser.
 - **Auto-save** (optional, Chrome / Edge) saves the planning sheet about a second and a half after each edit.
 - If a save fails the app retries three times, then shows **Not saved** and opens a dialog with tips and Retry, Save as... and Download copy. The most common cause is the file being open in Excel: close it there and click Retry. A recovery copy is kept in your browser, and the app offers to restore it the next time you open that file, with a list of what changed.
-- If the file changed on disk (for example you edited it in Excel), the app merges the changes and asks only about fields that conflict.
-- Opening the same file in a second tab shows a warning and pauses auto-save there.
+- If the file changed on disk (for example you edited it in Excel), the app merges the changes and asks only about fields that conflict. When you switch back to the app, a short message says how many tasks were updated from the file. With unsaved edits it says what changed in the file and asks whether to merge now; if you choose Not now, the status shows File changed with a Review button.
+- Opening the same file in a second tab shows a warning and pauses auto-save there until the other tab is closed; the status line shows "Auto-save paused" meanwhile, and Save Excel still works.
 - `.xlsm` files are saved in place with their macros kept. Only if the workbook cannot be patched safely does the app offer a new `.xlsx` copy (without macros).
 
 ## Coming from version 2?
@@ -98,6 +98,12 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.109 — 7 Nov 2026
+
+- A file open in two tabs: auto-save now comes back on by itself when the other tab is closed, and "Auto-save paused" shows in the status line while it is off.
+- When you switch back to the app after editing the file in Excel, a message now says how many tasks were updated from the file.
+- "File changed outside the app" now says what changed in the file, and "Not now" no longer asks again on every switch back; use Review next to "File changed" in the status line.
 
 ### v3.0.106 — 6 Nov 2026
 
