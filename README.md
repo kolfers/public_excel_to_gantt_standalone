@@ -53,7 +53,7 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Views:** six tabs, switched with `l` / `Shift+L`.
   - *Timeline*: tasks as bars on a calendar.
   - *Dependencies*: tasks laid out left to right by what they depend on.
-  - *Roadmap*: one row per phase or category, for the big picture.
+  - *Roadmap*: one row per phase or category, for the big picture; `t` jumps to today.
   - *Table*: one row per task with sortable, reorderable columns.
   - *Board*: a kanban board by status or priority; drag a card to change it; hide and reorder the columns with Panels ▾ or by dragging a column title, restore the default layout with **Reset view**, and create your own statuses with + New status (or Custom… in a task's Status list); the coloured edge of each card shows its phase or category (Settings).
   - *Matrix*: urgency by importance, in four quadrants; the coloured edge of each card shows its phase or category (Settings); drag a card to change its priority or due date; Done tasks are shown (hide them with the Active or Status filter); dropping a Done task on Do or Delegate explains why it can't go there and offers to hide Done tasks; **Reset view** restores the default rules.
@@ -98,6 +98,13 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.113 — 8 Nov 2026
+
+- The Completed Tasks button's tooltip now says that it shows or hides the list.
+- Roadmap: t jumps to today, as in the Timeline; the Today and rename buttons now show their shortcut keys.
+- Settings → File → Export… now shows its shortcut (x) and what it exports when you hover it.
+- The tour button's tooltip now says that the ? key opens the keyboard shortcuts.
 
 ### v3.0.109 — 7 Nov 2026
 
