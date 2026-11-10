@@ -59,6 +59,7 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
   - *Matrix*: urgency by importance, in four quadrants; the coloured edge of each card shows its phase or category (Settings); drag a card to change its priority or due date; Done tasks are shown (hide them with the Active or Status filter); dropping a Done task on Do or Delegate explains why it can't go there and offers to hide Done tasks; **Reset view** restores the default rules.
 - **Reorganise in the left panel:** drag a task onto another category to move it there, a category onto another phase, or a phase above or below another to reorder the phases (one undo step each). If the task has linked tasks (parents or children), you are asked whether to move them too; choose a default in Settings → Dependencies.
 - **Collapsed phases and categories:** in the Timeline and Dependencies charts a collapsed category shows **show category: Category**, and with Phase rows in the chart off a collapsed phase shows **show phase: Phase**; click it to expand.
+- **Counts and filters in the left panel:** phase and category rows count their active, overdue and done tasks; turning on a filter opens the closed groups that contain matches, and a group you close again shows how many match ("2 match").
 - **Order:** in Timeline and Dependencies the **Order** button (next to the New Task button) sets how tasks are ordered within each category. Tick the criteria to use (priority, days late, dates, urgency, progress, status and more), flip each between ascending and descending and drag them into priority order; keep tasks with a shared parent or child (direct, or the start or end of their chain) together; use one order for both views or one each. It is saved in this browser, not in the Excel file, and Reset to default restores today's order (priority, days late, start date).
 - **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
 - **Reset view:** appears in the nav row of every view once you change the view's layout or turn on a filter; one click restores the view's defaults and clears all filters (your data and browser settings stay).
@@ -72,7 +73,7 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Completed Tasks** (the ✓ button right of Compare Snapshot, in every view): a panel on the right lists every finished task (status Done or 100 %), newest first, grouped by day, week or month. The date comes from the saves in the file's Log; a task finished since the last save shows as "unsaved" under today, a task created as Done counts from the save that added it, and tasks that were already done when the file's Log started count from that first save. Hover a task for its details; click it to find it in the current view. The keyboard shortcuts keep working while it is open; Esc closes it.
 - **Export:** **Settings → File → Export…** (or `x`) offers 16:9 **slides** (PNG, SVG or clipboard): the timeline (rolled up to phases, categories or tasks), the changes since a snapshot, the milestones and a one-page status; and a read-only **interactive HTML** copy you can share. Slides are made for presentations: pick any of the app's colour palettes, light or dark, add a subtitle, and get a sharp 3840 × 2160 PNG (or Standard 1920 × 1080).
 - **Settings** (the gear): grouped into foldable sections (click a section's title to fold or unfold it; only File is open at first): File (save as, **New chart** opens the start screen in a new tab, export, reload, import report, auto-save) and Display (theme and palette buttons, legend, the Hotkeys strip, compact rows, phase and category rows in the chart, colour items by phase or category, status indicators left or right of the title), then hover info (Compact, Full, Side pane or Off; the left panel's task rows show the same hover card), the Subtasks switch, Dependencies (check dependencies, moving linked tasks, uniform bar width) and Help (keyboard shortcuts and the guided tour). Every setting is tagged (this browser) or (saved in the file) to show where it is saved (explained at the top of the panel), and there are two reset buttons: Reset browser settings and Reset Excel settings. **Info** (`i`) is a built-in guide to the app. Both panels stay docked to the side so the chart remains usable.
-- **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a compact left panel for narrow windows. The Hotkeys strip at the bottom shows the keys for what is under the mouse. Press `?` for the full list of shortcuts.
+- **Appearance:** several colour palettes (Catppuccin, Dracula, Monokai and more), light and dark mode (`m`, `p`), and a narrow left panel for small windows (the Narrow / Wide button in its header). The Hotkeys strip at the bottom shows the keys for what is under the mouse. Press `?` for the full list of shortcuts.
 
 ## Saving
 
@@ -98,6 +99,17 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.121 — 10 Nov 2026
+
+- Timeline and Dependencies: when filters hide every task, the left panel now offers Clear filters (or Show all), as the other views do.
+- Nav row: turning on a filter no longer shortens the buttons to "Act", "Ovd" and "Comp" on ordinary screens; short labels appear only in narrow windows and show the full name on hover.
+- Left panel: a phase's open-milestone flag is now grey, and turns red only when a milestone is overdue.
+- Left panel: the Compact / Full button is now called Narrow / Wide, so it is no longer confused with Settings → Compact rows.
+- Left panel: phase rows now count their active, overdue and done tasks, and turning on a filter opens the closed phases and categories that contain matches.
+- Hover card: "Last changed: since last save" now reads "Edited, not saved yet" (or "Added, not saved yet"), and the example chart no longer shows a Last changed line.
+- Left panel: a task's hover card now opens beside the panel, so it no longer hides the rows below.
+- The compact hover card now starts with the task's dates, duration, progress and status, and a milestone's card shows its date.
 
 ### v3.0.113 — 8 Nov 2026
 
@@ -181,7 +193,7 @@ Your data stays on your machine. The app makes no network requests; fonts and th
 - Search: on a narrow window the results are no longer covered by the date header in Timeline and Dependencies.
 
 ### v3.0.69 — 23 Oct 2026
-- Left panel: hovering a task shows the same details card as its bar in the chart, kept inside the panel.
+- Left panel: hovering a task shows the same details card as its bar in the chart, shown just right of the panel.
 - Hover cards show how many of a task's subtasks are done.
 - Subtasks: a task without subtasks shows an empty subtask row, so you can start typing right away.
 - Subtasks: Convert can now make each subtask a separate parent or child of the task, and each subtask has its own Convert button.
