@@ -15,7 +15,7 @@ Desktop browsers only (Chrome or Edge recommended; see [Saving](#saving)).
 
 No plan yet? Click **Try example chart**, **Start an empty chart** (the app asks you for your first task, and for a name when you first save), or **Download template**. **Download the app (one HTML file, works offline)** saves this page as a single file you can keep.
 
-The example chart opens with a short guided tour of the main features. **Stop tour** ends it, **Don't show again** switches it off (turn it back on in Settings), and the **?** button at the right end of the nav row replays the tour for the view you are in. It also points out undo (Ctrl+Z), the shortcut sheet (?) and where Compare snapshots come from.
+The example chart opens with a short guided tour of the main features. **Stop tour** ends it, **Don't show again** switches it off (turn it back on in Settings), and the tour button (the signpost at the right end of the nav row) replays the tour for the view you are in. In the views other than the Timeline it gives a short tour of just that view; **Full tour** on its cards shows everything. It also points out undo (Ctrl+Z), the shortcut sheet (?) and where Compare snapshots come from.
 
 ## Your Excel file
 
@@ -67,7 +67,7 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
 - **Link tasks:** hover a bar and drag the ◁ at the start of its hover menu onto the task it should wait for (its parent), or the ▷ at the end onto a task that should wait for it. Click a dependency line to remove it.
 - **Select several tasks:** Ctrl/Cmd+click, Shift+click for a range, Alt+click for a task and everything downstream. A bulk bar offers Status, Priority, Move to, Shift dates, Tags and Delete.
 - **Undo / redo:** Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y. Every bulk action is one step.
-- **Filters and search:** All / Active / Overdue, a filter panel (`f`) with Status, Priority, Owner, Tags and more (the Title field suggests matching task titles as you type), group by owner, and task search (`/`).
+- **Filters and search:** All / Active / Overdue, a filter panel (`f`; Esc closes it) with Status, Priority, Owner, Tags and more (the Title field suggests matching task titles as you type), group by owner, and task search (`/`).
 - **Check dependencies:** finds overlaps, cycles and missing references, and offers fixes with a preview.
 - **Compare** (Timeline, Dependencies and Table): pick a snapshot in the **Compare Snapshot** drop-down (the last control in the nav row; choose **None** or × to stop) to see ghost bars and a Changes panel (added, delayed, completed, ...). Hovering a task shows what changed since the snapshot (old → new). The drop-down is greyed out until the file has a snapshot: every Save Excel adds one. Snapshots can be named and one can be marked as the baseline.
 - **Completed Tasks** (the ✓ button right of Compare Snapshot, in every view): a panel on the right lists every finished task (status Done or 100 %), newest first, grouped by day, week or month. The date comes from the saves in the file's Log; a task finished since the last save shows as "unsaved" under today, a task created as Done counts from the save that added it, and tasks that were already done when the file's Log started count from that first save. Hover a task for its details; click it to find it in the current view. The keyboard shortcuts keep working while it is open; Esc closes it.
@@ -99,6 +99,13 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.125 — 11 Nov 2026
+
+- Filter panel: press Esc to close it; your filters stay on.
+- Tour: outside the Timeline the tour button now explains just that view; click Full tour on its card for the whole tour.
+- Filter chips now use the same words as the Filter panel, e.g. "Status: Done" and "Has dependency".
+- The tour button at the right of the nav row now shows a signpost instead of "?", so it no longer looks like the shortcuts key.
 
 ### v3.0.121 — 10 Nov 2026
 
