@@ -59,7 +59,7 @@ Rows without a title are skipped (and kept in the file). Missing or unreadable d
   - *Matrix*: urgency by importance, in four quadrants; the coloured edge of each card shows its phase or category (Settings); drag a card to change its priority or due date; Done tasks are shown (hide them with the Active or Status filter); dropping a Done task on Do or Delegate explains why it can't go there and offers to hide Done tasks; **Reset view** restores the default rules.
 - **Reorganise in the left panel:** drag a task onto another category to move it there, a category onto another phase, or a phase above or below another to reorder the phases (one undo step each). If the task has linked tasks (parents or children), you are asked whether to move them too; choose a default in Settings → Dependencies.
 - **Collapsed phases and categories:** in the Timeline and Dependencies charts a collapsed category shows **show category: Category**, and with Phase rows in the chart off a collapsed phase shows **show phase: Phase**; click it to expand.
-- **Counts and filters in the left panel:** phase and category rows count their active, overdue and done tasks; turning on a filter opens the closed groups that contain matches, and a group you close again shows how many match ("2 match").
+- **Counts and filters in the left panel:** phase and category rows count their active, overdue and done tasks; turning on a filter opens the closed groups that contain matches.
 - **Order:** in Timeline and Dependencies the **Order** button (next to the New Task button) sets how tasks are ordered within each category. Tick the criteria to use (priority, days late, dates, urgency, progress, status and more), flip each between ascending and descending and drag them into priority order; keep tasks with a shared parent or child (direct, or the start or end of their chain) together; use one order for both views or one each. It is saved in this browser, not in the Excel file, and Reset to default restores today's order (priority, days late, start date).
 - **Zoom:** Week / Month / Quarter / Year, `+` / `-` or Ctrl + scroll for finer steps (in Dependencies they make the bars wider or narrower), **Fit project**, **Today** (`t`). `v` cycles the levels.
 - **Reset view:** appears in the nav row of every view once you change the view's layout or turn on a filter; one click restores the view's defaults and clears all filters (your data and browser settings stay).
@@ -99,6 +99,10 @@ Version 3 is a rewrite and opens your v2 workbooks, with these differences:
 Your data stays on your machine. The app makes no network requests; fonts and the Excel library are inlined in the page. Recent files, view settings and recovery copies are stored only in your browser.
 
 ## Changelog
+
+### v3.0.126 — 25 Nov 2026
+
+- Left panel: a closed phase or category no longer shows the "N match" pill while a filter is on.
 
 ### v3.0.125 — 11 Nov 2026
 
